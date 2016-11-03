@@ -39,24 +39,28 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
     public function body_content()
     {           
         $ret = '';
+        include(dirname(__FILE__).'/ExceptionSaleItems.php');
         include('../config.php');
-        include('../common/lib/PriceRounder.php');
-        $rounder = new PriceRounder();
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         
         $ret .= '<div class="container">';
         $ret .= '<h4>Exception Sale Items</h4>';
+        $ret .= $this->form_content();
          
-        $query = $dbc->prepare("
+        //var_dump($items);
+        
+        list($in_sql, $args) = $dbc->safeInClause($items);
+        $query = '
             select 
                 upc, 
                 brand, 
                 description,
                 special_price 
             from products 
-            where upc = 0081878001252
-        ");
-        $result = $dbc->execute($query);
+            WHERE upc IN (' . $in_sql . ')
+        ';
+        $prep = $dbc->prepare($query);
+        $result = $dbc->execute($prep,$args);
         $data = array();
         while ($row = $dbc->fetch_row($result)) {
             $data[$row['upc']]['brand'] = $row['brand'];
@@ -75,8 +79,9 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
             </thead>';
         
         foreach ($data as $upc => $array) { 
+            $upcLink = '<a href="http://192.168.1.2/git/fannie/reports/ItemBatches/ItemBatchesReport.php?upc=' . $upc . '" target="_blank">' . $upc . '</a>';
             $ret .= '<tr>';
-            $ret .= '<td>' . $upc . '</td>';
+            $ret .= '<td>' . $upcLink . '</td>';
             $ret .= '<td>' . $array['brand'] . '</td>';
             $ret .= '<td>' . $array['desc'] . '</td>';
             $ret .= '<td>' . $array['salePrice'][0];
@@ -84,6 +89,25 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
         }
         $ret .=  '</table></div>';
         $ret .= '</div>';
+        
+        return $ret;
+    }
+    
+    public function form_content()
+    {
+        $ret .= '
+            <form method="post" class="form-inline">
+                <div class="input-group">
+                    <span class="input-group-addon">Add Item:</span>
+                    <input type="text" class="form-control" id="addItem" style="width: 175px" name="addItem" >&nbsp;&nbsp;
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon">Remove Item:</span>
+                    <input type="text" class="form-control" id="rmItem" style="width: 175px" name="rmItem" >&nbsp;&nbsp;
+                </div>
+                <button type="submit" class="btn btn-default">Add/Remove Item</button>
+            </form>
+        ';
         
         return $ret;
     }

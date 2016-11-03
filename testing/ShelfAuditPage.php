@@ -54,18 +54,21 @@ class ShelfAuditPage extends ScancoordDispatch
         if (isset($_GET['storeID'])) {
             if($_GET['storeID'] == 1) {
                 $queue = 13;
+				$ret .= 'Shelftag Queues Data for <strong>Hillside</strong>';
             } else {
                 $queue = 26;
+				$ret .= 'Shelftag Queues Data for <strong>Denfeld</strong>';
             }
         } else {
             $remote_addr = $_SERVER['REMOTE_ADDR'];
-            echo $serverIP;
             if(substr($remote_addr,0,2) == '10') {
                 $queue = 26;
                 $_GET['storeID'] = 2;
+				$ret .= 'Shelftag Queues Data for <strong>Denfeld</strong>';
             } else {
                 $queue = 13;
                 $_GET['storeID'] = 1;
+				$ret .= 'Shelftag Queues Data for <strong>Hillside</strong>';
             }
         }
         
@@ -231,7 +234,6 @@ class ShelfAuditPage extends ScancoordDispatch
     private function form_content()
     {
         return '
-            <div class="text-center container">
                 <form class ="form-inline"  method="get" > 
                     <br>
                     <div class="form-group">    
@@ -245,7 +247,6 @@ class ShelfAuditPage extends ScancoordDispatch
                         <input type="submit" class="btn btn-default" value="go">
                     </div>
                 </form>
-            </div>
         ';
     }
     

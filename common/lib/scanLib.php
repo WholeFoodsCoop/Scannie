@@ -68,6 +68,34 @@ class scanLib
             echo "<td>" . $date . "</td>";
         }   
     }
+    
+    public function dateAdjust($adjDay,$adjMonth,$adjYear)
+    {
+        /**
+        *   Takes the current date and reduce (d,m,y) by values in argument.
+        *   Returns the desired date in DATETIME format.
+        */
+        
+        $curY = date('Y') - $adjYear;
+        $curM = date('m') - $adjMonth;
+        $curD = date('d') - $adjDay;
+        
+        $date = $curY . '-' . $curM . '-' . $curD;
+        
+        return $date;
+    }
+    
 }
+
+
+
+
+
+
+
+
+
+
+
 
 

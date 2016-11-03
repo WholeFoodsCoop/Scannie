@@ -105,8 +105,9 @@ class TrackChangeNew extends ScancoordDispatch
                     . $upc . "&ntype=UPC&searchBtn=' target='_blank'>{$upc}</a>";
             $ret .=  "<div>Changes made to " . $upcLink . " <b>" . $desc[max(array_keys($desc))] . "</b></div>";
             $ret .=  "<div><i>*Changes now being sorted from newest to oldest.*</i></div>
-                &nbsp;&nbsp;&nbsp;&nbsp;<a value='back' onClick='history.go(-1);return false;'>back</a>
-              <div style='float:right'><a href='http://key/scancoord/item/last_sold_check.php?upc=" . $upc . "+&id=1'>last_sold check&nbsp;&nbsp;&nbsp;&nbsp;</a></div>
+              <a value='back' onClick='history.go(-1);return false;'>BACK</a>
+			  <span class='pipe'>&nbsp;|&nbsp;</span>
+              <a href='http://key/scancoord/item/last_sold_check.php?upc=" . $upc . "+&id=1'>LAST SOLD PAGE</a>
                 <br>";
                 
                 //<INPUT Type="button" VALUE="Back" onClick="history.go(-1);return true;">

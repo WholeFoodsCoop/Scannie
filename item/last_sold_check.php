@@ -114,6 +114,11 @@ class last_sold_check extends scancoordDispatch
         
         $ret .= '<div class="container"><h4>Item Last Sold Check</h4>';
         $ret .= self::form_content();
+        $ret .= '<a value="back" onClick="history.go(-1);return false;">BACK</a>';
+		$ret .= "<span class='pipe'>&nbsp;|&nbsp;</span>";
+		$upc = str_pad($_GET['upc'], 13, 0, STR_PAD_LEFT);
+        $ret .= '<a href="http://key/scancoord/item/TrackChangeNew.php?upc=' . $upc . '">TRACK CHANGE PAGE</a><br>';
+
         
         if ($_GET['paste_list']) {
             $ret .= self::last_sold_check_list($dbc);
@@ -337,12 +342,7 @@ class last_sold_check extends scancoordDispatch
                     
                 }
                 */
-               
-                
-
-                $ret .= '<a value="back" onClick="history.go(-1);return false;">back</a><br>';
-                $ret .= '<a href="http://key/scancoord/item/TrackChangeNew.php?upc=' . $upc . '">Track Change</a><br>';
-                
+                               
                 $ret .='<br>** if you are using this page while working on UNFI price change files -> if you cannot 
                 figure out why the Batch Page is suggesting an incorrect price AND there is more than one row in 
                 the <b>Vendor Items</b> panel, Batch Page is probably using the incorrect cost for this item. You

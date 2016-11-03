@@ -43,86 +43,109 @@ class generic_testing_page extends ScancoordDispatch
     {           
         $ret = '';
         include('../config.php');
-        include('../common/lib/PriceRounder.php');
-        $rounder = new PriceRounder();
+        //include('../common/lib/PriceRounder.php');
+        //$rounder = new PriceRounder();
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         
         if($_GET['upc']) {
             $_GET['upc'] = trim($_GET['upc']);
             $upc = str_pad($_GET['upc'], 13, 0, STR_PAD_LEFT);
         }
+
+        $ret .= $this->form_content();
+        $upcs = array();
+        //$upcString = '';
+        if ($_GET['upcs']) {
+            foreach ($_GET['upcs'] as $value) {
+                $upcs[] = $value;
+                echo $value;
+            }
+        }
+        $upcString = implode(",",$upcs);
+        echo $upcString;
          
-        $query = $dbc->prepare("select upc, brand, description from products limit 25");
+        $query = $dbc->prepare("
+            select 
+                pu.upc, 
+                pu.description, 
+                pu.modified, 
+                pu.cost,
+                p.brand
+            from prodUpdate as pu
+                left join products as p on pu.upc=p.upc
+            where pu.upc in (411,818,4011,218,217,425,495,666) 
+            group by pu.cost, pu.upc 
+            order by pu.upc, pu.modified;");
         $result = $dbc->execute($query);
-        $data = array();
-        $headers = array();
-        $i = 0;
+        if ($dbc->error()) echo $dbc->error();
+        
+        $item = array( array(
+            'cost',
+            'modified',
+            'days',
+            'description',
+            'brand'
+        ));
+        
         while ($row = $dbc->fetch_row($result)) {
-            foreach ($row as $k => $v) {
-                if(!is_numeric($k)) {
-                    $data[$i][$k] =  $v;
-                    $headers[$k] = $k;
-                }
-            }
-            $i++;
+            $item[$row['upc']]['cost'][$row['modified']] = $row['cost'];
+            $item[$row['upc']]['description'] = $row['description'];
+            $item[$row['upc']]['brand'] = $row['brand'];
         }
-        
-        /*  Add a column
-        $i = 0;
-        foreach ($data as $k => $array) { 
-            $newColumnName = 'column_name';
-            $data[$i][$newColumnName] = 'data_to_put_into_column';
-            $headers[$newColumnName] = $newColumnName;
-            $i++;
-        }
-        */
-        
-        /*  Add a flags
-        $i = 0;
-        $flags = array();
-        foreach ($data as $k => $array) { 
-            if ('condition') {
-                $flags['flag_type'][] = $i;
-            }
-            $i++;
-        }
-        */
-        
-        echo '<div class="panel panel-default"><table class="table table-striped">';
-        echo '<thead>';
-        foreach ($headers as $v) {
-            echo '<th>' . $v . '</th>';
-        }
-        echo '</thead>';
-        $prevKey = '1';
-        echo '<tr>';
-        foreach ($data as $k => $array) { 
-            foreach ($array as $kb => $v) {
-                echo '<td> ' . $v . '</td>'; 
-            }
-            if($prevKey != $k) {
-                /*  highlight Flagged rows
-                if (in_array(($k+1),$flags['flag_name'])) {
-                    echo '</tr><tr class="" style="background-color:tomato;color:white">';
-                } else {
-                    echo '</tr><tr>';
-                }
-                */
-                /*  rows w/ no flags */
-                echo '</tr><tr>';
-            } 
-            $prevKey = $k;
+
+		echo '<div class="panel panel-default">';        
+        echo '<table class="table table-condensed table-striped small">';
+        echo '
+            <thead>
+                <th>upc</th>
+                <th>brand</th>
+                <th>description</th>
+                <th>cur cost</th>
+                <th>prev cost</th>
+                <th>modified</th>
+				<th>ago</th>
+            </thead>
+        ';
+        foreach ($item as $upc => $data) {
+            echo '<tr>';
+            echo '<td>' . $upc . '</td>';
+            echo '<td>' . $data['brand'] . '</td>';
+            echo '<td>' . $data['description'] . '</td>';
+            echo '<td>' . end($data['cost']) . '</td>';
+            echo '<td><span style="color:grey">' . prev($data['cost']) . '</span></td>';
+            echo '<td>' . substr(key($data['cost']),0,10) . '<span style="color:lightgrey">';
+            echo ' ' . substr(key($data['cost']),11,5) . '</span></td>';
+			$new = strtotime(key($data['cost']));
+			end($data['cost']);
+			$prev = strtotime(key($data['cost']));
+			$elapsed = $prev - $new;
+			$elapsed = $this->time_elapsed($elapsed);
+			
+            echo '<td>' . $elapsed . '</td>';
+
         }
         echo '</table></div>';
+
         
-        /*
-        $upcLink = "<a href='http://key/git/fannie/item/ItemEditorPage.php?searchupc=" 
-                . $upc . "&ntype=UPC&searchBtn=' target='_blank'>{$upc}</a>";
-        */
-        if ($dbc->error()) echo $dbc->error();
+
         
         return $ret;
     }
+
+	private function time_elapsed($secs)
+	{
+		$bit = array(
+			'y' => $secs / 31556926 % 12,
+			'w' => $secs / 604800 % 52,
+			'd' => $secs / 86400 % 7
+		);
+		foreach($bit as $k => $v) 
+		{
+			if ($v>0) $ret[] = $v . $k;
+		}
+
+		return join(' ',$ret);
+	}
     
     private function form_content()
     {
@@ -131,10 +154,10 @@ class generic_testing_page extends ScancoordDispatch
                 <form class ="form-inline"  method="get" > 
                     <br>
                     <div class="form-group">    
-                        <input type="text" class="form-control" name="upc" placeholder="enter plu to track" autofocus>
+                        <textarea class="form-control" name="upcs"></textarea>
                     </div>
                     <div class="form-group">
-                        <input type="submit" class="btn btn-default" value="submit">
+                        <input type="submit" class="btn btn-default btn-sm" value="submit">
                     </div>
                 </form>
             </div>

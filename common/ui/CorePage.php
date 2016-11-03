@@ -125,6 +125,14 @@ class ScancoordDispatch
     border-image-repeat: repeat;
     border-image: url(/scancoord/common/src/img/greyborder.png) 25 round;
 }
+.btn-default {
+    background: lightgrey; /* For browsers that do not support gradients */
+    //background: -webkit-linear-gradient(white, lightgrey); /* For Safari 5.1 to 6.0 */
+    //background: -o-linear-gradient(white, lightgrey); /* For Opera 11.1 to 12.0 */
+    //background: -moz-linear-gradient(white, lightgrey); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(white, lightgrey); /* Standard syntax */
+
+}
 /*  Dark Theme - looks really, really pitifull...
 body, table, th, tr, td {
     background-color: #272822;
