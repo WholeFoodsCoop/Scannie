@@ -68,16 +68,19 @@ function changeStoreID(button, store_id)
     <button class="btn btn-default" type="button" onclick="changeStoreID(this, 2); return false; window.location.reload();">Denfeld</button>
 </div>
 <?php
+foreach ($_GET as $key => $value) {
+    //echo $key . ' ' . $value . '<br>';
+    if ($key == 'queue') $thisQueue = $value;
+}
+
+
+
 if(isset($_POST['session'])) $_SESSION['session'] = $_POST['session'];
     
 include('../../config.php');
 $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANALTDB, $SCANUSER, $SCANPASS);
 
 $curQueue = $_GET['queue'];
-
-$queueNames = get_queue_name($dbc);
-
-//$curQueue = $_GET['curQueue'];
 
 if($_SESSION['store_id'])
 {
@@ -100,6 +103,11 @@ function get_queue_name($dbc)
 
 function draw_table($dbc)
 {
+ 
+    $curQueue = $_GET['queue'];
+    $queueNames = array();
+    $queueNames = get_queue_name($dbc);
+    
     $query = "SELECT session 
         FROM SaleChangeQueues
         GROUP BY session
@@ -125,7 +133,7 @@ function draw_table($dbc)
         
     $id = $_SESSION['store_id'];
     $sess = $_SESSION['session'];
-    $args = array($id,$sess);
+    $args = array($curQueue,$id,$sess);
     $prep = $dbc->prepare("
         SELECT q.queue, u.brand, u.description,
                 u.upc, p.size, p.normal_price, ba.batchName,
@@ -135,7 +143,7 @@ function draw_table($dbc)
                     LEFT JOIN is4c_op.productUser as u on u.upc=p.upc
                     LEFT JOIN is4c_op.batchList as bl on bl.upc=p.upc
                     LEFT JOIN is4c_op.batches as ba on ba.batchID=bl.batchID
-                WHERE q.queue=1
+                WHERE q.queue= ?
                     AND q.store_id= ?
                     AND q.session= ?
                 GROUP BY upc
@@ -179,15 +187,8 @@ function draw_table($dbc)
     if ($dbc->error()) {
         echo $dbc->error(). "<br>";
     }
-
-    //echo "<h1 align='center'>Good Tags</h1>";
-    if ($curQueue == 0) {
-        echo "<h1 align='center'>Unchecked</h1>";
-    } elseif ($curQueue == 1) {
-        echo "<h1 align='center'>Good</h1>";
-    }
     
-    echo "<h1 align='center'>QUEUE NAME: " . $queueNames[$_GET['queue']] . "</h1>";
+    echo "<h1 align='center'>".ucwords($queueNames[$curQueue])."</h1>";
     
     echo "<div align='center'>";
     if ($_SESSION['store_id'] == 1) {
@@ -207,17 +208,18 @@ function draw_table($dbc)
           <th>Batch</th>
           <th></th><th></th><th></th>";
     foreach ($upcs as $upc => $v) {
-        if ($upc[$i] >= 0) {
+        if ($upc >= 0) {
             echo "<tr><td>" . $brand[$upc] . "</td>"; 
             echo "<td>" . $desc[$upc] . "</td>"; 
             echo "<td>" . $size[$upc] . "</td>"; 
             echo "<td>" . $price[$upc] . "</td>"; 
             echo "<td>" . $upcLink[$upc] . "</td>"; 
             echo "<td>" . $batch[$upc] . "</td>";    
-            echo "<td><button class=\"btn btn-default\" type=\"button\" onclick=\"sendToQueue(this, '{$upc[$i]}', 2, '{$_SESSION['session']}'); return false;\">Error</button></td>";    
-            echo "<td><button class=\"btn btn-default\" type=\"button\" onclick=\"sendToQueue(this, '{$upc[$i]}', 8, '{$_SESSION['session']}'); return false;\">Missing</button></td>";  
-            echo "<td><button class=\"btn btn-default\" type=\"button\" onclick=\"sendToQueue(this, '{$upc[$i]}', 0, '{$_SESSION['session']}'); return false;\">Unchecked</button></tr>";  
+            echo "<td><button class=\"btn btn-default\" type=\"button\" onclick=\"sendToQueue(this, '{$upc}', 1, '{$_SESSION['session']}'); return false;\">Good</button></td>";    
+            echo "<td><button class=\"btn btn-default\" type=\"button\" onclick=\"sendToQueue(this, '{$upc}', 8, '{$_SESSION['session']}'); return false;\">Missing</button></td>";    
+            echo "<td><button class=\"btn btn-default\" type=\"button\" onclick=\"sendToQueue(this, '{$upc}', 98, '{$_SESSION['session']}'); return false;\">DNC</button></td>";    
+            
         }
     }
     echo "</table>";
-    } 
+} 

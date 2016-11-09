@@ -16,7 +16,7 @@ printf ('
     <table class="table">
         <tr><td><a class="btn" href="ListGen.php"> Generate List </a>&nbsp;&nbsp;
             <a class="btn" href="ListRemove.php"> Delete Lists </a></td></tr>                                   
-        <tr><td><a class="btn" href="SalesChangeQueuesUnchecked.php"> Review Data  </a></td></tr>                 
+        <tr><td><a class="btn" href="SalesChangeQueues.php"> Review Data  </a></td></tr>                 
         <tr><td><a class="btn" href="SaleChangeScanner.php"> Scanner </a></td></tr>                               
         <tr><td><a class="btn" href="../SignInfoHelper.php"> Sale Item Report </a></td></tr>                                
         <tr><td><a class="btn" href="http://192.168.1.2/git/fannie/item/CoopDealsLookupPage.php"> Check Coop Deals </a></td></tr>                                
