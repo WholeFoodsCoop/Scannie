@@ -42,6 +42,7 @@ class ShelfAuditPage extends ScancoordDispatch
         
         include('../config.php');
         include('../common/lib/PriceRounder.php');
+        include('../common/lib/scanLib.php');
         $rounder = new PriceRounder();
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         
@@ -50,28 +51,15 @@ class ShelfAuditPage extends ScancoordDispatch
             $_GET['upc'] = trim($_GET['upc']);
             $upc = str_pad($_GET['upc'], 13, 0, STR_PAD_LEFT);
         }
-        
-        if (isset($_GET['storeID'])) {
-            if($_GET['storeID'] == 1) {
-                $queue = 13;
-				$ret .= 'Shelftag Queues Data for <strong>Hillside</strong>';
-            } else {
-                $queue = 26;
-				$ret .= 'Shelftag Queues Data for <strong>Denfeld</strong>';
-            }
+
+        $store_id = scanLib::getStoreID();
+        if($store_id == 2) {
+            $queue = 26;
+            $ret .= 'Shelftag Queues Data for <strong>Denfeld</strong>';
         } else {
-            $remote_addr = $_SERVER['REMOTE_ADDR'];
-            if(substr($remote_addr,0,2) == '10') {
-                $queue = 26;
-                $_GET['storeID'] = 2;
-				$ret .= 'Shelftag Queues Data for <strong>Denfeld</strong>';
-            } else {
-                $queue = 13;
-                $_GET['storeID'] = 1;
-				$ret .= 'Shelftag Queues Data for <strong>Hillside</strong>';
-            }
+            $queue = 13;
+            $ret .= 'Shelftag Queues Data for <strong>Hillside</strong>';
         }
-        
         
         
         $ret .= $this->form_content();
@@ -211,7 +199,7 @@ class ShelfAuditPage extends ScancoordDispatch
             if($prevKey != $k) {
                 if (in_array(($k+1),$flags['danger'])) {
                     $ret .=  '</tr><tr class="" style="background-color:tomato;color:white">';
-                } elseif (in_array(($k+1),$flags['warning'])) {
+	                } elseif (in_array(($k+1),$flags['warning'])) {
                     $ret .=  '</tr><tr class="" style="background-color:#FFF457;">';
                 } else {
                     $ret .=  '</tr><tr>';

@@ -57,8 +57,10 @@ class menu
             <li class="dropdown"><a style="width:160px;" class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">Data Monitor<span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                 <li class="dropdown-header">Discrepancy Tasks</li>
-                    <li><a href="http://192.168.1.2/scancoord/dataScanning/multiStoreDiscrepanciesPage.php">Multi-Store Prod Discrep</a></li>
                     <li><a href="http://192.168.1.2/scancoord/dataScanning/zeroPriceCheck.php">Bad Price Scan</a></li>
+                    <li><a href="http://192.168.1.2/scancoord/dataScanning/ExceptionSaleItemTracker.php">Exception Sale Items</a></li>
+                    <li><a href="http://192.168.1.2/scancoord/dataScanning/multiStoreDiscrepanciesPage.php">Multi-Store Prod Discrep</a></li>
+                    
             </ul>
             </li>
             
@@ -136,7 +138,7 @@ td.ltgrey {
 
 <script language="javascript" type="text/javascript">
 function popitup(url) {
-	newwindow=window.open(url,'name','height=400,width=300');
+	newwindow=window.open(url,'name','height=320,width=300');
 	if (window.focus) {newwindow.focus()}
 	return false;
 }

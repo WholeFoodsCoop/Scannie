@@ -173,7 +173,6 @@ if ($_POST['dept'] == 5){
 }
 echo " on {$_POST['startdate']} ";
 echo " for {$_POST['store_id']} <br>";
-echo "<a href=\"http://key/scancoord/BatchBreakdowns.php\" tarPOST='_blank'>Check For Breakdown Items in Batches</a><br>";
 
 //procure description of items based on 'upc's, and return their descriptions, organized by department and brand 
 for ($i = 0; $i < $upc_count; $i++) {

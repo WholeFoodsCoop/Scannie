@@ -189,6 +189,7 @@ function draw_table($dbc)
     }
     
     echo "<h1 align='center'>".ucwords($queueNames[$curQueue])."</h1>";
+    if (!isset($curQueue)) echo "<h1 align='center'>Home Page (No Queue Selected)</h1>";
     
     echo "<div align='center'>";
     if ($_SESSION['store_id'] == 1) {
@@ -199,6 +200,12 @@ function draw_table($dbc)
     echo "<span style='color:purple'>" . $_SESSION['session'] . "</span>";
     echo "</div>";
     echo "<p align='center'>" . count($upcs) . " tags in this queue</p>";
+    if (count($upcs) > 0) {
+        echo '<a href="" onclick="$(\'#cparea\').show(); return false;">Copy/paste</a><br />';
+        echo '<textarea id="cparea" class="collapse">';
+        echo implode("\n", $upcs);
+        echo '</textarea>';
+    }
     echo "<table class=\"table table-striped\">";
     echo "<th>Brand</th>
           <th>Name</th>
@@ -214,12 +221,20 @@ function draw_table($dbc)
             echo "<td>" . $size[$upc] . "</td>"; 
             echo "<td>" . $price[$upc] . "</td>"; 
             echo "<td>" . $upcLink[$upc] . "</td>"; 
-            echo "<td>" . $batch[$upc] . "</td>";    
-            echo "<td><button class=\"btn btn-default\" type=\"button\" onclick=\"sendToQueue(this, '{$upc}', 1, '{$_SESSION['session']}'); return false;\">Good</button></td>";    
-            echo "<td><button class=\"btn btn-default\" type=\"button\" onclick=\"sendToQueue(this, '{$upc}', 8, '{$_SESSION['session']}'); return false;\">Missing</button></td>";    
-            echo "<td><button class=\"btn btn-default\" type=\"button\" onclick=\"sendToQueue(this, '{$upc}', 98, '{$_SESSION['session']}'); return false;\">DNC</button></td>";    
+            echo "<td>" . $batch[$upc] . "</td>";
             
+            if ($curQueue == 7) {
+                echo "<td><a class=\"btn btn-default\" href=\"http://192.168.1.2/git/fannie/item/handheld/ItemStatusPage.php?id={$upc}\" target=\"_blank\">status check</a></tr>";  
+            } else {
+                echo "<td><button class=\"btn btn-default\" type=\"button\" onclick=\"sendToQueue(this, '{$upc}', 1, '{$_SESSION['session']}'); return false;\">Good</button></td>";    
+                echo "<td><button class=\"btn btn-default\" type=\"button\" onclick=\"sendToQueue(this, '{$upc}', 8, '{$_SESSION['session']}'); return false;\">Missing</button></td>";    
+                echo "<td><button class=\"btn btn-default\" type=\"button\" onclick=\"sendToQueue(this, '{$upc}', 98, '{$_SESSION['session']}'); return false;\">DNC</button></td>";    
+            }  
+            if ($curQueue == 99) {
+                echo "<td><button class=\"btn btn-default\" type=\"button\" onclick=\"sendToQueue(this, '{$upc}', 0, '{$_SESSION['session']}'); return false;\">Unchecked</button></td>";    
+            }
         }
     }
     echo "</table>";
+
 } 

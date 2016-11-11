@@ -85,6 +85,18 @@ class scanLib
         return $date;
     }
     
+    public function getStoreID()
+    {
+        $remote_addr = $_SERVER['REMOTE_ADDR'];
+        if(substr($remote_addr,0,2) == '10') {
+            $store_id = 2;
+        } else {
+            $store_id = 1;
+        }
+        
+        return $store_id;
+    }
+    
 }
 
 

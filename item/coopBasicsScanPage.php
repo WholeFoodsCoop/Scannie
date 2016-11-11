@@ -62,9 +62,21 @@ class coopBasicsScanPage
     {        
     
         include('../config.php');
+        include('../common/lib/scanLib.php');
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         
-        print self::form_content($dbc);
+        $store_id = scanLib::getStoreID();
+        if($store_id == 2) {
+            $shelftagid = 26;
+            echo '<h4>Coop Basics Review for <strong>Denfeld</strong></h4>';
+        } else {
+            $shelftagid = 13;
+            echo '<h4>Coop Basics Review for <strong>Hillside</strong></h4>';
+        }
+        
+        echo "don't forget to upload Coop Basics checklist to Generic Upload.<br>";
+        
+        //print self::form_content($dbc);
         /*
         print = '
             <u>To use</u><br>
@@ -75,17 +87,8 @@ class coopBasicsScanPage
             </ul><br>
         ';*/
         
-        $store_id = NULL;    
-        if (isset($_GET['store_id'])) {
-            if ($_GET['store_id'] == 1) {
-                $shelftagid = 13;
-                $store_id = 1;
-            } else {
-                $shelftagid = 26;
-                $store_id = 2; 
-            }
-        }
-        
+        //$store_id = NULL;    
+                
         if (isset($_GET['session'])) {
             $session = substr($_GET['session'],0,-1);
             echo $session  . "<br>";

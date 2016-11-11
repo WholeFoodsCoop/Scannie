@@ -39,10 +39,11 @@ class last_sold_check extends scancoordDispatch
     {
         $ret = "";
         $ret .= '
-            <form method="get">
+            <form method="get" class="form-inline">
                 <textarea class="form-control" style="width:170px" name="upcs"></textarea>
                 <input type="hidden" name="paste_list" value="1">
-                <button type="submit" class="btn btn-xs">Submit</button>
+                <img src="../common/src/img/back.png" height="10px" width="10px"> 
+                <button type="submit" class="btn btn-default btn-xs">Submit</button>
             </form>
         ';
 
@@ -366,7 +367,7 @@ class last_sold_check extends scancoordDispatch
                 <input type="submit" value="submit" id="btn-core" class="btn btn-default btn-core">
             </form>
             <form method="get">
-                or <button type="submit" class="btn  btn-xs" " name="paste_list" value="1">Copy/Paste a List of UPCs</button>
+                or <button type="submit" class="btn  btn-default btn-xs" " name="paste_list" value="1">Copy/Paste a List of UPCs</button>
             </form>
         ';
     }

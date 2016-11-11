@@ -131,9 +131,15 @@ class ScancoordDispatch
     //background: -o-linear-gradient(white, lightgrey); /* For Opera 11.1 to 12.0 */
     //background: -moz-linear-gradient(white, lightgrey); /* For Firefox 3.6 to 15 */
     background: linear-gradient(white, lightgrey); /* Standard syntax */
-
 }
-/*  Dark Theme - looks really, really pitifull...
+.btn-danger {
+    background: lightgrey; /* For browsers that do not support gradients */
+    //background: -webkit-linear-gradient(#d99696, #d64f4f); /* For Safari 5.1 to 6.0 */
+    //background: -o-linear-gradient(#d99696, #d64f4f); /* For Opera 11.1 to 12.0 */
+    //background: -moz-linear-gradient(#d99696, #d64f4f); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(#d99696, #d64f4f); /* Standard syntax */
+}
+/*  Cmder Themed
 body, table, th, tr, td {
     background-color: #272822;
     color: #cacaca;
@@ -162,6 +168,7 @@ body, table, th, tr, td {
     background-color: #272822;
     color: #cacaca;
 }
+
 */
         ';
     }

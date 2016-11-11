@@ -36,16 +36,34 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
     protected $description = "[Exception Sales] Monitor special prices of sale items.";
     protected $ui = TRUE;
     
+    function preprocess()
+    {
+        
+    }
+    
     public function body_content()
     {           
         $ret = '';
-        include(dirname(__FILE__).'/ExceptionSaleItems.php');
+        //include(dirname(__FILE__).'/ExceptionSaleItems.php');
         include('../config.php');
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         
         $ret .= '<div class="container">';
         $ret .= '<h4>Exception Sale Items</h4>';
         $ret .= $this->form_content();
+        
+        if (strlen($_POST['addItem']) == 13) {
+            $addItem = $_POST['addItem'];
+            $prep = $dbc->prepare("insert into woodshed_no_replicate.exceptionItems (upc) values (?)");
+            $dbc->execute($prep,$addItem);
+            unset($_POST['addItem']);
+        }
+        if ($_POST['rmItem']) {
+            $rmItem = $_POST['rmItem'];
+            $prep = $dbc->prepare("delete from woodshed_no_replicate.exceptionItems where upc = ?");
+            $dbc->execute($prep,$rmItem);
+            unset($_POST['rmItem']);
+        }
          
         //var_dump($items);
         
@@ -57,7 +75,7 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
                 description,
                 special_price 
             from products 
-            WHERE upc IN (' . $in_sql . ')
+            WHERE upc IN (SELECT upc FROM woodshed_no_replicate.exceptionItems)
         ';
         $prep = $dbc->prepare($query);
         $result = $dbc->execute($prep,$args);
