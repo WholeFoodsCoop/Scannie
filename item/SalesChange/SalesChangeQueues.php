@@ -137,7 +137,7 @@ function draw_table($dbc)
     $prep = $dbc->prepare("
         SELECT q.queue, u.brand, u.description,
                 u.upc, p.size, p.normal_price, ba.batchName,
-                p.special_price as price, ba.batchID
+                p.special_price as price, ba.batchID, q.notes
                 FROM SaleChangeQueues as q
                     LEFT JOIN is4c_op.products as p on p.upc=q.upc
                     LEFT JOIN is4c_op.productUser as u on u.upc=p.upc
@@ -158,6 +158,7 @@ function draw_table($dbc)
         $queue[$upc] = $row['queue'];
         $size[$upc] = $row['size'];
         $price[$upc] = $row['price'];
+        $notes[$upc] = $row['notes'];
         $upcLink[$upc] = "<a href='http://key/git/fannie/item/ItemEditorPage.php?searchupc=" 
                     . $row['upc'] 
                     . "&ntype=UPC&searchBtn=' class='blue' target='_blank'>{$row['upc']}
@@ -206,6 +207,7 @@ function draw_table($dbc)
         echo implode("\n", $upcs);
         echo '</textarea>';
     }
+
     echo "<table class=\"table table-striped\">";
     echo "<th>Brand</th>
           <th>Name</th>
@@ -222,6 +224,7 @@ function draw_table($dbc)
             echo "<td>" . $price[$upc] . "</td>"; 
             echo "<td>" . $upcLink[$upc] . "</td>"; 
             echo "<td>" . $batch[$upc] . "</td>";
+            if ($curQueue == 2) echo "<td><strong>" . $notes[$upc] . "</strong></td>";
             
             if ($curQueue == 7) {
                 echo "<td><a class=\"btn btn-default\" href=\"http://192.168.1.2/git/fannie/item/handheld/ItemStatusPage.php?id={$upc}\" target=\"_blank\">status check</a></tr>";  

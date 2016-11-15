@@ -159,10 +159,6 @@ class last_sold_check extends scancoordDispatch
             while ($row = mysql_fetch_assoc($result)) {
                 if ($row['store_id'] == 1) $row['store_id'] = 'Hillside';
                 else $row['store_id'] = 'Denfeld';
-                if ($i == 0) {
-                    if ($row['last_sold'] == NULL) $ret .= '<div class="alert alert-danger sm">No sale records for this item at ' . $row['store_id'] . '.</div>';
-                }
-                $i++;
                 //$ret .= '<tr><td>' . $row['store_id'] . '</td><td>' . substr($row['last_sold'], 0, 10) . '</tr>';
                 $year = substr($row['last_sold'], 0, 4);
                 $month = substr($row['last_sold'], 5, 2);

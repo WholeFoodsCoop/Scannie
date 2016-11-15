@@ -139,6 +139,10 @@ class ScancoordDispatch
     //background: -moz-linear-gradient(#d99696, #d64f4f); /* For Firefox 3.6 to 15 */
     background: linear-gradient(#d99696, #d64f4f); /* Standard syntax */
 }
+.table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
+   background-color: #fff7f0;
+}
+
 /*  Cmder Themed
 body, table, th, tr, td {
     background-color: #272822;

@@ -34,6 +34,7 @@ class menu
                 <li><a href="http://192.168.1.2/scancoord/item/last_sold_check.php">Last Sold</a></li>
                 <li><a href="http://192.168.1.2/scancoord/item/TrackChangeNew.php">Track Change</a></li>
                 <li><a href="" onclick="popitup(\'http://key/scancoord/item/marginCalc.php\')">Margin Calc</a></li>
+                <li><a href="" onclick="popitup(\'http://key/scancoord/item/PercentCalc.php\')">Percent Calc</a></li>
             </ul></li>
             
             <li class="dropdown"><a style="width:160px;" class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">Batches<span class="caret"></span></a>
@@ -47,6 +48,7 @@ class menu
                     <li><a href="http://192.168.1.2/scancoord/item/Batches/unfiBreakdowns.php">Breakdown</a></li>
                     <li><a href="http://192.168.1.2/scancoord/item/SignInfoHelper.php">Sign Info</a></li>
                     <li><a href="http://192.168.1.2/scancoord/item/Batches/prodBatchHistory.php">Item Batch History</a></li>
+                    <li><a href="http://192.168.1.2/scancoord/testing/CoopDealsSearchPage.php">Coop+Deals File</a></li>
                 <li class="divider"></li><!-- divider with no header -->
                 <li class="dropdown-header">Price Changes</li>
                     <li><a href="http://192.168.1.2/scancoord/item/Batches/batchForceCheck.php">Batch Force Check</a></li>
