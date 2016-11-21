@@ -20,40 +20,47 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     
 *********************************************************************************/
-include('../../../../../../var/www/html/git/fannie/config.php');
-if (!class_exists('FannieAPI')) {
-    include('../../../../../../var/www/html/git/fannie/classlib2.0/FannieAPI.php');
+include('../../config.php');
+if (!class_exists('ScancoordDispatch')) {
+    include($SCANROOT.'/common/ui/CorePage.php');
+}
+if (!class_exists('SQLManager')) {
+    include_once(dirname(dirname(dirname(__FILE__))) . '/common/sqlconnect/SQLManager.php');
 }
 /**
 *   @class CoopDealsBadPriceCheck
 *
 *   Find bad deals & missing sign info in Batches.
 */
-class CoopDealsReviewPage
+class CoopDealsReview extends ScancoordDispatch
 {
     
-    protected $title = 'Bad Price Check';
+    protected $title = 'Coop Deals Review Page';
+    protected $description = "[CDRP] All-in-one Co-op Deals Reviews.";
+    protected $ui = TRUE;
     
-    public function view() {
+    public function body_content() {
+        
         include('../../config.php');
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         
-        print self::form_content();
-        $start = FormLib::get('startDate');
+        $ret = '';
+        $ret .= $this->form_content();
+        $start = $_GET['startDate'];
         if (isset($start)) {
-            print self::getBadPriceItems($dbc) 
-                . self::getMissingSignText($dbc)    
-                . self::getBadPrices($dbc);
+            $ret .= $this->getBadPriceItems($dbc);
+            $ret .= $this->getMissingSignText($dbc);
+            $ret .= $this->getBadPrices($dbc);
         }
         
-        return false;
+        return $ret;
     }
     
     private function getBadPrices($dbc)
     {
         $ret = '';
         
-        $startDate = FormLib::get('startDate');
+        $startDate = $_GET['startDate'];;
         $query = $dbc->prepare("
             SELECT bl.*, p.brand, p.description, p.normal_price
             FROM batchList AS bl 
@@ -75,13 +82,13 @@ class CoopDealsReviewPage
         }
         $ret .= $dbc->error();
         
-        $ret .='<fieldset style="border: 1px dotted black; width: 650px; float:left">
-            <legend>Items with HIGH % Deals</legend>';
-        $ret .= '<table>';
+        $ret .='<div class="panel panel-default" style="float:left" >
+            <legend class="panel-heading small">Items with HIGH % Deals</legend>';
+        $ret .= '<table class="table table-default table-condensed small">';
         foreach ($discount as $upc => $percent) {
             $batchL = '<a href="http://192.168.1.2/git/fannie/batches/newbatch/EditBatchPage.php?id=' 
 				. $percent['batchID'] .'" target="_blank">' . $percent['batchID'] . '</a>';
-            if ($percent['off'] > 60) {
+            if ($percent['off'] > 60 && !strstr($upc,"LC")) {
                 $ret .= '<tr>';
                 $ret .= '<td>' . $upc . '</td><td>' . sprintf('%d',$percent['off']) . '% OFF</td>';
                 $ret .= '<td>' . $percent['description'] . '</td>';
@@ -89,17 +96,17 @@ class CoopDealsReviewPage
                 $ret .= '</tr>';
             }
         }
-        $ret .= '</table></fieldset>';
+        $ret .= '</table></div>';
         
         return $ret;
     }
     
     private function getMissingSignText($dbc)
     {
-        $startDate = FormLib::get('startDate');
+        $startDate = $_GET['startDate'];;
         $ret = '';
-        $ret .='<fieldset style="border: 1px dotted black; width: 650px; float:left">
-            <legend>Items Missing Sign Text</legend>';
+        $ret .='<div class="panel panel-default" style="float:left" >
+            <legend class="panel-heading small">Items Missing Sign Text</legend>';
          
         $query = $dbc->prepare("
             SELECT 
@@ -121,7 +128,7 @@ class CoopDealsReviewPage
         ;");
         
         $result = $dbc->execute($query);
-        $ret .= '<table>';
+        $ret .= '<table class="table table-default table-condensed small">';
         while ($row = $dbc->fetchRow($result)) {
             $ret .= '<tr>';
             $ret .= '<td>' . $row['upc'] . '</td>';
@@ -138,16 +145,17 @@ class CoopDealsReviewPage
         }
         $ret .= '</table>';
         
-        $ret .= '</fieldset>';
+        $ret .= '</div>';
+        
         return $ret;
     }
     
     private function getBadPriceItems($dbc)
     {           
-        $startDate = FormLib::get('startDate');
+        $startDate = $_GET['startDate'];
         $ret = '';
-        $ret .='<fieldset style="border: 1px dotted black; width: 500px; float:left">
-            <legend>Items with Bad Sales Prices</legend>';
+        $ret .='<div class="panel panel-default" style="float:left" >
+            <legend class="panel-heading small">Items with Bad Sales Prices</legend>';
         
         $query = $dbc->prepare("
             SELECT bl.*, p.brand, p.description
@@ -160,7 +168,7 @@ class CoopDealsReviewPage
         ");
         
         $result = $dbc->execute($query);
-		$ret .= '<table>';
+		$ret .= '<table class="table table-default table-condensed small">';
         while ($row = $dbc->fetchRow($result)) {
 			$editL = '<a href="http://192.168.1.2/git/fannie/item/ItemEditorPage.php?searchupc=' . $row['upc'] . '" target="_blank">' . $row['upc'] . '</a> ';
             $batchL = '<a href="http://192.168.1.2/git/fannie/batches/newbatch/EditBatchPage.php?id=' 
@@ -175,17 +183,9 @@ class CoopDealsReviewPage
 		$ret .= '</table>';
         
         $result = $dbc->execute($query);
-        $ret .= '
-            &nbsp;&nbsp;<span style="color:grey">copy/paste</span><br>
-            &nbsp;&nbsp;<textarea class="" style="height:100px;">
-        ';
-        while ($row = $dbc->fetchRow($result)) {
-            $ret .= $row['upc'] . "\r";
-        }
-        $ret .= '</textarea><br>';
-        $ret .= '<span class="danger">' . $dbc->error() . '</span>';
+       
         
-        $ret .= '</fieldset>';
+        $ret .= '</div>';
         
         return $ret;
     }
@@ -194,18 +194,19 @@ class CoopDealsReviewPage
     {
         $ret = ''; 
         $ret .= '
-            <fieldset style="border: 1px dotted black; width: 300px;height:50px">
-                <legend>Start Date</legend>
-                <form method="get">
-                    <input type="date" name="startDate">
-                    <button type="submit">Submit</button>
+            
+                <strong>Start Date</strong>
+                <form method="get" class="form-inline">
+                    <input type="date" class="form-control" name="startDate">
+                    <button type="submit" class="btn btn-default">Submit</button>
                 </form>
-            </fieldset>
+            
         ';
         return $ret;
     }
     
     
 }
-CoopDealsReviewPage::view();
+
+ScancoordDispatch::conditionalExec();
 
