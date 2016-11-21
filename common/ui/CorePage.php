@@ -42,7 +42,7 @@ class ScancoordDispatch
         
         if ($this->ui === TRUE) {
             print '
-                <div class="container" style="width:95%;">
+                <div class="container" style="width:95%; ">
                     <div style="font-size:28px;margin-bottom:5px;" class="primaryColor">
                         <img src="/scancoord/common/src/img/scanner.png" style="width:75px;heigh:75px;float:left">
                         <a href="/scancoord">Scannie</a>
@@ -55,7 +55,7 @@ class ScancoordDispatch
                 </div>
             ';
             //print '<div class="container" id="border" style="width:95%;padding:5px">';
-            print '<div class="container" id="" style="width:95%;border:1px solid lightgrey;padding:border:1px solid lightgrey;padding:5px">';
+            print '<div class="container" id="" style="min-height: 850px;width:95%;border:1px solid lightgrey; padding:5px; background-color: white">';
             print menu::nav_menu();    
         }
         
@@ -119,6 +119,12 @@ class ScancoordDispatch
     {
         
         return '
+body {
+    background: linear-gradient(white, #faedde);
+    background-size: 100% 100%;
+    background-attachment: fixed;
+    
+}
 #border {
     border: 10px solid transparent;
     padding: 15px;
@@ -139,8 +145,11 @@ class ScancoordDispatch
     //background: -moz-linear-gradient(#d99696, #d64f4f); /* For Firefox 3.6 to 15 */
     background: linear-gradient(#d99696, #d64f4f); /* Standard syntax */
 }
+.btn-active {
+    background-color: blue;
+}
 .table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
-   background-color: #fff7f0;
+   background-color: #e0e0e0;
 }
 
 /*  Cmder Themed

@@ -58,6 +58,11 @@ class scanLib
     
     public function check_date_downwards($year,$month,$day)
     {
+        
+        /**
+        *   Check if a DATETIME is > 1 month old.
+        */
+        
         $date = $year . '-' . $month . '-' . $day;
         $curY = date('Y');
         $curM = date('m');
