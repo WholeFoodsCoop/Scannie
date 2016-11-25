@@ -60,7 +60,7 @@ class ScancoordDispatch
         }
         
         print $this->body_content();        
-        print '</div>';
+        print '</div></div></div>';
         print $this->footer();
     }
     
@@ -108,6 +108,12 @@ class ScancoordDispatch
     {
         $ret ='';
         $ret .= '
+            <div style="position:relative; left:50px; width: 300px;">
+            You are logged in as <strong>User</strong>. <a href="">[Logout]</a><br />
+            Current version: 0.0.1-dev<br />
+            <a href="">Site Map</a><br />
+            <br />
+            </div>
        ';
         $ret .= '
 </body></html>
