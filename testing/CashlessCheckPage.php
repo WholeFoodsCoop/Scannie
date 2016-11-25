@@ -142,9 +142,8 @@ class CashlessCheckPage extends ScancoordDispatch
                 transType
             FROM PaycardTransactions 
             WHERE dateID = ?
-                AND empNo = ?
                 AND registerNo = ?
-            ORDER BY requestDatetime DESC LIMIT 5;
+            ORDER BY requestDatetime DESC;
         ");
         
         
@@ -176,11 +175,11 @@ class CashlessCheckPage extends ScancoordDispatch
                 $result = $dbc->execute($qTime,$args);
             } elseif ($LU) {
                 $dateID = $_GET['dateID'];
-                $empNo = $_GET['empNo'];
+                //$empNo = $_GET['empNo'];
                 $regNo = $_GET['regNo'];
                 //$transNo = $_GET['transNo'];
                 //$amount = $_GET['amount'];
-                $args = array($dateID,$empNo,$regNo);
+                $args = array($dateID,$regNo);
                 $result = $dbc->execute($qTransLU,$args);
             } else {
                 $result = $dbc->execute($qTime,$args);
@@ -242,6 +241,8 @@ class CashlessCheckPage extends ScancoordDispatch
     
     private function form_content()
     {
+        
+        $dateID = $_GET['dateID'];
         return '
             <div class="container" align="center">
             <button onclick="$(\'#transLookup\').show(); return false;" >Transaction Lookup</button>
@@ -250,13 +251,7 @@ class CashlessCheckPage extends ScancoordDispatch
                     <span class="input-group-addon">
                         DateID 
                     </span>
-                    <input type="text" class="form-control" id="dateID" style="width: 175px" name="dateID">&nbsp;&nbsp;
-                </div>
-                <div class="input-group">
-                    <span class="input-group-addon">
-                        Emp No.
-                    </span>
-                    <input type="text" class="form-control" id="empNo" style="width: 175px" name="empNo" >&nbsp;&nbsp;
+                    <input type="text" class="form-control" id="dateID" value="'.$dateID.'" style="width: 175px" name="dateID">&nbsp;&nbsp;
                 </div>
                 
                 <div class="input-group">
