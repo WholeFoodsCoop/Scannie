@@ -1,39 +1,36 @@
-<html>
-<head>
-  <title> Breakdowns </title>
-  <link rel="stylesheet" href="../../common/bootstrap/bootstrap.min.css">
-  <script src="../../common/bootstrap/jquery.min.js"></script>
-  <script src="../../common/bootstrap/bootstrap.min.js"></script>
-<style>
-</style>
-</head>
-<body>
-
 <?php
-include('/var/www/html/git/fannie/config.php');
-if (!class_exists('FannieAPI')) {
-    include($FANNIE_ROOT.'classlib2.0/FannieAPI.php');
+include('../../config.php');
+if (!class_exists('ScancoordDispatch')) {
+    include($SCANROOT.'/common/ui/CorePage.php');
+}
+if (!class_exists('SQLManager')) {
+    include_once(dirname(dirname(dirname(__FILE__))) . '/common/sqlconnect/SQLManager.php');
 }
 
-class unfiBreakdowns 
+class unfiBreakdowns extends ScancoordDispatch
 {
     
     protected $title = 'UNFI Breakdowns Page';
-    protected $description = '';
+    protected $description = '[UNFI Breakdowns] Find break-down products missing in 
+        sales batches.';
+    protected $ui = TRUE;
     
-    public function view()
+    public function body_content()
     {        
         include('../../config.php');
-        $rounder = new \COREPOS\Fannie\API\item\PriceRounder();
+        //$rounder = new \COREPOS\Fannie\API\item\PriceRounder();
+        include('../../common/lib/PriceRounder.php');
+        $rounder = new PriceRounder();
         
-        print self::form_content();
+        $ret = '<div class="container">';
+        $ret .=  self::form_content();
         
-        $start = FormLib::get('start');
+        $start = $_GET['start'];
         
-        if (FormLib::get('end')) {
-            $end = FormLib::get('end');
+        if ($_GET['end']) {
+            $end = $_GET['end'];
         } else {
-            $end = FormLib::get('start');
+            $end = $_GET['start'];
         }
         
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', 'woodshed_no_replicate', $SCANUSER, $SCANPASS);
@@ -50,7 +47,7 @@ class unfiBreakdowns
             $children[] = $row['upcDn'];
             $size[$row['upcUp']] = $row['size']; //size is saved only to parent UPCs
         }
-        if ($dbc->error()) print $dbc->error() . '<br>';
+        if ($dbc->error()) $ret .=  $dbc->error() . '<br>';
         
         $args = array($start,$end);
         $prep = $dbc->prepare("
@@ -76,9 +73,10 @@ class unfiBreakdowns
            $batchDesc[$row['upc']] = $row['description'];
         }
         
-        print "<p style='width:350px'>If there are UPCs listed below, they should be added to<br>the appropriate batches</p>";
+        $ret .=  "<p style='width:350px'>If there are UPCs listed below, they should be added to the following batches. 
+            You may want to double check the prices suggested by this page.</p>";
         
-        print '<table class="table table-striped table-bordered" style="width:250px;border:2px solid lightgrey">
+        $ret .=  '<table class="table table-striped table-condensed small" style="width:250px;border:2px solid lightgrey">
                     <th></ht><th>upc</th><th>batchID</th><th>saleprice</th>';
         foreach ($batchList as $upc => $salePrice) {
             //  GET Child
@@ -94,7 +92,7 @@ class unfiBreakdowns
                 foreach ($childKey as $value) $child = $children[$value];
                 $child = str_pad($child, 13, 0, STR_PAD_LEFT);
                 if (!in_array($child,$bathListUpcs)) {
-                    print sprintf('<tr><td>child</td><td>%s</td><td>%s</td><td>%0.2f</td></tr>',$child,$batch,$price);
+                    $ret .=  sprintf('<tr><td>child</td><td>%s</td><td>%s</td><td>%0.2f</td></tr>',$child,$batch,$price);
                 }                
             }
             
@@ -111,13 +109,14 @@ class unfiBreakdowns
                     $price--;
                 }
                 if (!in_array($parent,$bathListUpcs)) {
-                    print sprintf('<tr><td>parent</td><td>%s</td><td>%s</td><td>%0.2f</td></tr>',$parent,$batch,$price);
+                    $ret .=  sprintf('<tr><td>parent</td><td>%s</td><td>%s</td><td>%0.2f</td></tr>',$parent,$batch,$price);
                 }
             }
         }
-        print '</table>';
+        $ret .=  '</table>';
+        $ret .= '</div>';
         
-        return false;
+        return $ret;
     }
     
     private function form_content()
@@ -126,11 +125,12 @@ class unfiBreakdowns
             <form method="get"> 
                 <input type="text" name="start" placeholder="start batchID" autofocus require>
                 <input type="text" name="end" placeholder="end batchID (opt).">
-                <button type="submit">Submit</button>
+                <button type="submit" class="">Submit</button>
             </form>
         ';
     }
     
 }
-unfiBreakdowns::view();
+
+ScancoordDispatch::conditionalExec();
 
