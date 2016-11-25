@@ -114,7 +114,7 @@ class BatchReviewPage extends scancoordDispatch
                 $ret .= '<td>' . $row['margin'] . '</td>';
                 
                 if ($diff < -0.08 | $diff > 0.08) {
-                    $ret .= '<td class="redText">' . $diff . '</td>';
+                    $ret .= '<td><span style="color: tomato;">' . $diff . '</span></td>';
                 } else {
                     $ret .= '<td>' . $diff . '</td>';
                 }

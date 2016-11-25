@@ -48,6 +48,7 @@ class PercentCalc extends ScancoordDispatch
 			$price = $_GET['price'];
 			$percent = $_GET['percent'];
 			$newprice = $price - ($price * ($percent * 0.01));
+			$rawprice = $newprice;
 			$newprice = $rounder->round($newprice);
 		}
 
@@ -61,6 +62,8 @@ class PercentCalc extends ScancoordDispatch
 	<td>% </td><td><input type="text" name="percent" value="'.$percent.'" style="width:90px"></td></tr>
 	<td></td><td><button type="submit" class="btn btn-default btn-sm">submit</button></td>
 	<tr><td>.</td></tr>
+	<td>Raw Price</td><td>'.sprintf('%0.2f',$rawprice).'</td>
+	</tr><tr>
 	<td>New Price</td><td>'.$newprice.'</td>
 
 </table>

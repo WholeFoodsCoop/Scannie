@@ -124,12 +124,10 @@ print '
         <tr><td>cost:</td>
         <td><input type="text" class="invisInput" name="cost" autofocus autocomplete="off"></tr>
         <td>price:</td><td><input type="text" class="invisInput" name="price" autocomplete="off"></tr>
-        <td>dept_mg: &nbsp;</td><td><input type="text" class="invisInput" autocomplete="off" name="dept_margin" value="
-            '; 
-                if ($_GET['dept_margin']) { 
-                    echo sprintf('%.4f', $_GET['dept_margin']);
-                }
-print '"></td></tr><tr><td><button type="submit" class="invisInput" style="width:70px;">Submit</button></td><td><a value="back" onClick="history.go(-1);return false;">back</a></td></tr>
+        <td>dept_mg: &nbsp;</td><td><input type="text" class="invisInput" autocomplete="off" name="dept_margin" value="'.$dept_marg.'
+      		" ></td></tr><tr><td><button type="submit" class="invisInput" style="width:70px;">Submit</button></td><td><a value="back" 
+onClick="history.go(-1);return 
+false;">back</a></td></tr>
         <td></td><td align="center"><input type="submit" hidden></tr>
     </table> 
 
