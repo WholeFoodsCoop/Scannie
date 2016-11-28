@@ -90,6 +90,7 @@ class ScancoordDispatch
 <html>
 <head>
     <link rel="stylesheet" href="/scancoord/common/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/scancoord/common/lib/Scannie_css.css">
     <script src="/scancoord/common/bootstrap/jquery.min.js"></script>
     <script src="/scancoord/common/bootstrap/bootstrap.min.js"></script>
     <title>' . $this->title . '</title>
@@ -108,88 +109,23 @@ class ScancoordDispatch
     {
         $ret ='';
         $ret .= '
-            <div style="position:relative; left:50px; width: 300px;">
+<div class="container" id="" style="width:96%;">
+        ';
+        $ret .= '
             You are logged in as <strong>User</strong>. <a href="">[Logout]</a><br />
             Current version: 0.0.1-dev<br />
             <a href="">Site Map</a><br />
             <br />
-            </div>
        ';
         $ret .= '
-</body></html>
+</div></body></html>
         ';
         return $ret;
     }
     
     private function css_content()
     {
-        
-        return '
-body {
-    background: linear-gradient(white, #faedde);
-    background-size: 100% 100%;
-    background-attachment: fixed;
-    
-}
-#border {
-    border: 10px solid transparent;
-    padding: 15px;
-    border-image-repeat: repeat;
-    border-image: url(/scancoord/common/src/img/greyborder.png) 25 round;
-}
-.btn-default {
-    background: lightgrey; /* For browsers that do not support gradients */
-    //background: -webkit-linear-gradient(white, lightgrey); /* For Safari 5.1 to 6.0 */
-    //background: -o-linear-gradient(white, lightgrey); /* For Opera 11.1 to 12.0 */
-    //background: -moz-linear-gradient(white, lightgrey); /* For Firefox 3.6 to 15 */
-    background: linear-gradient(white, lightgrey); /* Standard syntax */
-}
-.btn-danger {
-    background: lightgrey; /* For browsers that do not support gradients */
-    //background: -webkit-linear-gradient(#d99696, #d64f4f); /* For Safari 5.1 to 6.0 */
-    //background: -o-linear-gradient(#d99696, #d64f4f); /* For Opera 11.1 to 12.0 */
-    //background: -moz-linear-gradient(#d99696, #d64f4f); /* For Firefox 3.6 to 15 */
-    background: linear-gradient(#d99696, #d64f4f); /* Standard syntax */
-}
-.btn-active {
-    background-color: blue;
-}
-.table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
-   background-color: #e0e0e0;
-}
-
-/*  Cmder Themed
-body, table, th, tr, td {
-    background-color: #272822;
-    color: #cacaca;
-    font-family: consolas;
-}
-.success {
-  color: #74aa04;
-}
-.danger {
-  color: #a70334;
-}
-.warning {
-  color: #b6b649;
-  background-color: #272822;
-}
-.info {
-  color: #58c2e5;
-}
-.purple {
-  color: #89569c;
-}
-.primary {
-  color: #1a83a6;
-}
-.panel {
-    background-color: #272822;
-    color: #cacaca;
-}
-
-*/
-        ';
+        return false;
     }
     
 }
