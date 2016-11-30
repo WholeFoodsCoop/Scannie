@@ -135,7 +135,9 @@ function draw_table($dbc)
     $sess = $_SESSION['session'];
     $args = array($curQueue,$id,$sess);
     $prep = $dbc->prepare("
-        SELECT q.queue, u.brand, u.description,
+        SELECT q.queue, 
+                CASE WHEN u.brand IS NULL OR u.brand='' THEN p.brand ELSE u.brand END AS brand, 
+                CASE WHEN u.description IS NULL OR u.description='' THEN p.description ELSE u.description END as description,
                 u.upc, p.size, p.normal_price, ba.batchName,
                 p.special_price as price, ba.batchID, q.notes,
                 p.last_sold
@@ -148,7 +150,7 @@ function draw_table($dbc)
                     AND q.store_id= ?
                     AND q.session= ?
                 GROUP BY upc
-                ORDER BY u.brand ASC
+                ORDER BY brand ASC
     ");
     $res = $dbc->execute($prep,$args);
     while ($row = $dbc->fetch_row($res)) {
