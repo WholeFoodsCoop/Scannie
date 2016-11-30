@@ -53,16 +53,59 @@ class CashlessCheckPage extends ScancoordDispatch
         $ret .= $this->form_content();
         
         $ret .= '
+            <div align="center" class="container" style="padding:5px;">
+                <button class="btn btn-default btn-xs" onclick="$(\'#xResScan\').show(); return false;" >View xResData</button>
+        ';
+        $xResScan = $this->getResultScan($dbc,100);
+        $xResScanT = $this->getResultScan($dbc,0);
+        $ret .= '
+                <div class="collapse" id="xResScan">
+                    <a onclick="$(\'#xResScan\').hide(); return false;">[<i>collapse</i>]</a>
+                    <div class="row" align="center">
+                        <div class="col-xs-6">
+                            <h4>xResultMessages in last 30 days</h4>
+                            <table class="table table-condensed small" style="width:500px">
+        ';
+        $ret .= '
+                        
+        ';
+        foreach ($xResScan as $error => $count) {
+            $ret .= '<tr>';
+            $ret .= '<td>' . $error . '</td><td>' . $count . '</tr>';
+            $ret .= '</tr>';
+        }
+        $ret .= '
+                            </table>
+                        </div><!-- column 1 -->
+        ';
+        $ret .= '
+                        <div class="col-xs-6">
+                            <h4>xResultMessages Today</h4>
+                            <table class="table table-condensed small" style="width:500px">
+                        ';
+        
+        foreach ($xResScanT as $error => $count) {
+            $ret .= '<tr>';
+            $ret .= '<td>' . $error . '</td><td>' . $count . '</tr>';
+            $ret .= '</tr>';
+        }
+        $ret .= '
+                            </table>
+                        </div><!-- column 2 -->
+        ';
+        $ret .= '</div></div></div>';
+        
+        $ret .= '
             <form method="get" id="tabs">
             <div align="center"><div class="container">
-                <button name="store_id" value="1" >Hillside</button>
-                <button name="store_id" value="2" >Denfeld</button>
-                <button name="store_id" value="*" >* Stores</button>
+                <button class="btn btn-default btn-xs" name="store_id" value="1" >Hillside</button>
+                <button class="btn btn-default btn-xs" name="store_id" value="2" >Denfeld</button>
+                <button class="btn btn-default btn-xs" name="store_id" value="*" >* Stores</button>
                     <br>
-                <button name="view_by" value="time" >*/Time</button>
-                <button onclick="$(\'#issuer\').show(); return false;" >/issuer</button>
-                <button onclick="$(\'#cardType\').show(); return false;" >/cardType</button>
-                <button onclick="$(\'#processor\').show(); return false;" name="view_by" value="processor">/processor</button>
+                <button class="btn btn-default btn-xs" name="view_by" value="time" >*/Time</button>
+                <button class="btn btn-default btn-xs" onclick="$(\'#issuer\').show(); return false;" >/issuer</button>
+                <button class="btn btn-default btn-xs" onclick="$(\'#cardType\').show(); return false;" >/cardType</button>
+                <button class="btn btn-default btn-xs" onclick="$(\'#processor\').show(); return false;" name="view_by" value="processor">/processor</button>
                 <br>
             </form>
         ';
@@ -71,17 +114,17 @@ class CashlessCheckPage extends ScancoordDispatch
         $processors = array('GoEMerchant','MercuryE2E','MercuryGift');
         $ret .= '<div id="processor" class="collapse"><strong>Issuer : </strong>';
         foreach ($processors as $processor) {
-            $ret .= '<button name="ext" value="'.$processor.'" >'.$processor.'</button>';
+            $ret .= '<button class="btn btn-default btn-xs" name="ext" value="'.$processor.'" >'.$processor.'</button>';
         }
         $ret .= '</div>';
         $ret .= '<div id="cardType" class="collapse"><strong>Issuer : </strong>';
         foreach ($cardTypes as $cardType) {
-            $ret .= '<button name="ext" value="'.$cardType.'" >'.$cardType.'</button>';
+            $ret .= '<button class="btn btn-default btn-xs" name="ext" value="'.$cardType.'" >'.$cardType.'</button>';
         }
         $ret .= '</div>';
         $ret .= '<div id="issuer" class="collapse"><strong>Issuer : </strong>';
         foreach ($issuers as $issuer) {
-            $ret .= '<button name="ext" value="'.$issuer.'" >'.$issuer.'</button>';
+            $ret .= '<button class="btn btn-default btn-xs" name="ext" value="'.$issuer.'" >'.$issuer.'</button>';
         }
         $ret .= '</div>';
         $ret .= '</div></div><br>';
@@ -245,7 +288,7 @@ class CashlessCheckPage extends ScancoordDispatch
         $dateID = $_GET['dateID'];
         return '
             <div class="container" align="center">
-            <button onclick="$(\'#transLookup\').show(); return false;" >Transaction Lookup</button>
+            <button class="btn btn-default btn-xs" onclick="$(\'#transLookup\').show(); return false;" >Transaction Lookup</button>
             <form method="get" class="form-inline collapse" id="transLookup" >
                 <div class="input-group" >
                     <span class="input-group-addon">
@@ -261,12 +304,38 @@ class CashlessCheckPage extends ScancoordDispatch
                     <input type="text" class="form-control" id="regNo" style="width: 175px" name="regNo" >&nbsp;&nbsp;
                 </div>
                 <input type="hidden" name="LU" value="1">
-                <button type="submit" class="btn btn-default">L/U Transaction</button>
+                <button class="btn btn-default btn-xs" type="submit" class="btn btn-default">L/U Transaction</button>
                 <br>
             </form>
             </div>
         ';
     }
+    
+    private function getResultScan($dbc,$minusDate)
+    {
+        $date = date('Ymd');
+        $date -= $minusDate; 
+        $data = array();
+        
+        $prep = $dbc->prepare("
+            select 
+                count(xResultMessage) AS count, 
+                xResultMessage 
+            from PaycardTransactions 
+            where xResultMessage not like '%approved%' 
+                and xResultMessage not like '%declined%' 
+                and dateID >= ? 
+            group by xResultMessage 
+            order by count(xResultMessage);");
+        $result = $dbc->execute($prep,$date);
+        while ($row = $dbc->fetchRow($result)) {
+            $data[$row['xResultMessage']] = $row['count'];
+        }
+        if ($dbc->error()) echo '<div class="alert alert-danger small">'.$dbc->error().'</div>';
+        
+        return $data;
+    }
+    
     
 }
 
