@@ -70,7 +70,8 @@ class PercentCalc extends ScancoordDispatch
 </form>
 </div>
 		';        
-
+		$ret .= '<br><br><br>';
+ 
         return $ret;
     }
     

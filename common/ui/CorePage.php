@@ -114,7 +114,7 @@ class ScancoordDispatch
         $ret .= '
             You are logged in as <strong>User</strong>. <a href="">[Logout]</a><br />
             Current version: 0.0.1-dev<br />
-            <a href="">Site Map</a><br />
+            <a href="http://key/scancoord/testing/SiteMap.php">Site Map</a><br />
             <br />
        ';
         $ret .= '

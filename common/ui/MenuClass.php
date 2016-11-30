@@ -75,7 +75,7 @@ class menu
                     <li><a href="http://192.168.1.2/scancoord/testing/CashlessCheckPage.php">Cashess Trans. Check</a></li>
                 </ul>
             </li> 
-            <li class="dropdown"><a style="width:160px;" href="http://key/git/fannie/item/ItemEditorPage.php">Office<span class=""></span></a>
+            <li class="dropdown"><a style="width:160px;" href="http://key/git/fannie/item/ItemEditorPage.php">CORE-POS<span class=""></span></a>
     </div>
 </div>
     ';
