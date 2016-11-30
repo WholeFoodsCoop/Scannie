@@ -32,8 +32,8 @@ if (!class_exists('SQLManager')) {
 class CoopDealsSearchPage extends ScancoordDispatch
 {
     
-    protected $title = "none";
-    protected $description = "[none] blank.";
+    protected $title = "Search Coop Deals";
+    protected $description = "[Search Coop Deals] Look through Co-op Deals commitmend worksheet.";
     protected $ui = TRUE;
     
     public function body_content()
@@ -65,7 +65,8 @@ class CoopDealsSearchPage extends ScancoordDispatch
                     description,
                     packSize,
                     srp,
-                    lineNotes
+                    lineNotes,
+  					promoDiscount
                 FROM CoopDeals".$month."
                 ORDER BY upc ASC
             ;");
@@ -79,7 +80,8 @@ class CoopDealsSearchPage extends ScancoordDispatch
                     description,
                     packSize,
                     srp,
-                    lineNotes
+                    lineNotes,
+					promoDiscount
                 FROM CoopDeals".$month."
                     WHERE brand = '".$brand."'
                 ORDER BY upc ASC
@@ -94,7 +96,8 @@ class CoopDealsSearchPage extends ScancoordDispatch
                     description,
                     packSize,
                     srp,
-                    lineNotes
+                    lineNotes,
+					promoDiscount
                 FROM CoopDeals".$month."
 					WHERE description like '% ? %'
                 ORDER BY upc ASC
@@ -119,6 +122,7 @@ class CoopDealsSearchPage extends ScancoordDispatch
                 $data[$upc]['size'] = $row['packSize'];
                 $data[$upc]['price'] = $row['srp'];
                 $data[$upc]['lineNotes'] = $row['lineNotes'];
+				$data[$upc]['promoDiscount'] = $row['promoDiscount'].'% OFF';
             }
             if ($dbc->error()) echo $dbc->error();
 
@@ -135,6 +139,7 @@ class CoopDealsSearchPage extends ScancoordDispatch
 					<th>Size</th>
 					<th>Sale Price</th>
 					<th>Line Notes</th>
+					<th>PromoDisc</th>
 				</thead>
 			';
             foreach ($data as $upc => $row) {
