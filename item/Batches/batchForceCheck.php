@@ -130,7 +130,10 @@ class batchForceCheck extends ScancoordDispatch
             }
         }
         echo "</table><br>";
-
+        $batchIDs = array_keys($batchList);
+        $printLink = 'http://key/git/fannie/admin/labels/SignFromSearch.php?'
+            . array_reduce($batchIDs, function($c, $i) {  return $c . "batch[]={$i}&"; });
+        echo "<a href=\"{$printLink}\">Print Tags</a>";
 
 
         //* Info to print 
