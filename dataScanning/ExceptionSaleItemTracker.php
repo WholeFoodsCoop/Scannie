@@ -53,10 +53,13 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
         $ret .= $this->form_content();
         
         if (strlen($_POST['addItem']) == 13) {
-            $addItem = $_POST['addItem'];
-            $prep = $dbc->prepare("insert into woodshed_no_replicate.exceptionItems (upc) values (?)");
-            $dbc->execute($prep,$addItem);
+            $upc = $_POST['addItem'];
+			$note = $_POST['note'];
+			$args = array($upc,$note);
+            $prep = $dbc->prepare("insert into woodshed_no_replicate.exceptionItems (upc,note) values (?,?)");
+            $dbc->execute($prep,$args);
             unset($_POST['addItem']);
+			unset($_POST['note']);
         }
         if ($_POST['rmItem']) {
             $rmItem = $_POST['rmItem'];
@@ -70,12 +73,14 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
         list($in_sql, $args) = $dbc->safeInClause($items);
         $query = '
             select 
-                upc, 
-                brand, 
-                description,
-                special_price 
-            from products 
-            WHERE upc IN (SELECT upc FROM woodshed_no_replicate.exceptionItems)
+                p.upc, 
+                p.brand, 
+                p.description,
+                p.special_price,
+				e.note
+            from products as p
+				INNER JOIN woodshed_no_replicate.exceptionItems AS e ON e.upc=p.upc
+            WHERE p.upc IN (SELECT upc FROM woodshed_no_replicate.exceptionItems)
         ';
         $prep = $dbc->prepare($query);
         $result = $dbc->execute($prep,$args);
@@ -84,16 +89,18 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
             $data[$row['upc']]['brand'] = $row['brand'];
             $data[$row['upc']]['desc'] = $row['description'];
             $data[$row['upc']]['salePrice'][] = $row['special_price'];
+			$data[$row['upc']]['note'] = $row['note'];
         }
         if ($dbc->error()) $ret .=  $dbc->error();
         
-        $ret .=  '<div class="panel panel-default" style="width:800px"><table class="table table-striped">';
+        $ret .=  '<div class="panel panel-default" style="width:90%"><table class="table table-striped">';
         $ret .=  '
             <thead>
                 <th>upc</th>
                 <th>brand</th>
                 <th>description</th>
                 <th>Hill | Den</th>
+				<th>Notation</th>
             </thead>';
         
         foreach ($data as $upc => $array) { 
@@ -104,6 +111,7 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
             $ret .= '<td>' . $array['desc'] . '</td>';
             $ret .= '<td>' . $array['salePrice'][0];
             $ret .= ' | ' . $array['salePrice'][1] . '</td>';
+			$ret .= '<td>' . $array['note'] . '</td>';
         }
         $ret .=  '</table></div>';
         $ret .= '</div>';
@@ -117,12 +125,16 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
             <form method="post" class="form-inline">
                 <div class="input-group">
                     <span class="input-group-addon">Add Item:</span>
-                    <input type="text" class="form-control" id="addItem" style="width: 175px" name="addItem" >&nbsp;&nbsp;
+                    <input type="text" class="form-control" id="addItem" style="width: 120px; font-size: 10px" name="addItem" >&nbsp;&nbsp;
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon">Remove Item:</span>
-                    <input type="text" class="form-control" id="rmItem" style="width: 175px" name="rmItem" >&nbsp;&nbsp;
+                    <input type="text" class="form-control" id="rmItem" style="width: 120px; font-size: 10px" name="rmItem" >&nbsp;&nbsp;
                 </div>
+				<div class="input-group">
+					<span class="input-group-addon">Notate:</span>
+					<input type="text" class="form-control" id="note" style="width: 175px" name="note" >&nbsp;&nbsp;
+				</div>
                 <button type="submit" class="btn btn-default">Add/Remove Item</button>
             </form>
         ';
