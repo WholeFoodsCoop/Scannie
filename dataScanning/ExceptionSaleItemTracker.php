@@ -93,7 +93,7 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
         }
         if ($dbc->error()) $ret .=  $dbc->error();
         
-        $ret .=  '<div class="panel panel-default" style="width:90%"><table class="table table-striped">';
+        $ret .=  '<div class="panel panel-default" style="width:90%"><table class="table table-striped table-condensed small">';
         $ret .=  '
             <thead>
                 <th>upc</th>
