@@ -82,6 +82,8 @@ $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANALTDB, $SCANUSER, $SCANPASS);
 
 $curQueue = $_GET['queue'];
 
+
+
 if($_SESSION['store_id'])
 {
     draw_table($dbc);
@@ -185,6 +187,7 @@ function draw_table($dbc)
         ");
         $res = $dbc->execute($prep,$upc);
         while ($row = $dbc->fetch_row($res)) {
+            $batchName[$upc] = $row['batchName'];
             $batch[$upc] = "<a href='http://key/git/fannie/batches/newbatch/EditBatchPage.php?id="
 			. $row['batchID'] . "' target='_blank'>" . $row['batchName'] . "</a>";
         }
@@ -205,6 +208,37 @@ function draw_table($dbc)
     echo "<span style='color:purple'>" . $_SESSION['session'] . "</span>";
     echo "</div>";
     echo "<p align='center'>" . count($upcs) . " tags in this queue</p>";
+    if ($curQueue == 0) {
+        echo '
+            <form method="post">
+              <input type="hidden" name="queue" value="0">
+              <input type="hidden" name="rmDisco" value="1">
+              <button type="submit" class="btn btn-default btn-xs">Remove Disco/Overstock batch items</button>
+            </form>
+        ';
+    }
+    if ($_POST['rmDisco']) {
+        $rmProduct = array();
+        $args = array($upc,$sess);
+        foreach ($batchName as $upc => $name) {
+            if (strpos($name,"Disco")
+                || strpos($name,'Disco') 
+                || strpos($name,'DISCO') 
+                || strpos($name,'overstock') 
+                || strpos($name,'OVERSTOCK') 
+                || strpos($name,'Overstock') 
+                || strpos($name,'LINE') 
+                || strpos($name,'Line') 
+                || strpos($name,'DC') 
+            ) {
+                $prep = $dbc->prepare("UPDATE SaleChangeQueues SET queue = 1 WHERE upc = ? AND session = ?");
+                $dbc->execute($prep,$args);
+                if ($dbc->error()) {
+                    echo $dbc->error(). "<br>";
+                }
+            }
+        }
+    }
     if (count($upcs) > 0) {
         echo '<a href="" onclick="$(\'#cparea\').show(); return false;">Copy/paste</a><br />';
         echo '<textarea id="cparea" class="collapse">';
