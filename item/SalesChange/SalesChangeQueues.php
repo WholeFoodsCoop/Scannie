@@ -213,10 +213,11 @@ function draw_table($dbc)
             <form method="post">
               <input type="hidden" name="queue" value="0">
               <input type="hidden" name="rmDisco" value="1">
-              <button type="submit" class="btn btn-default btn-xs">Remove Disco/Overstock batch items</button>
+              <!-- <button type="submit" class="btn btn-default btn-xs">Remove Disco/Overstock batch items</button> -->
             </form>
         ';
     }
+/*
     if ($_POST['rmDisco']) {
         $rmProduct = array();
         $args = array($upc,$sess);
@@ -239,6 +240,7 @@ function draw_table($dbc)
             }
         }
     }
+*/
     if (count($upcs) > 0) {
         echo '<a href="" onclick="$(\'#cparea\').show(); return false;">Copy/paste</a><br />';
         echo '<textarea id="cparea" class="collapse">';
