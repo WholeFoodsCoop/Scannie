@@ -128,9 +128,9 @@ class costChangeReport extends ScancoordDispatch
             if ($curChange == 0 || $prevCost[$upc] == 0) {
                 $curChange = '--';
             } elseif ($curChange > 0) {
-                $curChange = '&#x394;<span style="color:orange;">&#11014</span>'.abs($curChange);
+                $curChange = '<span style="color: grey;">&#x394;</span><span style="color:orange;">&#11014</span>'.abs($curChange);
             } else {
-                $curChange = '&#x394;<span style="color:green ;">&#11015</span>'.abs($curChange);
+                $curChange = '<span style="color: grey;">&#x394;</span><span style="color:green ;">&#11015</span>'.abs($curChange);
             }
 
             $ret .= '<tr>';
@@ -165,7 +165,7 @@ class costChangeReport extends ScancoordDispatch
             }
         }
         $avg = $avg / $i;
-        $ret .= '<span style="border: 1px solid lightgrey;">&Lambda;</span> :';
+        $ret .= '<span style="background-color: lightgrey;">&Lambda;</span> :';
         if ($avg > 0) {
             $ret .= '<span style="color:orange;">&#11014</span> ';
         } else {
@@ -188,7 +188,7 @@ class costChangeReport extends ScancoordDispatch
         }
         $stdev = $stdev / $i;
         $stdev = sqrt($stdev);
-        $ret .= '<span style="border: 1px solid lightgrey;">&sigma;</span> : '.sprintf('%0.2f',$stdev).' <br />';
+        $ret .= '<span style="background-color:  lightgrey;">&sigma;</span> : '.sprintf('%0.2f',$stdev).' <br />';
         $ret .= '<span style="color: red">STDEV is not correct. Logic issue requires resolution.</span><br />';
         
         $ret .= '</div></div></div> <!-- End Second Column -->';

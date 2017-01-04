@@ -76,48 +76,24 @@ class coopBasicsScanPage
         
         echo "don't forget to upload Coop Basics checklist to Generic Upload.<br>";
         
-        //print self::form_content($dbc);
-        /*
-        print = '
-            <u>To use</u><br>
-            <ul>
-                <li>Check that your shelftag queue is empty. Hillside: use Hillside Scancoord queue; Denfeld: use Denfeld Scancoord.</li>
-                <li>Scan all Coop Basics signs to your queue</li>
-                <li>Load this page.</li>
-            </ul><br>
-        ';*/
-        
-        //$store_id = NULL;    
-                
         if (isset($_GET['session'])) {
             $session = substr($_GET['session'],0,-1);
             echo $session  . "<br>";
         }
         
-        //  Form: store_id, session, 
         $list = array();
-        /*
         $queryA = ("
-            SELECT * 
-            FROM woodshed_no_replicate.SaleChangeQueues 
-            WHERE queue = 0 
-                AND session = '{$session}' 
-                AND upc != 0009396600014
-                AND upc != 0009396600015
-                AND upc != 0009396600016
-                AND upc != 0009396600017
-                AND upc != 0009396651015
-                AND upc != 0009396651225
-                AND upc != 0009396651245
-                AND upc != 0000000014011
-            GROUP BY upc
-        ");*/
-        $queryA = ("
-            SELECT UPC FROM is4c_op.GenericUpload;
+            SELECT upc FROM is4c_op.GenericUpload;
         ");
         $resA = $dbc->query($queryA);
         while ($row = $dbc->fetchRow($resA))  {
-            $list[] = $row['UPC'];  
+            $list[] = $row['upc'];  
+        }
+        
+        if (count($list) < 1) {
+            echo '<span class="danger">No scanned items were found.<br>
+                Check that barcodes are in the correct queue.<br>
+                Check your query.</span>';
         }
         
         $scanned = array();
@@ -187,6 +163,7 @@ class coopBasicsScanPage
         foreach ($remove as $upc) echo $upc . '<br>';
         echo '<br>These items should be marked as not in use for your store,
             <br>they have not sold in at least 2 months<br>---------------------------------------------------------<br>';
+        echo '<span class="danger">This list has now been made irrelevant by product inUse automation.<br></span>';
         foreach ($notInUse as $upc) echo $upc . '<br>';
         
         

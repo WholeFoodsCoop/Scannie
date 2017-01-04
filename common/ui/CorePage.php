@@ -49,7 +49,7 @@ class ScancoordDispatch
                         <!-- this span is for detecting bootstrap screensize -->
                             <span class="device-xs visible-xs"></span>
                             <div style="font-size:20px;" class="secondaryColor" data-toggle="collapse" data-target=".navbar-default" onclick="smartToggle();">
-                                IT COREY maintenance &amp; reporting
+                                IT COREY maintenance &amp; reporting : <span style="color: #8c7b70;">'.$this->title.'</span>
                             </div>
                     </div>
                 </div>

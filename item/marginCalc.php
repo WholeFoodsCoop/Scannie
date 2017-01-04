@@ -41,7 +41,10 @@ if (!class_exists('FannieAPI')) {
       border-top: none !important;
   }                               
   body {
-      background-color: #272822;
+      background-color: black;
+      background-image: url('../common/src/img/darkswoopy1.png');
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
       color: #cacaca;
       font-family: consolas;
   }
@@ -70,9 +73,12 @@ if (!class_exists('FannieAPI')) {
       color: #cacaca;
       font-family: consolas;
       font-size: 16px;
+      opacity: 0.9
   }
-  input:focus {
+  input:focus, button:focus, a:focus {
       //border: 1px solid blue;
+      background: linear-gradient(#7f8fa3,#555f6b);
+      border: none;
   }
   textarea {
       width: 100%;
@@ -80,7 +86,7 @@ if (!class_exists('FannieAPI')) {
       
   }
 fieldset {
-    border: 1px dotted darkslategrey;
+    border: 1px dotted grey;
 }
 </style>
 <script language="javascript" type="text/javascript">

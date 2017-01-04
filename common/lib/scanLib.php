@@ -60,18 +60,78 @@ class scanLib
     {
         
         /**
-        *   Check if a DATETIME is > 1 month old.
+        *   @function: check_date_downwards 
+            @purpose: In a table, take a datetime and return 
+            stylized table data with warning colors. 
+                dates < 1 month return with normal <td> color
+                dates > 1 > 2 month return yellow 
+                dates > 2 > 3 months return orange,
+                dates > 3 months return red
+            @params: The year, month and date to compare 
+            against the current datetime.
+            @returns: Table data contents
+            e.g. '<td>'.[DATETIME].'</td>';
         */
         
+        $ret = '';
         $date = $year . '-' . $month . '-' . $day;
         $curY = date('Y');
         $curM = date('m');
         $curD = date('d');
-        if (($year < $curY) or ($month < ($curM - 1)) or ($month < $curM && $day < $curD)) {
-            echo "<td style='color:red'>" . $date . "</td>";
+        if (($year == $curY) && ($month <= ($curM - 1)) && ($month >= ($curM-2))) {
+            $ret .= "<td style='color:#ffd500'>" . $date . "</td>";
+        } elseif (($year == $curY) && ($month < ($curM - 2))) {
+            $ret .= "<td style='color:orange'>" . $date . "</td>";
+        } elseif (($year < $curY) or ($month < ($curM - 3)) or ($month < $curM && $day < $curD)) {
+            $ret .= "<td style='color:red'>" . $date . "</td>";
         } else {
-            echo "<td>" . $date . "</td>";
+            $ret .= "<td style='color:green'>" . $date . "</td>";
         }   
+        
+        return $ret;
+    }
+    
+    public function check_date_downwards_alert($year,$month,$day)
+    {
+        
+        /**
+        *   @function: check_date_downwards_alert
+            @purpose: In a table, take a datetime and return 
+            stylized table data with warning colors. 
+                dates < 1 month return with normal <td> color
+                dates > 1 > 2 month return yellow 
+                dates > 2 > 3 months return orange,
+                dates > 3 months return red
+            @params: The year, month and date to compare 
+            against the current datetime.
+            @returns: <td> contents and alert level as array.
+            e.g. 
+                'td' = '<td>'.[DATETIME].'</td>';
+                'alert' = 0
+        */
+        
+        $ret = '';
+        $date = $year . '-' . $month . '-' . $day;
+        $curY = date('Y');
+        $curM = date('m');
+        $curD = date('d');
+        if (($year == $curY) && ($month <= ($curM - 1)) && ($month >= ($curM-2))) {
+            $ret .= "<td style='color:#ffd500'>" . $date . "</td>";
+            $data['alert'] = 1;
+        } elseif (($year == $curY) && ($month < ($curM - 2))) {
+            $ret .= "<td style='color:orange'>" . $date . "</td>";
+            $data['alert'] = 2;
+        } elseif (($year < $curY) or ($month < ($curM - 3)) or ($month < $curM && $day < $curD)) {
+            $ret .= "<td style='color:red'>" . $date . "</td>";
+            $data['alert'] = 3;
+        } else {
+            $ret .= "<td style='color:green'>" . $date . "</td>";
+            $data['alert'] = 0;
+        }   
+        
+        $data['td'] = $ret;
+        
+        return $data;
     }
     
     public function dateAdjust($adjDay,$adjMonth,$adjYear)
