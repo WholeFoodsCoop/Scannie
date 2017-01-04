@@ -271,8 +271,9 @@ function draw_table($dbc)
                 $year = substr($last_sold[$upc], 0, 4);
                 $month = substr($last_sold[$upc], 5, 2);
                 $day = substr($last_sold[$upc], 8, 2);
+				$wIcon = '<img src="../../common/src/img/warningIcon.png">';
                 if (($year < $curY) or ($month < ($curM - 1)) or ($month < $curM && $day < $curD)) {
-                    echo "<td style='color:red'>! -> " . substr($last_sold[$upc],0,10) . "</td>";
+                    echo "<td style='color:red'>" . $wIcon . ' ' . substr($last_sold[$upc],0,10) . "</td>";
                 } else {
                     echo "<td>" . substr($last_sold[$upc],0,10) . "</td>";
                 }
