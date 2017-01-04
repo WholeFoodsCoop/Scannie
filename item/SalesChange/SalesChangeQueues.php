@@ -144,7 +144,7 @@ function draw_table($dbc)
                 p.special_price as price, ba.batchID, q.notes,
                 p.last_sold
                 FROM SaleChangeQueues as q
-                    LEFT JOIN is4c_op.products as p on p.upc=q.upc
+                    LEFT JOIN is4c_op.products as p on p.upc=q.upc AND p.store_id=q.store_id
                     LEFT JOIN is4c_op.productUser as u on u.upc=p.upc
                     LEFT JOIN is4c_op.batchList as bl on bl.upc=p.upc
                     LEFT JOIN is4c_op.batches as ba on ba.batchID=bl.batchID
