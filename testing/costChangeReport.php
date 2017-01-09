@@ -132,15 +132,17 @@ class costChangeReport extends ScancoordDispatch
             } else {
                 $curChange = '<span style="color: grey;">&#x394;</span><span style="color:green ;">&#11015</span>'.abs($curChange);
             }
-
-            $ret .= '<tr>';
-            $ret .= '<td>'.$upc.'</td>';
-            $ret .= '<td>'.$brand[$upc].'</td>';
-            $ret .= '<td>'.$description[$upc].'</td>';
-            $ret .= '<td>'.$prevCost[$upc].'</td>';
-            $ret .= '<td>'.$cost[$upc].'</td>';
-            $ret .= '<td>'.$curChange.'</td>';
-            $ret .= '</tr>';
+            
+            if ($curChange != '--') {
+                $ret .= '<tr>';
+                $ret .= '<td>'.$upc.'</td>';
+                $ret .= '<td>'.$brand[$upc].'</td>';
+                $ret .= '<td>'.$description[$upc].'</td>';
+                $ret .= '<td>'.$prevCost[$upc].'</td>';
+                $ret .= '<td>'.$cost[$upc].'</td>';
+                $ret .= '<td>'.$curChange.'</td>';    
+                $ret .= '</tr>';
+            }
             
             $count['all']++;
            
