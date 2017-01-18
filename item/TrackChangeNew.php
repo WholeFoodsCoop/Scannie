@@ -158,17 +158,23 @@ class TrackChangeNew extends ScancoordDispatch
                         $ret .=  "<tr class='warning'>";
                     }
                     
+                    //$switch = array(0=>"<span class=\"text-danger\">O</span>",1=>"<span class=\"text-success\">|</span>");
+                    $switch = array(
+                        0=>"<span class=\"alert-danger\" style=\"color: white\">off</span>",
+                        1=>"<span class=\"alert-success\"> on </span>"
+                    );
+                    
                     $ret .=  "<td>" . $desc[$i] . "</td>";
                     $ret .=  "<td>" . $price[$i] . "</td>";
                     $ret .=  "<td>" . $salePrice[$i]  . "</td>";
                     $ret .=  "<td>" . $cost[$i] . "</td>";
                     $ret .=  "<td>" . $dept[$i] . "</td>";
-                    $ret .=  "<td>" . $tax[$i] . "</td>";
-                    $ret .=  "<td>" . $fs[$i] . "</td>";
-                    $ret .=  "<td>" . $scale[$i] . "</td>";
-                    $ret .=  "<td>" . $wic[$i] . "</td>";
+                    $ret .=  "<td>" . $switch[$tax[$i]] . "</td>";
+                    $ret .=  "<td>" . $switch[$fs[$i]] . "</td>";
+                    $ret .=  "<td>" . $switch[$scale[$i]] . "</td>";
+                    $ret .=  "<td>" . $switch[$wic[$i]] . "</td>";
                     $ret .=  "<td>" . $store_id[$i] . "</td>";
-                    $ret .=  "<td>" . $inUse[$i] . "</td>";
+                    $ret .=  "<td>" . $switch[$inUse[$i]] . "</td>";
                     $ret .=  "<td>" . $modified[$i] . "</td> ";
                     if ($realName[$i] == NULL) {
                         $ret .=  "<td><i>unknown / scheduled change " . $uid[$i] . "</i></tr>";

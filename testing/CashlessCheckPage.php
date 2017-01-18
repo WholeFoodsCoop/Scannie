@@ -56,7 +56,7 @@ class CashlessCheckPage extends ScancoordDispatch
             <div align="center" class="container" style="padding:5px;">
                 <button class="btn btn-default btn-xs" onclick="$(\'#xResScan\').show(); return false;" >View xResData</button>
         ';
-        $xResScan = $this->getResultScan($dbc,100);
+        $xResScan = $this->getResultScan($dbc,100); //subtracting 100 goes back 1 month UNLESS the month you're looking at is Jan. 
         $xResScanT = $this->getResultScan($dbc,0);
         $ret .= '
                 <div class="collapse" id="xResScan">
@@ -106,6 +106,8 @@ class CashlessCheckPage extends ScancoordDispatch
                 <button class="btn btn-default btn-xs" onclick="$(\'#issuer\').show(); return false;" >/issuer</button>
                 <button class="btn btn-default btn-xs" onclick="$(\'#cardType\').show(); return false;" >/cardType</button>
                 <button class="btn btn-default btn-xs" onclick="$(\'#processor\').show(); return false;" name="view_by" value="processor">/processor</button>
+                <br />
+                <button class="btn btn-warning btn-xs" name="inProcess" value="1">SCAN: Failed Voids from previous day</button>
                 <br>
             </form>
         ';
@@ -189,6 +191,17 @@ class CashlessCheckPage extends ScancoordDispatch
             ORDER BY requestDatetime DESC;
         ");
         
+        $sTransLU = $dbc->prepare("
+            SELECT registerNo, transNo, empNo, processor, refnum, 
+                cardType, amount, PAN, issuer, name, requestDatetime, 
+                commErr, xResultMessage, paycardTransactionID as PID,
+                transType
+            FROM PaycardTransactions 
+            WHERE dateID = ?
+                AND registerNo = ?
+            ORDER BY requestDatetime DESC;
+        ");
+        
         
         if ($_SESSION['store_id'] == 1) {
             $lanes = array(1,2,3,4,5,6);
@@ -199,6 +212,10 @@ class CashlessCheckPage extends ScancoordDispatch
         }
         if ($LU) {
             $lanes = array($GET['regNo']);
+        }
+        
+        if ($_GET['inProcess']) {
+            $ret .= $this->getVoidErrors($dbc);
         }
         
         foreach ($lanes as $lane) {
@@ -228,6 +245,7 @@ class CashlessCheckPage extends ScancoordDispatch
                 $result = $dbc->execute($qTime,$args);
             }
             //$result = $dbc->execute($query,$lane);
+            
             $data = array();
             while ($row = $dbc->fetch_row($result)) {
                 $data[$row['PID']]['issuer'] = $row['issuer'];
@@ -240,19 +258,22 @@ class CashlessCheckPage extends ScancoordDispatch
                 $data[$row['PID']]['amount'] = $row['amount'];
                 $data[$row['PID']]['PAN'] = substr($row['PAN'],-5);
                 $data[$row['PID']]['transType'] = $row['transType'];
+				$data[$row['PID']]['refnum'] = '<span style="color: grey; font-size: 10;">'.$row['refnum'].'</span>';
             }
             
             $ret .= '<div align="center"><div class="panel panel-default" style="width:800px;" id="table'.$lane.'">
                 <div class="panel-heading"><strong>Register No.'.$lane.'</strong></div>
                 <table class="table table-striped table-condensed small">';
                 
-            $headers = array('Issuer','trans_no','Processor','Result','TransType','Amount','Date/Time','PAN');
+            $headers = array('Issuer','trans_no','Processor','Result','TransType','Amount','Date/Time','PAN','refnum');
             $ret .=  '<thead>';
             foreach ($headers as $header) $ret .= '<th>' . $header . '</th>';
             $ret .= '</thead>';
                 
             foreach ($data as $PID => $row) {
-                if ($LU) $lane = $regNo;
+                if ($LU) {
+                    $lane = $regNo;
+                }
                 $ret .= '<tr>';
                 $ret .= '<td>' . $row['issuer'] . '</td>';
                 $ret .= '<td>' . $row['empNo'] . '-' . $lane . '-' . $row['transNo'] . '</td>';
@@ -265,14 +286,16 @@ class CashlessCheckPage extends ScancoordDispatch
                 } else {
                     $ret .= '<td class="text-danger">' . $xRes . '</td>';
                 }
-				$ret .= '<td>' . $row['transType'] . '</td>';
+                $ret .= '<td>' . $row['transType'] . '</td>';
                 
                 $ret .= '<td>$' . $row['amount'] . '</td>';
                 //$ret .= '<td>' . $row['commErr'] . '</td>';
                 $ret .= '<td>' . substr($row['requestDatetime'],5,-3) . '</td>';
                 $ret .= '<td>' . $row['PAN'] . '</td>';
+                $ret .= '<td>' . $row['refnum'] . '</td>';
                 
                 $ret .= '</tr>';
+            
             }
             $ret .= '</table></div></div>';
             unset($data);
@@ -334,6 +357,57 @@ class CashlessCheckPage extends ScancoordDispatch
         if ($dbc->error()) echo '<div class="alert alert-danger small">'.$dbc->error().'</div>';
         
         return $data;
+    }
+    
+    private function getVoidErrors($dbc)
+    {
+        $date = date('Ymd');
+        $date -= 1; //look at previous day. Doesn't work for the 1st of the month. 
+        $rDate = 
+        
+        $prep = $dbc->prepare("SELECT transNo, registerNo FROM PaycardTransactions WHERE dateid = ? AND xResultMessage = 'In Process!';");
+        $result = $dbc->execute($prep,$date);
+        $transactions = array();
+        while ($row = $dbc->fetchRow($result)) {
+            $transactions[$row['transNo']] = $row['registerNo'];
+        }
+        if ($dbc->error()) echo '<div class="alert alert-danger small">'.$dbc->error().'</div>';
+        
+        foreach ($transactions as $transNo => $registerNo) {
+            $args = array($date,$transNo,$registerNo);
+            $prep = $dbc->prepare("select * from PaycardTransactions where dateid = ? and transNo = ? and registerNo = ?;");
+            $result = $dbc->execute($prep,$args);
+            while ($row = $dbc->fetchRow($result)) {
+                if ($row['xResultMessage'] == 'In Process!') {
+                    $curPTID = $row['paycardTransactionID'];
+                    $curEmpNo = $row['empNo'];
+                    $curAmount = $row['amount'];
+                }
+                if ($row['paycardTransactionID'] == ($curPTID+1)) {
+                    $xRes = $row['xResultMessage'];
+                    $amount = $row['amount'];
+                    $qln = 1;
+                    
+                    if ($xRes == 'Cancelled at POS.') {
+                        //do nothing
+                    } elseif ((strstr($xRes,'Approved') || strstr($xRes,'APPROVED')) && $amount == $curAmount) {
+                        //do nothing
+                    } else {
+                        $ret .= '
+                            <div align="center">
+                                <div class="alert alert-danger" style="text-align: center; width: 800px">
+                                    POSSIBLE UNCOMPLETE TRANS ('.$xRes.') '.$curEmpNo.'-'.$registerNo.'-'.$transNo.' on '.$date.' <br />
+                                </div>
+                            </div>
+                        ';
+                    }
+                    
+                    
+                }
+            }
+        }
+        
+        return $ret;
     }
     
     

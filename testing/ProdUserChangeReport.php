@@ -105,7 +105,7 @@ class ProdUserChangeReport extends ScancoordDispatch
         $ret .= '<select name="user" class="form-control">';
         $user_names = array('Corey Sather','Corrina Rouleau','Sam Hise','Janice Matthews',
             'Ellen Turner','Jim Richardson','Pauline Veatch','Lisa Anderson','Tim Wilson',
-            'Erika Osterman','Dean Walczynski','Peter Schulz','Marlene Weikle');
+            'Erika Osterman','Dean Walczynski','Peter Schulz','Marlene Weikle','Andy Theuninck');
         foreach ($uids as $uid => $name) {
             if (in_array($name,$user_names)) {
                 $ret .= '<option value="'.$uid.'"';

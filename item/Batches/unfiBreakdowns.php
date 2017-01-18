@@ -121,10 +121,14 @@ class unfiBreakdowns extends ScancoordDispatch
     
     private function form_content()
     {
+		
+		$id1 = $_GET['start'];
+		$id2 = $_GET['end'];
+		
         return '
             <form method="get"> 
-                <input type="text" name="start" placeholder="start batchID" autofocus require>
-                <input type="text" name="end" placeholder="end batchID (opt).">
+                <input type="text" value="'.$id1.'" name="start" placeholder="start batchID" autofocus require>
+                <input type="text" value="'.$id2.'" name="end" placeholder="end batchID (opt).">
                 <button type="submit" class="">Submit</button>
             </form>
         ';

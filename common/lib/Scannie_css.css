@@ -1,8 +1,9 @@
 body {
-    background: linear-gradient(white, #faedde);
+    background: linear-gradient(white, #edf7fc);
     background-size: 100% 100%;
     background-attachment: fixed;
-    
+    background-image: url("../src/img/blueGrad.png");
+    //background-repeat: no-repeat;
 }
 #border {
     border: 10px solid transparent;
@@ -27,6 +28,41 @@ body {
 .btn-active {
     background-color: blue;
 }
+
+.btn-warning {
+    background: #ffa72b; /* For browsers that do not support gradients */
+    background: linear-gradient(#ffca80,#ffa72b); /* Standard syntax */
+}
+.btn-success {
+    background: #71c98a; /* For browsers that do not support gradients */
+    background: linear-gradient(#abdeb9,#71c98a); /* Standard syntax */
+}
+.btn-surprise {
+    background: #c674cc; /* For browsers that do not support gradients */
+    background: linear-gradient(#d9b2db,#c674cc); /* Standard syntax */
+    color: white;
+}
+.btn-inverse {
+    background: #c674cc; /* For browsers that do not support gradients */
+    background: linear-gradient(#545454,#323632); /* Standard syntax */
+    color: white;
+}
+.btn-info {
+    background: #c674cc; /* For browsers that do not support gradients */
+    background: linear-gradient(#88caeb,#5ebceb); /* Standard syntax */
+    color: white;
+}
+.alert-inverse {
+    background: #c674cc; /* For browsers that do not support gradients */
+    background: linear-gradient(#545454,#323632); /* Standard syntax */
+    color: white;
+}
+.alert-surprise {
+    background: #c674cc; /* For browsers that do not support gradients */
+    background: linear-gradient(#d9b2db,#c674cc); /* Standard syntax */
+    color: #6a356e;
+}
+
 .table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
    background-color: #e0e0e0;
 }
