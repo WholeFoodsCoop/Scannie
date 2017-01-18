@@ -6,7 +6,7 @@ include('/var/www/html/git/fannie/classlib2.0/FannieAPI.php');
 p {
     font-size: 14;
     text-align: center;
-    background-color: #acfaf7;
+    //background: linear-gradient(#9edef7, lightblue);
 }
 </style>
 
@@ -113,5 +113,14 @@ if ($queue == 99) {
     } 
 }
 
-echo '<p>' . $upc . '<br>Sent to Queue ' . $queue . '<br>' . $session . '</p';
+//echo '<p>' . $upc . '<br>Sent to Queue ' . $queue . '<br>' . $session . '</p';
+
+
+$alert_class = array(1=>"success",2=>"danger",99=>"info",8=>"warning",7=>"surprise",9=>"inverse");
+echo '<p id="result" class="alert alert-'.$alert_class[$queue].'">
+    ' . $upc . '<br />Sent to Queue ' . $queue . '
+    <a href="" onClick="$(\'#result\').hide(); return false;" style="float: right; color: grey; font-weight: 300">X</a><br />' 
+    . $session . '<br />
+    
+</p>';
 

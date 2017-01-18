@@ -144,7 +144,7 @@ function changeStoreID(button, store_id)
   </div>
 </form>
 
-<div id="ajax-resp" style="font-weight:bold; font-size: 8pt;"></div>
+<div id="ajax-resp" style="font-weight:bold; font-size: 8pt; position: fixed; top: 75px; width: 100%;"></div>
 
 <script>
 function myFunction() {
@@ -209,9 +209,16 @@ if ($_SESSION['session'] == NULL) {
 }
 
 include('../../config.php');
+include('../../common/sqlconnect/SQLManager.php');
 $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANALTDB, $SCANUSER, $SCANPASS);
 
 if ($_GET['upc']) {
+    
+    if ($_GET['upc'] < 99999 && $_GET['upc'] > 9999) {
+        $_GET['upc'] = ltrim($_GET['upc'], '0');
+        $_GET['upc'] = skuToUpc($_GET['upc'], $dbc);
+    }
+    
     $_GET['upc'] = str_pad($_GET['upc'], 13, '0', STR_PAD_LEFT);
     echo "<table class='table'  align='center' width='100%'>";
     
@@ -341,7 +348,7 @@ echo "<table class='table'>";
 echo "<tr><td><button class=\"btn btn-success\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 1, '{$_SESSION['session']}','NULL'); return false;\">Check Sign</button></tr>";
 echo "<tr><td><button class=\"btn btn-info\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 99, '{$_SESSION['session']}','NULL'); return false;\">Add Item to Queue</button></tr>";
 echo "<tr><td><button class=\"btn btn-warning\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 8, '{$_SESSION['session']}'); return false;\">Missing Sign</button></tr>";
-echo '<tr><td><div id="ajax-form"></div></td></tr>';
+echo '<tr><td><div id="ajax-form" ></div></td></tr>';
 echo "<tr><td><button class=\"btn btn-danger\" type=\"button\" onclick=\"getErrNote('{$_GET['upc']}'); return false;\">Write Note</button></tr>";
 echo "<tr><td><button class=\"btn btn-default purple\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 7, '{$_SESSION['session']}','NULL'); return false;\">Shelf Tag Missing</button></tr>";
 echo "<tr><td><button class=\"btn btn-default black\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 9, '{$_SESSION['session']}','NULL'); return false;\">Generic Sign Needed</button></tr>";
@@ -382,6 +389,26 @@ $query = "SELECT session
         </form>
     ';
         
+function skuToUpc($upc,$dbc)
+{
+    $queryStr = 'SELECT upc
+        FROM is4c_op.vendorItems
+        WHERE vendorID = 1
+        AND sku like "%'.$upc.'%" 
+            AND (size = "#" 
+                OR size = "LB" 
+                OR size = "3/3.33LB" 
+                OR size = "5 GAL" 
+                OR size = "5 LB")
+    ';
+    $query = $dbc->prepare($queryStr);
+    $result = $dbc->execute($query);
+    while ($row = $dbc->fetchRow($result)) {
+        $ourUpc = $row['upc'];
+    }
+    
+    return $ourUpc;
+}
 ?>
 
 <br><br>
@@ -394,4 +421,6 @@ $query = "SELECT session
 
 <div align="center">
 <br><br><br>
-<a href="http://192.168.1.2/scancoord/marginCalc.php">link to margin calc</a>
+<a href="http://192.168.1.2/scancoord/marginCalc.php">link to margin calc</a><br />
+<a href="http://192.168.1.2/scancoord/testing/AuditScanner.php">Temporary Link</a>
+<br /><br />
