@@ -146,7 +146,7 @@ class BatchReviewPageUNFI extends scancoordDispatch
         $ret .= '
             <form method="get" class="form-inline">
                 <input type="text" class="form-control" name="id" placeholder="Enter Batch  ID" autofocus>
-                <input type="submit" class="form-control">
+				<button class="btn btn-default" type="submit">Submit</button>
             </form>
         ';
         
