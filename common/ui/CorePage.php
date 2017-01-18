@@ -24,21 +24,33 @@
 class ScancoordDispatch 
 {
     
-    function __construct() {}
+    protected $start_timestamp = NULL;
+    protected $must_authenticate = false;
+    protected $current_user = false;
+    protected $auth_classes = array();
+    protected $add_css_content = false;
+    protected $add_javascript_content = false;
+    
+    function __construct() {
+        $this->start_timestamp = microtime(true);
+        $auth_default = NULL;
+        $css_content = FALSE;
+    }
     
     private function runPage($class)
     {
         $obj = new $class();
-        $obj->draw_page();
+        $obj->draw_page($class);
+        
     }
     
-    private function draw_page()
+    private function draw_page($class)
     {
         if (!class_exists('MenuClass')) {
             include(dirname(__FILE__).'/MenuClass.php');
         }
         print "<br />";
-        print $this->header();
+        print $this->header($class);
         
         if ($this->ui === TRUE) {
             print '
@@ -83,21 +95,29 @@ class ScancoordDispatch
     
     private function preflight() {}
     
-    private function header()
+    private function header($class)
     {   
         $ret = '';
         $ret .= '
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/scancoord/common/bootstrap/bootstrap.min.css">
-    <link rel="stylesheet" href="/scancoord/common/lib/Scannie_css.css">
+    <link rel="stylesheet" href="/scancoord/common/lib/Scannie_css.css?foo=bar">
     <script src="/scancoord/common/bootstrap/jquery.min.js"></script>
     <script src="/scancoord/common/bootstrap/bootstrap.min.js"></script>
     <title>' . $this->title . '</title>
 <style>';
-        $ret .= self::css_content();
+        //$ret .= self::css_content();
+        if ($this->add_css_content == TRUE) {
+            $ret .= $class::css_content();
+        }
         $ret .= '
-</style>
+</style>';
+        if ($this->add_javascript_content == TRUE) {
+            $ret .= $class::javascript_content();
+        }
+        $ret .= '
 </head>
 <body>
         ';
@@ -123,9 +143,11 @@ class ScancoordDispatch
         return $ret;
     }
     
+    /*
     private function css_content()
     {
-        return false;
+        return '';
     }
+    */
     
 }
