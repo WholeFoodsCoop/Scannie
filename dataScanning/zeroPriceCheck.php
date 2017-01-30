@@ -33,9 +33,27 @@ class zeroPriceCheck extends ScancoordDispatch
 {
     
     protected $title = "Bad Price Scan";
-    protected $description = "[Bad Price Scan] Scan for in-use items priced at 0.00 
-        or greater than 99.00.";
+    protected $description = "[Bad Price Scan] Scan for in-use items with bad prices.";
     protected $ui = TRUE;
+    protected $about = '
+        <p>Scans products to locate prices that may be bad.</p>
+        <label>Scans for products that meet the following criteria</label>
+        <ul>
+            <li>price equlas zero</li>
+            <li>price > 99.99</li>
+            <li>price < cost</li>
+        </ul>
+        <label>Excludes</label>
+        <ul>
+            <li>Produce Super Department.</li>
+            <li>Deli Super Department.</li>
+            <li>Misc. Super Department.</li>
+            <li>Brand Super Department.</li>
+            <li>Wicable Products</li>
+            <li>Products with a Price Rule ID (variably priced items)</li>
+            <li>Products that are NOT in use.</li>
+        </ul>
+        ';
     
     public function body_content()
     {           
@@ -44,57 +62,99 @@ class zeroPriceCheck extends ScancoordDispatch
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         include('../common/lib/PriceRounder.php');
         $rounder = new PriceRounder();
-        
         if($_GET['upc']) {
             $_GET['upc'] = trim($_GET['upc']);
             $upc = str_pad($_GET['upc'], 13, 0, STR_PAD_LEFT);
         }
         
-        $ret .= '<div class="container"><h5>Bad Prices for Products Page</h5>';
+        $ret .= '<button class="btn btn-default btn-xs" data-toggle="modal" data-target="#help">Help</button>';
+        $ret .= '
+            <div id="help" class="modal fade">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h3 class="modal-title" id="exampleModalLabel">Bad Price Scan</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        '.$this->about.'
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        ';
+        
         $item = array ( array() );
-        $ret = "";
-
-        $query = $dbc->query("SELECT 
-                upc,
-                normal_price,
-                brand,
-                description,
-                store_id,
-                last_sold
-            FROM products
+        $query = $dbc->prepare("SELECT 
+                p.upc,
+                p.normal_price,
+                p.brand,
+                p.description,
+                p.store_id,
+                p.last_sold,
+                p.cost,
+                m.super_name
+            FROM products AS p
+                RIGHT JOIN MasterSuperDepts AS m ON p.department = m.dept_ID
             WHERE inUse=1
-                AND (normal_price = 0 OR normal_price > 99)
-                AND department NOT BETWEEN 508 AND 998
-                AND department NOT BETWEEN 250 AND 259
-                AND department NOT BETWEEN 225 AND 234
-                AND department NOT BETWEEN 61 AND 78
-                AND department != 46
-                AND department != 150
-                AND department != 208
-                AND department != 235
-                AND department != 240
-                AND department != 500
+                AND m.superID != 0
+                AND m.superID != 3
+                AND m.superID != 6
+                AND m.superID != 7
+                AND (normal_price = 0 OR normal_price > 99.99)
                 AND last_sold is not NULL
                 AND upc <> 0001440035017
                 AND upc <> 0085068400634
+                AND upc <> 0000000000114
+                AND upc <> 0000000001092
+                AND wicable = 0
+                    OR (
+                        m.superID != 0
+                        AND m.superID != 3
+                        AND m.superID != 6
+                        AND m.superID != 7
+                        AND normal_price < cost 
+                        AND inUse = 1
+                        AND normal_price > 0
+                        AND upc <> 0000000003361
+                        AND upc <> 0000000001138
+                        AND upc <> 0000000000114
+                        AND p.price_rule_id = 0
+                        AND wicable = 0
+                    )
             GROUP BY upc
         ");
         $result = $dbc->execute($query);
-        if($dbc->numRows($result) == 0 ) {
-            echo '<div class="success">No badly priced items discovered.</div>';
+        $count = $dbc->numRows($result);
+        if ($count == 0) {
+            echo '<div class="alert alert-success" align="center">
+                No badly priced items discovered.</div>';
         } else {
-            echo  '<div class="danger" align="center">
-                Items found with \'0.00\' or >\'99.00\' price!<br></div>';
-
-            $ret .=  '<table class="table">';
-            $ret .=  '<table class="container">';
-            while ($row = mysql_fetch_assoc($result)) {
+            echo  '<div class="well" align="center">
+                '.$count.' products with bad prices discovered.<br></div>';
+                
+            $ret .=  '<table class="table table-condensed table-striped">';
+            $headers = array('upc','description','brand','super Dept.','price','cost','store','x');
+            $ret .= '<thead>';
+            foreach ($headers as $header) {
+                $ret .= '<th>'.$header.'</th>';
+            }
+            $ret .= '</thead>';
+          
+            while ($row = $dbc->fetchRow($result)) {
                 $ret .=  '<tr><td><a href="http://key/git/fannie/item/ItemEditorPage.php?searchupc=' . $row['upc'] . '" target="_blank">' . $row['upc'] . '</a>';
                 $ret .=  '<td>' . $row['description'];
                 $ret .=  '<td>' . $row['brand'];
-                $ret .=  '<td> <i>store_id</i><b>: ' . $row['store_id'] . '</b>';
-                $ret .=  '<td> <i>last sold on</i>: ' . $row['last_sold'];
-                $ret .=  '<td> <a href="http://key/scancoord/TrackChangeNew.php?upc=' . $row['upc'] . '" target="_blank">Track Changes Made</a>';
+                $ret .=  '<td>' . $row['super_name'];
+                $ret .=  '<td style="color: red; ">' . $row['normal_price'];
+                $ret .=  '<td style="color: grey; ">' . $row['cost'];
+                $ret .=  '<td>'.$row['store_id'] . '</b>';
+                $ret .=  '<td> <a href="http://key/scancoord/item/TrackChangeNew.php?upc=' . $row['upc'] . '" target="_blank">See Change</a>';
             }
             if (mysql_errno() > 0) {
                 $ret .=  mysql_errno() . ": " . mysql_error(). "<br>";
