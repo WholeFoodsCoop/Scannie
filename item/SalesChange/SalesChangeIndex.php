@@ -32,8 +32,8 @@ if (!class_exists('SQLManager')) {
 class SalesChangeIndex extends ScancoordDispatch
 {
     
-    protected $title = "none";
-    protected $description = "[none] blank.";
+    protected $title = "Batch Check Index";
+    protected $description = "[Batch Check Index] Index of Batch Checking Utilities directory.";
     protected $ui = TRUE;
     protected $readme = "This is a generic page for running and drawing a query to table.
         By default, every column returned by query will be drawn in table, in the order 
@@ -51,7 +51,7 @@ class SalesChangeIndex extends ScancoordDispatch
                     <tr><td><a class="btn" href="ListGen.php"> Generate List </a>&nbsp;&nbsp;
                         <a class="btn" href="ListRemove.php"> Delete Lists </a></td></tr>                                   
                     <tr><td><a class="btn" href="SalesChangeQueues.php"> Review Data  </a></td></tr>                 
-                    <tr><td><a class="btn" href="SaleChangeScanner.php"> Scanner </a></td></tr>                               
+                    <tr><td><a class="btn" href="SCScanner.php"> Scanner </a></td></tr>                               
                     <tr><td><a class="btn" href="../SignInfoHelper.php"> Sale Item Report </a></td></tr>                                
                     <tr><td><a class="btn" href="http://192.168.1.2/git/fannie/item/CoopDealsLookupPage.php"> Check Coop Deals </a></td></tr>                                
                 </table></div></div></div>

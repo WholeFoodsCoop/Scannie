@@ -19,7 +19,7 @@ echo '
         <input type="text" class="form-control" style="width:300px;border: 1px solid red" 
             name="notes" placeholder="Type Notes Here">
         <input type="hidden" name="upc" value="' . $upc  . '"><br>
-        <input type="submit" class="btn btn-default" value="Save Note" 
+        <input type="submit" class="btn btn-danger" value="Save Note" 
             style="width:300px;height:70px;border: 2px solid red;background-color:#fae3e3">
     </form> 
 ';

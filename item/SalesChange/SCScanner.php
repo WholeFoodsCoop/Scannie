@@ -2,14 +2,6 @@
 session_start();
 ?>
 
-
-
-
-
-
-<style>
-
-</style>
 <script type="text/javascript" src="/git/fannie/src/javascript/jquery.js"></script>
 <script type="text/javascript" src="/git/fannie/src/javascript/linea/cordova-2.2.0.js"></script>
 <script type="text/javascript" src="/git/fannie/src/javascript/linea/ScannerLib-Linea-2.0.0.js"></script>
@@ -21,29 +13,17 @@ $(document).ready(function(){
 function sendToQueue(button, upc, queue_id, session,notes)
 {
     $.ajax({
-
-        // Info will be sent to this URL
         url: 'salesChangeAjax2.php',
-
-        // The actual data to send
         data: 'upc='+upc+'&queue='+queue_id+'&session='+session+'&notes='+notes,
-
-        // callback to process the response
         success: function(response)
         {
-            // display the response in element w/ id=ajax-resp
             $('#ajax-resp').html(response);
-
-            // search DOM upword for a <tr> tag and hide that element
-            // as well as its children
-            $(button).closest('tr').hide();
         }
     });
 }
 function changeStoreID(button, store_id)
 {
     $.ajax({
-        
         url: 'salesChangeAjax3.php',
         data: 'store_id='+store_id,
         success: function(response)
@@ -191,7 +171,7 @@ class SCScanner extends scancoordDispatch
                     $ret .= "<tr><td><b>size</td><td>" . $row['vsize'] . "</tr>";
                 }
                 
-            
+                /*
                 if ($row['queue_no'] != NULL)  {
                     if ($row['queue_no'] === "1") {
                         $ret .= "<tr><td><b>queue</td><td><span class='code btn-success'>" . $row['queue_no'] . " - " . $row['name'] . "</span></tr>";
@@ -214,25 +194,20 @@ class SCScanner extends scancoordDispatch
                     if($row['queue_no'] === "9") {
                         $ret .= "<tr><td><b>queue</td><td><span class='code btn-inverse'>" . $row['queue_no'] . " - " . $row['name'] . "</span></tr>";
                     }
-                } else if ($row['queue'] == NULL) {
+                } elseif ($row['queue'] == NULL) {
                     $ret .= "<tr><td><b>queue</td><td><i class=\"red\">This items is queue-less</tr>";
                 }
                 $ret .= "<tr><td><b>Price</td><td>" . "$" . $row['normal_price'] . "</tr>";
+            */
             
+            $queueCode = array(1=>'success',2=>'danger',0=>'default',99=>'info',8=>'warning',7=>'surprise',9=>'inverse');
+            if ($row['queue_no'] != NULL)  {
+                $ret .= "<tr><td><b>queue</td><td><span class='code btn-".$queueCode[$row['queue_no']]."'>" . $row['queue_no'] . " - " . $row['name'] . "</span></tr>";
+            } elseif ($row['queue'] == NULL) {
+                $ret .= "<tr><td><b>queue</td><td><i class=\"red\">This items is queue-less</tr>";
+            }
+            $ret .= "<tr><td><b>Price</td><td>" . "$" . $row['normal_price'] . "</tr>";
                 
-            /*    
-                if ($row['queue'] == 0) {
-                    $ret .= "<tr><td><b>queue</td><td><i>item has not been checked yet</tr>";
-                } else if ($row['queue'] == 1) {
-                    $ret .= "<tr><td><b>queue</td><td>good tag</tr>";
-                } else if ($row['queue'] >=2 && $row['queue'] <=7) {
-                    $ret .= "<tr><td><b>queue</td><td>tag error</tr>";
-                } else if ($row['queue'] == 8) {
-                    $ret .= "<tr><td><b>queue</td><td>tag missing</tr>";
-                } else if ($row['queue'] == NULL){
-                    $ret .= "<tr><td><b>queue</td><td>tag is not in a queue</tr>";
-                }
-            */  
             }
             
 
@@ -259,7 +234,7 @@ class SCScanner extends scancoordDispatch
                 ;";
             $result = $dbc->query($query);
             while ($row = $dbc->fetchRow($result)) {
-                $ret .= "<tr><td><b>sale price</td><td class=\"blue\">" . $row['salePrice'] . "</tr>";
+                $ret .= "<tr><td><b>sale price</td><td class=\"text-info\">" . $row['salePrice'] . "</tr>";
                 $ret .= "<tr><td><b>batch name</td><td>" . $row['batchName'] . "</tr>";
             } 
             if ($dbc->error()) {
@@ -273,8 +248,8 @@ class SCScanner extends scancoordDispatch
         $ret .= "<tr><td><button class=\"btn btn-success\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 1, '{$_SESSION['session']}','NULL'); return false;\">Check Sign</button></tr>";
         $ret .= "<tr><td><button class=\"btn btn-info\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 99, '{$_SESSION['session']}','NULL'); return false;\">Add Item to Queue</button></tr>";
         $ret .= "<tr><td><button class=\"btn btn-warning\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 8, '{$_SESSION['session']}'); return false;\">Missing Sign</button></tr>";
-        $ret .= '<tr><td><div id="ajax-form" ></div></td></tr>';
-        $ret .= "<tr><td><button class=\"btn btn-danger\" type=\"button\" onclick=\"getErrNote('{$_GET['upc']}'); return false;\">Write Note</button></tr>";
+        $ret .= '<tr id="noteTr" class="collapse"><td><div id="ajax-form"></div></td></tr>';
+        $ret .= "<tr><td><button class=\"btn btn-danger\" id=\"errBtn\" type=\"button\" onclick=\"getErrNote('{$_GET['upc']}'); return false;\">Write Note</button></tr>";
         $ret .= "<tr><td><button class=\"btn btn-surprise\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 7, '{$_SESSION['session']}','NULL'); return false;\">Shelf Tag Missing</button></tr>";
         $ret .= "<tr><td><button class=\"btn btn-default btn-inverse\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 9, '{$_SESSION['session']}','NULL'); return false;\">Generic Sign Needed</button></tr>";
         $ret .= "</table>";
@@ -365,8 +340,6 @@ class SCScanner extends scancoordDispatch
 
 <div align="center">
 <br><br><br>
-<a href="http://192.168.1.2/scancoord/marginCalc.php">link to margin calc</a><br />
-<a href="http://192.168.1.2/scancoord/testing/AuditScanner.php">Temporary Link</a>
 <br /><br />';
 
     }
@@ -426,6 +399,8 @@ function getErrNote(upc)
         success: function(response)
         {
             $('#ajax-form').html(response);
+            $('#errBtn').hide();
+            $('#noteTr').show();
         }
     });
 }
