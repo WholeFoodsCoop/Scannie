@@ -40,9 +40,8 @@ if (!class_exists('FannieAPI')) {
 /**
 *   @class coopBasicsScanPage  - Hillside
 *
-*   coopBasicsScanPage specifically checks for Coop Basics 
-*   missing signs for Hillside, using the Hillside scancoord 
-*   shelftag queue (id=13). 
+*   coopBasicsScanPage checks for Coop Basics 
+*   missing signs for Hillside, using the woodshed.AuditScanner data.  
 *   Requires list of Coop Basics UPCs to be uploaded to 
 *   woodshed'...SaleChangeQueues which currently must be done 
 *   manually.
@@ -50,8 +49,11 @@ if (!class_exists('FannieAPI')) {
 *   Instructions on use:
 *   
 *   1. Upload Coop Basics Checklist to Generic Uploads (Excel Upload in Office).
-*   2. Veriphy that $saleItems is generating a list of items on sale. 
-*   3. 
+*   2. Verify that $saleItems is generating a list of items on sale. 
+*   3. Clear the Audit Scanner Queue.
+*	4. Pull up the audit scanner on a handheld device and scan each coop-basics 
+*	   item. No buttons are necessary, just scan those items, the scanner will
+*	   save a list of everything that is scanned.
 */
 class coopBasicsScanPage
 {
@@ -95,9 +97,18 @@ class coopBasicsScanPage
                 Check that barcodes are in the correct queue.<br>
                 Check your query.</span>';
         }
-        
+
+		/*        
         $scanned = array();
         $queryB = ('SELECT * FROM shelftags WHERE id = 13');
+        $resB = $dbc->query($queryB);
+        while ($row = $dbc->fetchRow($resB))  {
+            $scanned[] = $row['upc'];
+        }
+		*/
+
+		$scanned = array();
+        $queryB = ('SELECT * FROM woodshed_no_replicate.AuditScanner');
         $resB = $dbc->query($queryB);
         while ($row = $dbc->fetchRow($resB))  {
             $scanned[] = $row['upc'];
