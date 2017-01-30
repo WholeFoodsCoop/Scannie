@@ -136,7 +136,8 @@ class AuditScanner extends ScancoordDispatch
                 vd.margin AS unfiMarg,
                 d.margin AS deptMarg,
                 pu.description AS signdesc,
-                pu.brand AS signbrand
+                pu.brand AS signbrand,
+                case when n.upc is not null then '<span class=\'alert-warning\'>Flagged Narrow</span>' else NULL end as narrow
             FROM products AS p
                 LEFT JOIN productUser AS pu ON p.upc = pu.upc
                 LEFT JOIN departments AS d ON p.department=d.dept_no
@@ -147,6 +148,7 @@ class AuditScanner extends ScancoordDispatch
                 LEFT JOIN vendorDepartments AS vd 
                     ON vd.vendorID = p.default_vendor_id 
                         AND vd.deptID = vi.vendorDept
+                LEFT JOIN NarrowTags AS n ON p.upc=n.upc
             WHERE p.store_id = ?
                 AND p.upc = ?
             LIMIT 1
@@ -166,6 +168,7 @@ class AuditScanner extends ScancoordDispatch
             $signDesc = $row['signdesc'];
             $signBrand = $row['signbrand'];
             $inUse = $row['inUse'];
+            $narrow = $row['narrow'];
             
             if ($row['default_vendor_id'] == 1) {
                 $dMargin = $row['unfiMarg'];
@@ -291,6 +294,7 @@ class AuditScanner extends ScancoordDispatch
                                 <span class="text-'.$saleButtonClass.'" style="font-weight: bold; ">'.$saleStatus.' </span>
                                 <span class="caret text-'.$saleButtonClass.'"></span>
                             </button>
+                            '.$narrow.'
                         </div> 
                     </div>
                     
