@@ -25,22 +25,31 @@ body {
     //background: -moz-linear-gradient(#d99696, #d64f4f); /* For Firefox 3.6 to 15 */
     background: linear-gradient(#d99696, #d64f4f); /* Standard syntax */
 }
+.text-danger {
+    color: #d64f4f;
+}
 .btn-active {
     background-color: blue;
 }
-
 .btn-warning {
     background: #ffa72b; /* For browsers that do not support gradients */
     background: linear-gradient(#ffca80,#ffa72b); /* Standard syntax */
+}
+.text-warning {
+    color: #ffa72b;
 }
 .btn-success {
     background: #71c98a; /* For browsers that do not support gradients */
     background: linear-gradient(#abdeb9,#71c98a); /* Standard syntax */
 }
+.text-success {
+    color: #71c98a;
+}
 .btn-surprise {
     background: #c674cc; /* For browsers that do not support gradients */
     background: linear-gradient(#d9b2db,#c674cc); /* Standard syntax */
     color: white;
+    border: 1px solid purple;
 }
 .btn-inverse {
     background: #c674cc; /* For browsers that do not support gradients */
@@ -51,6 +60,10 @@ body {
     background: #c674cc; /* For browsers that do not support gradients */
     background: linear-gradient(#88caeb,#5ebceb); /* Standard syntax */
     color: white;
+}
+.text-info {
+    color: #5ebceb;
+    font-weight: bold;
 }
 .alert-inverse {
     background: #c674cc; /* For browsers that do not support gradients */
@@ -66,6 +79,10 @@ body {
 .table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
    background-color: #e0e0e0;
 }
+.menuNav {
+    font-weight: bold;
+}
+
 
 /*  Cmder Themed
 body, table, th, tr, td {

@@ -25,27 +25,31 @@ class menu
     public function nav_menu()
     {
         return '
-<div class="container-fluid"  align="center" style="height:80px;width:900px;">   
+<div class="container-fluid"  align="center" style="height:80px;width:900px; ">   
     <div class="navbar navbar-default collapse in hidden-xs hidden-print" style="background-color:white;border:none">
         <ul class="nav navbar-nav">
         
-            <li class="dropdown"><a style="width:160px;" class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">Item<span class="caret"></span></a>
+            <li class="dropdown"><a style="width:160px;" class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Item<span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
-                <li><a href="http://192.168.1.2/scancoord/item/last_sold_check.php">Last Sold</a></li>
-                <li><a href="http://192.168.1.2/scancoord/item/TrackChangeNew.php">Track Change</a></li>
-                <li><a href="" onclick="popitup(\'http://key/scancoord/item/marginCalc.php\')">Margin Calc</a></li>
-                <li><a href="" onclick="popitup(\'http://key/scancoord/item/PercentCalc.php\')">Percent Calc</a></li>
+                    <li><a href="http://192.168.1.2/scancoord/item/last_sold_check.php">Last Sold</a></li>
+                    <li><a href="http://192.168.1.2/scancoord/item/TrackChangeNew.php">Track Change</a></li>
+                    <li><a href="" onclick="popitup(\'http://key/scancoord/item/marginCalc.php\')">Margin Calc</a></li>
+                    <li><a href="" onclick="popitup(\'http://key/scancoord/item/PercentCalc.php\')">Percent Calc</a></li>
+                <li class="divider"></li><!-- divider with no header -->
+                <li class="dropdown-header">Scanning</li>
+                    <li><a href="http://key/scancoord/testing/AuditScanner.php">Audit Scanner</a></li>
+                    <li><a href="http://key/scancoord/testing/AuditScannerReport.php">Audit Scan Report</a></li>
             </ul></li>
             
-            <li class="dropdown"><a style="width:160px;" class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">Batches<span class="caret"></span></a>
+            <li class="dropdown"><a style="width:160px;" class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Batches<span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                 <li class="dropdown-header">Basics</li>
                     <li><a href="http://192.168.1.2/scancoord/item/coopBasicsScanPage.php">Basics Scan</a></li>
                 <li class="divider"></li><!-- divider with no header -->
                 <li class="dropdown-header">UNFI Sales Change</li>
-                    <li><a href="http://192.168.1.2/scancoord/item/SalesChange/SalesChangeIndex.php">Batch Check Index</a></li>
+                    <li><a href="http://192.168.1.2/scancoord/item/SalesChange/SalesChangeIndex.php">Batch Check </a></li>
                     <li><a href="http://192.168.1.2/scancoord/item/SalesChange/CoopDealsReview.php">Quality Assurance</a></li>
-                    <li><a href="http://192.168.1.2/scancoord/item/Batches/unfiBreakdowns.php">Breakdown</a></li>
+                    <li><a href="http://192.168.1.2/scancoord/item/Batches/unfiBreakdowns.php">Breakdowns</a></li>
                     <li><a href="http://192.168.1.2/scancoord/item/SignInfoHelper.php">Sign Info</a></li>
                     <li><a href="http://192.168.1.2/scancoord/item/Batches/prodBatchHistory.php">Item Batch History</a></li>
                     <li><a href="http://192.168.1.2/scancoord/testing/CoopDealsSearchPage.php">Coop+Deals File</a></li>
@@ -56,7 +60,7 @@ class menu
             </ul>
             </li>    
             
-            <li class="dropdown"><a style="width:160px;" class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">Data Monitor<span class="caret"></span></a>
+            <li class="dropdown"><a style="width:160px;" class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Data Monitor<span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                 <li class="dropdown-header">Discrepancy Tasks</li>
                     <li><a href="http://192.168.1.2/scancoord/dataScanning/zeroPriceCheck.php">Bad Price Scan</a></li>
@@ -66,7 +70,7 @@ class menu
             </li>
             
             
-            <li class="dropdown"><a style="width:160px;" class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">Misc.<span class="caret"></span></a>
+            <li class="dropdown"><a style="width:160px;" class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Misc.<span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                     <li class="dropdown-header">Testing</li>
                     <li><a href="http://192.168.1.2/scancoord/testing/ShelfAuditPage.php">Shelf Audit</a></li>
@@ -75,7 +79,9 @@ class menu
                     <li><a href="http://192.168.1.2/scancoord/testing/CashlessCheckPage.php">Cashess Trans. Check</a></li>
                 </ul>
             </li> 
-            <li class="dropdown"><a style="width:160px;" href="http://key/git/fannie/item/ItemEditorPage.php">CORE-POS<span class=""></span></a>
+            
+            
+            <li class="dropdown"><a class="menuNav" style="width:160px;" href="http://key/git/fannie/item/ItemEditorPage.php">CORE-POS<span class=""></span></a>
     </div>
 </div>
     ';
