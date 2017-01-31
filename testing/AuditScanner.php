@@ -319,9 +319,12 @@ class AuditScanner extends ScancoordDispatch
                     <br /><br />
                     <div class="row">
                         <div class="col-xs-4">
-                            
+                            <a class="text-info" href="AuditScannerReport.php ">View Report</a>                    
                         </div>
-                        <div class="col-xs-4"></div>
+                        <div class="col-xs-4">
+                        </div>
+                        <div class="col-xs-4">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -367,9 +370,10 @@ class AuditScanner extends ScancoordDispatch
                     </div>
                 </div>
             </div>
+        </div>
         ';
         
-        //$ret .= '<a class="btn btn-surprise" href="http://192.168.1.2/scancoord/testing/AuditScanner.php ">REFRESH</a>';
+        
         
         $ret .= '<br /><br /><br /><br /><br /><br />';
         

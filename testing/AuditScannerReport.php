@@ -193,7 +193,9 @@ class AuditScannerReport extends ScancoordDispatch
             <form method="post" id="myform">
                 <div align="right">
                     <button type="submit" name="cleardata" id="cleardata" value="1" class="btn btn-danger " 
-                        onclick="return confirm(\'Are you sure?\')" style="border: 2px solid red; ">Clear Scan Data</button>
+                        onclick="return confirm(\'Are you sure?\')" style="border: 2px solid red; ">Clear Scan Data</button><br />
+                        <br />
+                    <a class="text-info" style="width: 132px" href="AuditScanner.php ">Goto Scanner</a>&nbsp;&nbsp;&nbsp;&nbsp;
                 </div>
             </form>
         ';
