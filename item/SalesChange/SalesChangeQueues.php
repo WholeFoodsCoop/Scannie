@@ -105,7 +105,7 @@ function get_queue_name($dbc)
 
 function draw_table($dbc)
 {
- 
+   
     $curQueue = $_GET['queue'];
     $queueNames = array();
     $queueNames = get_queue_name($dbc);
@@ -175,11 +175,13 @@ function draw_table($dbc)
     }
     
     $batch = array();
+    $batchTypes = array();
     foreach ($upcs as $upc) {
         $prep = $dbc->prepare("
             SELECT 
                 ba.batchName,
-                ba.batchID
+                ba.batchID,
+                ba.batchType
             FROM is4c_op.batches AS ba 
             LEFT JOIN is4c_op.batchList AS bl ON ba.batchID=bl.batchID
             WHERE bl.upc = ?
@@ -188,6 +190,7 @@ function draw_table($dbc)
         $res = $dbc->execute($prep,$upc);
         while ($row = $dbc->fetch_row($res)) {
             $batchName[$upc] = $row['batchName'];
+            $batchTypes[$upc] = $row['batchType'];
             $batch[$upc] = "<a href='http://key/git/fannie/batches/newbatch/EditBatchPage.php?id="
 			. $row['batchID'] . "' target='_blank'>" . $row['batchName'] . "</a>";
         }
@@ -242,10 +245,15 @@ function draw_table($dbc)
     }
 */
     if (count($upcs) > 0) {
-        echo '<a href="" onclick="$(\'#cparea\').show(); return false;">Copy/paste</a><br />';
+        echo '<a href="" onclick="$(\'#cparea\').show(); return false;">Copy/paste</a>';
         echo '<textarea id="cparea" class="collapse">';
         echo implode("\n", $upcs);
         echo '</textarea>';
+        echo ' | <a href="http://192.168.1.2/scancoord/item/SalesChange/SalesChangeQueues.php?rmOtherSales=1&queue=0">Remove Non Co-op Deals Sale Items from List</a><br />';
+    }
+    
+    if ($_GET['rmOtherSales'] == 1) {
+        removeAddBatches($dbc,$batchTypes);
     }
 
     $curY = date('Y');
@@ -279,12 +287,7 @@ function draw_table($dbc)
                 } else {
                     echo "<td>" . substr($last_sold[$upc],0,10) . "</td>";
                 }
-            }
-            
-            
-            
-            
-
+            }        
             
             if ($curQueue == 7) {
                 echo "<td><a class=\"btn btn-default\" href=\"http://192.168.1.2/git/fannie/item/handheld/ItemStatusPage.php?id={$upc}\" target=\"_blank\">status check</a></tr>";  
@@ -301,3 +304,34 @@ function draw_table($dbc)
     echo "</table>";
 
 } 
+
+function removeAddBatches($dbc,$batchTypes)
+{
+    
+    $session = $_SESSION['session'];
+   
+    $upcs = array();
+    foreach ($batchTypes as $upc => $batchType) {
+        if ($batchType != 1) {
+            $upcs[] = $upc;
+        }
+    }
+    
+    list($inClause,$args) = $dbc->safeInClause($upcs);
+    $updateQ = 'UPDATE SaleChangeQueues SET queue = 1 WHERE upc IN ('.$inClause.')';
+    $prep = $dbc->prepare($updateQ);
+    $dbc->execute($prep,$args);
+    if ($dbc->error()) {
+        echo '<div class="alert alert-danger">'.$dbc->error().'</div>';
+    } else {
+        echo '<div class="alert alert-success">Items Removed from List</div>';
+    }
+    
+    return false;
+    
+}
+
+
+
+
+
