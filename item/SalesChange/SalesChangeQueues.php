@@ -324,7 +324,7 @@ function removeAddBatches($dbc,$batchTypes)
     if ($dbc->error()) {
         echo '<div class="alert alert-danger">'.$dbc->error().'</div>';
     } else {
-        echo '<div class="alert alert-success">Items Removed from List</div>';
+        echo '<div class="alert alert-success">Items Removed from List. Refresh the page by clicking \'Unchecked\' to reload the list with products removed.</div>';
     }
     
     return false;
