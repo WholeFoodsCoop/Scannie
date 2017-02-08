@@ -67,7 +67,7 @@ class ScancoordDispatch
                 </div>
             ';
             //print '<div class="container" id="border" style="width:95%;padding:5px">';
-            print '<div class="container" id="" style="min-height: 850px;width:95%;border:1px solid lightgrey; padding:5px; background-color: white">';
+            print '<div class="container" id="" style="min-height: 850px;width:95%;border:1px solid #f5ebd0; padding:5px; background-color: white">';
             print menu::nav_menu();    
         }
         

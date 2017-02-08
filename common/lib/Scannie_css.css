@@ -49,7 +49,7 @@ body {
     background: #c674cc; /* For browsers that do not support gradients */
     background: linear-gradient(#d9b2db,#c674cc); /* Standard syntax */
     color: white;
-    border: 1px solid purple;
+    border: 1px solid #f2b6e1;	
 }
 .btn-inverse {
     background: #c674cc; /* For browsers that do not support gradients */
@@ -81,6 +81,9 @@ body {
 }
 .menuNav {
     font-weight: bold;
+}
+td.highlight:hover, tr.highlight:hover  {
+    background-color: #f2f2f2;
 }
 
 

@@ -33,7 +33,7 @@ class menu
                 <ul class="dropdown-menu" role="menu">
                     <li><a href="http://192.168.1.2/scancoord/item/last_sold_check.php">Last Sold</a></li>
                     <li><a href="http://192.168.1.2/scancoord/item/TrackChangeNew.php">Track Change</a></li>
-                    <li><a href="" onclick="popitup(\'http://key/scancoord/item/marginCalc.php\')">Margin Calc</a></li>
+                    <li><a href="" onclick="popitup(\'http://key/scancoord/item/MarginCalcNew.php\')">Margin Calc</a></li>
                     <li><a href="" onclick="popitup(\'http://key/scancoord/item/PercentCalc.php\')">Percent Calc</a></li>
                 <li class="divider"></li><!-- divider with no header -->
                 <li class="dropdown-header">Scanning</li>
@@ -148,7 +148,7 @@ td.ltgrey {
 
 <script language="javascript" type="text/javascript">
 function popitup(url) {
-	newwindow=window.open(url,'name','height=320,width=300');
+	newwindow=window.open(url,'name','height=300,width=300');
 	if (window.focus) {newwindow.focus()}
 	return false;
 }
