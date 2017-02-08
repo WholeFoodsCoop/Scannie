@@ -46,7 +46,7 @@ class multiStoreDiscrepanciesPage extends ScancoordDispatch
         $ret = '<span class="text-success">' . ucwords($field)  . ' Discrepances : </span>';
         
         $diffR = $dbc->query("
-            SELECT upc
+            SELECT upc, description
             FROM products
             WHERE inUse = 1
             GROUP BY upc
@@ -57,23 +57,25 @@ class multiStoreDiscrepanciesPage extends ScancoordDispatch
         $msg = "";
         if ($count > 0 ) {
             while ($row = $dbc->fetchRow($diffR)) {
-                $itemA[$row['upc']] = 1;
+                $itemA[$row['upc']] = $row['description'];
             }
         }
         
         
         $ret .=  $count . ' discrepancies were discovered.<br>';
         
-        $ret .=  '<div align="left"><table style="border: none">';
+        $ret .=  '<div align="left"><table class="table-striped" style="border: none">';
         $ret .=  '
             <thead>
                 <th style="width:120px;text-align:center"></th>
-                <th style="width:120px;text-align:center"></th>
+                <th style="width:220px;text-align:center"></th>
+                <th style="width:50px;text-align:center"></th>
             </thead>
         ';
         foreach ($itemA as $upc => $value)  {
             $ret .=  '<tr>';
             $ret .=  '<td><a href="http://192.168.1.2/git/fannie/item/ItemEditorPage.php?searchupc=' . $upc . '&ntype=UPC&searchBtn=" target="_blank">' . $upc . '</a></td>';
+            $ret .= '<td>'.$value.'</td>';
             $ret .= '<td><div align="center"><a href="http://key/scancoord/item/TrackChangeNew.php?upc=' . $upc . '" target="_blank"><img src="../common/src/img/q.png" style="width:20px"></a></div></td>';
             $ret .=  '</tr>';
         }
