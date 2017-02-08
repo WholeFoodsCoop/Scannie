@@ -76,7 +76,7 @@ class coopBasicsScanPage
             echo '<h4>Coop Basics Review for <strong>Hillside</strong></h4>';
         }
         
-        echo "don't forget to upload Coop Basics checklist to Generic Upload.<br>";
+        echo "don't forget to upload Coop Basics checklist to <strong>Generic Upload</strong>.<br>";
         
         if (isset($_GET['session'])) {
             $session = substr($_GET['session'],0,-1);
@@ -149,6 +149,7 @@ class coopBasicsScanPage
         $notInUse = array();
         $curM = date('m');
         foreach ($missing as $key => $upc) {
+            /*
             $query = ("select last_sold from products where upc = {$upc} and store_id = 1");
             $res = $dbc->query($query);
             while ($row = $dbc->fetchRow($res))  {
@@ -162,19 +163,29 @@ class coopBasicsScanPage
                     //  do nothing
                 }
             }
+            */
+            $query = ("select inUse from products where upc = {$upc} and store_id = 1");
+            $res = $dbc->query($query);
+            while ($row = $dbc->fetchRow($res))  {
+                if ($row['inUse'] == 0) {
+                    unset($missing[$key]);
+                    $notInUse[] = $upc;
+                } else  {
+                    // do nothing
+                }
+            }
         }
         
         foreach ($missing as $key => $upc) {
             if (is_null($upc)) unset($missing[$key]);
         }
         
-        echo '<br>Signs that are missing, apparently<br>----------------------------------<br>';
+        echo '<br>Signs that are missing<br>----------------------------------<br>';
         foreach ($missing as $upc) echo $upc . '<br>';
-        echo '<br>Signs that are on the floor that should be taken down. . . apparently<br>---------------------------------------------------------------------<br>';
+        echo '<br>These signs are on the sales floor and should be taken down<br>---------------------------------------------------------------------<br>';
         foreach ($remove as $upc) echo $upc . '<br>';
-        echo '<br>These items should be marked as not in use for your store,
-            <br>they have not sold in at least 2 months<br>---------------------------------------------------------<br>';
-        echo '<span class="danger">This list has now been made irrelevant by product inUse automation.<br></span>';
+        echo '<br>These items should be marked as not in use for this store
+            <br>---------------------------------------------------------<br>';
         foreach ($notInUse as $upc) echo $upc . '<br>';
         
         
