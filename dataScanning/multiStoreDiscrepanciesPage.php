@@ -64,11 +64,11 @@ class multiStoreDiscrepanciesPage extends ScancoordDispatch
         
         $ret .=  $count . ' discrepancies were discovered.<br>';
         
-        $ret .=  '<div align="left"><table class="table-striped" style="border: none">';
+        $ret .=  '<div align="left" ><table class="table-striped" style="border: 1px solid lightgrey;">';
         $ret .=  '
             <thead>
                 <th style="width:120px;text-align:center"></th>
-                <th style="width:220px;text-align:center"></th>
+                <th style="width:300px;text-align:center"></th>
                 <th style="width:50px;text-align:center"></th>
             </thead>
         ';
