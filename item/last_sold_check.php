@@ -56,7 +56,15 @@ class last_sold_check extends scancoordDispatch
             }
         }
         
-        $ret .= '<table class="table table-striped table-condensed small" style="width:900 px;border:2px solid lightgrey">';
+        $link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+        $ret .= '
+            <div align="right">
+                <a href="'.$link.'&hide=1" class="btn btn-default btn-xs" id="btn-hill">Hide Hillside</a>
+                <a href="'.$link.'&hide=2" class="btn btn-default btn-xs" id="btn-denf">Hide Denfeld</a>
+            </div><br>
+        ';
+        
+        $ret .= '<table class="table table-condensed small" style="width:900 px;border:2px solid lightgrey"><tbody>';
         $ret .= '
             <th>UPC</th>
             <th>Last Date Sold</th>
@@ -92,11 +100,17 @@ class last_sold_check extends scancoordDispatch
                 }
                 $upcLink = '<a href="http://192.168.1.2/git/fannie/item/ItemEditorPage.php?searchupc=' . $upc . '" target="_blank">' . $upc . '</a>';
                 $ret .= "<tr>";
-                $ret .= "<td>" . $upcLink . "</td><td>" . $last_sold . "</td><td>" . $row['store_id'] . "</td><td>" . $row['description'] . "</td><td>" . $row['brand'] . "</td>";
+                $ret .= "<td>" . $upcLink . "</td><td>" . $last_sold . "</td><td class='store_id'>" . $row['store_id'] . "</td><td>" . $row['description'] . "</td><td>" . $row['brand'] . "</td>";
                 $ret .= "</tr>";
             }
         }
-        $ret .= "</table>";
+        $ret .= "</tbody></table>";
+        
+        if ($_GET['hide'] == 1) {
+            $ret .= $this->javascript_hide_hillside();
+        } elseif ($_GET['hide'] == 2) {
+            $ret .= $this->javascript_hide_denfeld();
+        } 
         
         return $ret;
     }
@@ -367,6 +381,41 @@ class last_sold_check extends scancoordDispatch
             </form>
         ';
     }
+    
+    private function javascript_hide_hillside()
+    {     
+        return '
+<script type="text/javascript">
+    $("tr").each(function() { 
+        var op_store = 1;
+        var id = $(this).find(\'td.store_id\').text();
+        if (id == op_store) {
+            $(this).closest(\'tr\').hide();
+        }
+    });
+        $("#btn-hill").hide();
+</script>
+        ';
+    
+    }
+    
+    private function javascript_hide_denfeld()
+    {     
+        return '
+<script type="text/javascript">
+    $("tr").each(function() { 
+        var op_store = 2;
+        var id = $(this).find(\'td.store_id\').text();
+        if (id == op_store) {
+            $(this).closest(\'tr\').hide();
+        }
+    });
+    $("#btn-denf").hide();
+</script>
+        ';
+    
+    }
+
     
 }
 

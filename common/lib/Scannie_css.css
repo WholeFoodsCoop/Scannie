@@ -85,6 +85,9 @@ body {
 td.highlight:hover, tr.highlight:hover  {
     background-color: #f2f2f2;
 }
+thead.float {
+    background-color: white;
+}
 
 
 /*  Cmder Themed

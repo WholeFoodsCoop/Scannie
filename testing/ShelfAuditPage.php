@@ -53,6 +53,7 @@ class ShelfAuditPage extends ScancoordDispatch
         }
 
         $store_id = scanLib::getStoreID();
+		//$store_id = 2;
         if($store_id == 2) {
             $queue = 26;
             $ret .= 'Shelftag Queues Data for <strong>Denfeld</strong>';
@@ -178,7 +179,7 @@ class ShelfAuditPage extends ScancoordDispatch
         }
         
         $ret .=  '<div class="panel panel-default">
-            <table class="table table-striped">';
+            <table class="table">';
         $ret .=  '<thead>';
         foreach ($headers as $v) {
             $ret .=  '<th>' . $v . '</th>';

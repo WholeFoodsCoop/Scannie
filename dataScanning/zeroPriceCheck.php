@@ -139,7 +139,7 @@ class zeroPriceCheck extends ScancoordDispatch
                 '.$count.' products with bad prices discovered.<br></div>';
                 
             $ret .=  '<table class="table table-condensed table-striped">';
-            $headers = array('upc','description','brand','super Dept.','price','cost','store','x');
+            $headers = array('upc','description','brand','super Dept.','price','cost','store','&Delta;');
             $ret .= '<thead>';
             foreach ($headers as $header) {
                 $ret .= '<th>'.$header.'</th>';

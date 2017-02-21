@@ -82,6 +82,8 @@ class menu
             
             
             <li class="dropdown"><a class="menuNav" style="width:160px;" href="http://key/git/fannie/item/ItemEditorPage.php">CORE-POS<span class=""></span></a>
+            
+            <li></li>
     </div>
 </div>
     ';

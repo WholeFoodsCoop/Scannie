@@ -37,16 +37,19 @@ class AuditScannerReport extends ScancoordDispatch
     protected $ui = TRUE;
     protected $add_javascript_content = TRUE;
     
-    private function clear_scandata_hander($dbc)
+    private function clear_scandata_hander($dbc,$storeID) 
     {
         
-        $query = $dbc->prepare("TRUNCATE woodshed_no_replicate.AuditScanner");
-        $dbc->execute($query);
+        $args = array($storeID);
+        $query = $dbc->prepare("DELETE FROM woodshed_no_replicate.AuditScanner WHERE store_id = ?");
+        $dbc->execute($query,$args);
         
         return '
-            <div class="alert alert-success">Data Cleared <a href="http://key/scancoord/testing/AuditScannerReport.php" 
-                class="btn btn-success btn-xs">Reload</a>
+        <div align="center">
+            <div class="alert alert-success">Data Cleared<br /> <a href="http://key/scancoord/testing/AuditScannerReport.php" 
+                class="btn btn-success btn-xs">Please - Click Me - </a>
             </div>
+        </div>
         ';
     }
     
@@ -60,9 +63,10 @@ class AuditScannerReport extends ScancoordDispatch
         include('../common/lib/scanLib.php');
         $rounder = new PriceRounder();
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
+        $storeID = scanLib::getStoreID(); 
         
         if ($_POST['cleardata']) {
-            $ret .= $this->clear_scandata_hander($dbc);
+            $ret .= $this->clear_scandata_hander($dbc,$storeID);
         }
         
         if($_GET['upc']) {
@@ -73,17 +77,17 @@ class AuditScannerReport extends ScancoordDispatch
         $ret .= $this->form_content();
         
         $ret .= '
-            <table class="table table-bordered table-condensed small" style="width: 300px;"> 
+            <table class="table table-bordered table-condensed small" style="width: 500px;"> 
                 <tr><td>Key</td><td></td></tr>
-                <tr><td style="background-color: lightgrey">&nbsp;</td><td>Product Missing Cost</td></tr>
-                <tr><td style="background-color: lightblue">&nbsp;</td><td>Price Above Margin</td></tr>
-                <tr><td style="background-color: #FFF457">&nbsp;</td><td>Price Below Margin (M)</td></tr>
-                <tr><td style="background-color: tomato">&nbsp;</td><td>Price Below Margin (L)</td></tr>
+                <tr><td style="background-color: lightgrey">&nbsp;</td><td>Product Missing Cost</td>
+                <td style="background-color: lightblue; width: 30px">&nbsp;</td><td>Price Above Margin</td></tr>
+                <tr><td style="background-color: #FFF457">&nbsp;</td><td>Price Below Margin (M)</td>
+                <td style="background-color: tomato; width: 30px; ">&nbsp;</td><td>Price Below Margin (L)</td></tr>
             </table>
         ';
         
         $query = $dbc->prepare("
-        	SELECT upc, description, cost, price, curMarg, desMarg, rsrp, srp, prid, flag, dept, vendor, notes
+        	SELECT upc, description, cost, price, curMarg, desMarg, rsrp, srp, prid, flag, dept, vendor, notes, store_id
 			FROM woodshed_no_replicate.AuditScanner 
             ORDER BY vendor, dept;
         ");    
@@ -109,7 +113,6 @@ class AuditScannerReport extends ScancoordDispatch
             $srp = $data[$k]['srp'];
             $price = $data[$k]['price'];
             $difference = sprintf("%0.3f",$srp - $price);
-            
             $margin = $data[$k]['curMarg'];
             $dMargin = $data[$k]['desMarg'];
             //CREATE FLAGS FOR <TR> STYLE
@@ -132,23 +135,23 @@ class AuditScannerReport extends ScancoordDispatch
         }
         
         $ret .=  '<div class="panel panel-default">
-            <table class="table table-condensed">';
-        $ret .=  '<thead>';
+            <table class="table table-condensed" id="mytable">';
+        $ret .=  '<thead class="float">';
         foreach ($headers as $v) {
             $ret .=  '<th>' . $v . '</th>';
         }
         $ret .=  '</thead>';
         $prevKey = '1';
-        $ret .= '<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
-        $ret .=  '<tr>';
+        $ret .= '<tbody>';
+        $ret .= '<tr style="background-color: grey"><td></td><td></td><td></td><td></td><td></td>
+            <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+        $ret .=  '<tr class="highlight">';
         foreach ($data as $k => $array) { 
             foreach ($array as $kb => $v) {
-                //  mod values in table
-                if ($kb == 'prid' && $v > 0) {
-                    //$ret .=  '<td style="background-color:white; color: grey; ">' . $v . '</td>'; 
-                    $ret .=  '<td> ' . $v . '</td>'; 
+                if ($kb == 'store_id') {
+                    $ret .=  '<td class="store_id">' . $v . '</td>'; 
                 } else {
-                    $ret .=  '<td> ' . $v . '</td>'; 
+                    $ret .=  '<td>' . $v . '</td>'; 
                 }
             }
             if($prevKey != $k) {
@@ -161,28 +164,35 @@ class AuditScannerReport extends ScancoordDispatch
                     $ret .=  '</tr><tr>';
                 }*/
                 if ($data[$k+1]['cost'] == 0) {
-                    $ret .=  '</tr><tr class="" style="background-color:lightgrey; ">';
+                    $ret .=  '</tr><tr class="highlight" style="background-color:lightgrey; ">';
                 } elseif (in_array(($k+1),$flags['danger']) && $data[$k+1]['prid'] == 0) {
-                    $ret .=  '</tr><tr class="" style="background-color:tomato; color:#700404">';
+                    $ret .=  '</tr><tr class="highlight" style="background-color:tomato; color:#700404">';
 	            } elseif (in_array(($k+1),$flags['warning']) && $data[$k+1]['prid'] == 0) {
-                    $ret .=  '</tr><tr class="" style="background-color:#FFF457; color: #635d00">';
+                    $ret .=  '</tr><tr class="highlight" style="background-color:#FFF457; color: #635d00">';
                 } elseif (in_array(($k+1),$flags['info']) && $data[$k+1]['prid'] == 0) {
-                    $ret .=  '</tr><tr class="" style="background-color:lightblue; color: #344c57">';
+                    $ret .=  '</tr><tr class="highlight" style="background-color:lightblue; color: #344c57">';
                 } else {
-                    $ret .=  '</tr><tr>';
+                    $ret .=  '</tr><tr class="highlight">';
                 }
                 
             } 
             
             $prevKey = $k;
         }
-        $ret .=  '</table></div>';
+        $ret .=  '</tbody></table></div>';
         
         /*
         $upcLink = "<a href='http://key/git/fannie/item/ItemEditorPage.php?searchupc=" 
                 . $upc . "&ntype=UPC&searchBtn=' target='_blank'>{$upc}</a>";
         */
         if ($dbc->error()) $ret .=  $dbc->error();
+        
+        if ($storeID == 1) {
+            $OppoID = 2;
+        } else {
+            $OppoID = 1;
+        }
+        $ret .= $this->javascript_content($OppoID);
         
         return $ret;
     }
@@ -201,21 +211,27 @@ class AuditScannerReport extends ScancoordDispatch
         ';
     }
     
-    public function javascript_content()
+    public function javascript_content($e)
     {
         
-        return '
-<script>
-function clicked() {
-    if (confirm(\'Do you want to submit?\')) {
-           $(\'#myform\').submit();
-       } else {
-           return false;
-       }
-}
+        $ret = '';
+        $ret .= '
+<script type="text/javascript">
+    $("tr").each(function() { 
+        var op_store = '.$e.';
+        var id = $(this).find(\'td.store_id\').text();
+        if (id == op_store) {
+            $(this).closest(\'tr\').hide();
+        }
+    });
 </script>
-
+<script type="text/javascript">
+    var $table = $(\'#mytable\');
+    $table.floatThead();
+</script>
+<script src="/scancoord/common/javascript/jquery.floatThead.min.js"></script>
         ';
+        return $ret;
     }
     
     

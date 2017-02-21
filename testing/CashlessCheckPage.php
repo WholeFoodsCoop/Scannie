@@ -389,14 +389,14 @@ class CashlessCheckPage extends ScancoordDispatch
                     $qln = 1;
                     
                     if ($xRes == 'Cancelled at POS.') {
-                        //do nothing
                     } elseif ((strstr($xRes,'Approved') || strstr($xRes,'APPROVED')) && $amount == $curAmount) {
+                        //do nothing
                         //do nothing
                     } else {
                         $ret .= '
                             <div align="center">
                                 <div class="alert alert-danger" style="text-align: center; width: 800px">
-                                    POSSIBLE UNCOMPLETE TRANS ('.$xRes.') '.$curEmpNo.'-'.$registerNo.'-'.$transNo.' on '.$date.' <br />
+                                    POSSIBLE INCOMPLETE TRANS ('.$xRes.') '.$curEmpNo.'-'.$registerNo.'-'.$transNo.' on '.$date.' <br />
                                 </div>
                             </div>
                         ';

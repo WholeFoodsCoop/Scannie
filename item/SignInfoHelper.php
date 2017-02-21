@@ -14,6 +14,7 @@ class SignInfoHelper extends ScancoordDispatch
     protected $description = "[Sign Info Helper] Find product information in relation 
         to sales on a specified date.";
     protected $ui = TRUE;
+    protected $add_javascript_content = TRUE;
     
     public function body_content()
     {
@@ -69,11 +70,11 @@ class SignInfoHelper extends ScancoordDispatch
         echo " on ".$startdate;
         echo " for ".$_POST['store_id']." <br>";
         
-        print '<div class="panel panel-default">';
-        print "<table class='table table-striped table-condensed small'>";
+        echo '<div class="panel panel-default">';
+        echo '<table id="mytable" class="table table-striped table-condensed small">';
         $headers = array('Brand','Brand','Description','Description','size','upc,','Norm $',
             'Sale $','Batch Name','BatchID','last_sold');
-        echo '<thead ">';
+        echo '<thead>';
         foreach ($headers as $header) echo '<th>'.$header.'</th>';
         echo '</thead>';
         $wTD = '<td class="btn-danger">';
@@ -96,8 +97,8 @@ class SignInfoHelper extends ScancoordDispatch
             echo $row['last_sold'].'</td>';
             echo '</tr>';
         }
-        print "</table>";
-        print '</div>';
+        echo "</table>";
+        echo '</div>';
     }
     
     private function form_content()
@@ -130,6 +131,20 @@ class SignInfoHelper extends ScancoordDispatch
             </div><br>
         ';
         
+        return $ret;
+    }
+    
+    public function javascript_content()
+    {
+        
+        $ret = '';
+        $ret .= '
+<script type="text/javascript">
+    var $table = $(\'#mytable\');
+    $table.floatThead();
+</script>
+<script src="/scancoord/common/javascript/jquery.floatThead.min.js"></script>
+        ';
         return $ret;
     }
     

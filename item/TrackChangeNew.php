@@ -32,9 +32,10 @@ class TrackChangeNew extends ScancoordDispatch
     protected $title = "Track Change";
     protected $description = "[Track Change] Track all changes made to an item in POS/OFFICE.";
     protected $ui = TRUE;
+    protected $add_javascript_content = TRUE;
     
     public function body_content()
-    {           
+    {
         $ret = '';
 
         $desc = array();
@@ -116,21 +117,22 @@ class TrackChangeNew extends ScancoordDispatch
             }
 
             $ret .=  "<div class='panel panel-default'>";
-            $ret .=  "<table class='table' style='color:black'>";
+            $ret .=  "<table class='table' id='mytable'>";
             $ret .=  "
-                <tr><td>Description</td>
-                <td>Price</td><td>Sale</td>
-                <td>Cost</td>
-                <td>Dept</td>
-                <td>Tax</td>
-                <td>FS</td>
-                <td>Scale</td>
-                <td>wic</td>
-                <td>store</td>
-                <td>In Use</td>
-                <td>Modified</td>
-                <td>Modified By</td>
-                </tr>
+                <thead>
+                <th>Description</th>
+                <th>Price</th><th>Sale</th>
+                <th>Cost</th>
+                <th>Dept</th>
+                <th>Tax</th>
+                <th>FS</th>
+                <th>Scale</th>
+                <th>wic</th>
+                <th>store</th>
+                <th>In Use</th>
+                <th>Modified</th>
+                <th>Modified By</th>
+                </thead>
             ";
             for ($i=0; $i<count($desc); $i++) {
                 if($store_id[$i] == 1) $store_id[$i] = "Hillside";
@@ -204,6 +206,20 @@ class TrackChangeNew extends ScancoordDispatch
                     </div>
                 </form>
         ';
+    }
+    
+        public function javascript_content()
+    {
+        
+        $ret = '';
+        $ret .= '
+<script type="text/javascript">
+    var $table = $(\'#mytable\');
+    $table.floatThead();
+</script>
+<script src="/scancoord/common/javascript/jquery.floatThead.min.js"></script>
+        ';
+        return $ret;
     }
     
 }

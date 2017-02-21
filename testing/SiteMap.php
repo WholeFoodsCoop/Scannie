@@ -102,6 +102,7 @@ class SiteMap extends ScancoordDispatch
         $exceptions[] = "salesChangeAjaxErrSigns.php";
         $exceptions[] = "salesChangeAjax2.php";
         $exceptions[] = "SalesChangeLinksNew.html";
+        $exceptions[] = "DiscrepanciesEmail.php";
         
         $dir = opendir($dirname);
         

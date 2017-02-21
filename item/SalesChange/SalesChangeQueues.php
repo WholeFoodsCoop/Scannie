@@ -216,7 +216,7 @@ function draw_table($dbc)
             <form method="post">
               <input type="hidden" name="queue" value="0">
               <input type="hidden" name="rmDisco" value="1">
-              <!-- <button type="submit" class="btn btn-default btn-xs">Remove Disco/Overstock batch items</button> -->
+              <!-- <button type="submit" class="btn btn-default btn-xs" >Remove Disco/Overstock batch items</button> -->
             </form>
         ';
     }
@@ -249,7 +249,8 @@ function draw_table($dbc)
         echo '<textarea id="cparea" class="collapse">';
         echo implode("\n", $upcs);
         echo '</textarea>';
-        echo ' | <a href="http://192.168.1.2/scancoord/item/SalesChange/SalesChangeQueues.php?rmOtherSales=1&queue=0">Remove Non Co-op Deals Sale Items from List</a><br />';
+        echo ' | <a href="http://192.168.1.2/scancoord/item/SalesChange/SalesChangeQueues.php?rmOtherSales=1&queue=0"
+            onclick="return confirm(\'Are you sure?\')">Remove Non Co-op Deals Sale Items from List</a><br />';
     }
     
     if ($_GET['rmOtherSales'] == 1) {

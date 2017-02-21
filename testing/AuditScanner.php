@@ -137,6 +137,8 @@ class AuditScanner extends ScancoordDispatch
                 d.margin AS deptMarg,
                 pu.description AS signdesc,
                 pu.brand AS signbrand,
+                v.shippingMarkup, 
+                v.discountRate,
                 case when n.upc is not null then '<span class=\'alert-warning\'>Flagged Narrow</span>' else NULL end as narrow
             FROM products AS p
                 LEFT JOIN productUser AS pu ON p.upc = pu.upc
@@ -169,6 +171,12 @@ class AuditScanner extends ScancoordDispatch
             $signBrand = $row['signbrand'];
             $inUse = $row['inUse'];
             $narrow = $row['narrow'];
+            $markup = $row['shippingMarkup'];
+            $discount = $row['discountRate'];
+            
+            $adjcost = $cost;
+            if ($markup > 0) $adjcost += $cost * $markup;
+            if ($discount > 0) $adjcost -= $cost * $discount;
             
             if ($row['default_vendor_id'] == 1) {
                 $dMargin = $row['unfiMarg'];
@@ -178,10 +186,17 @@ class AuditScanner extends ScancoordDispatch
         }
         if ($dbc->error()) echo $dbc->error();
         
+        /* This was used before $adjcost was introduced. 
         $margin = ($price - $cost) / $price;
         $rSrp = $cost / (1 - $dMargin);
         $srp = $rounder->round($rSrp);
-        $sMargin = ($srp - $cost ) / $srp;
+        $sMargin = ($srp - $cost ) / $srp;    
+        */
+        $margin = ($price - $adjcost) / $price;
+        $rSrp = $adjcost / (1 - $dMargin);
+        $srp = $rounder->round($rSrp);
+        $sMargin = ($srp - $adjcost ) / $srp;  
+        
         
         $sWarn = 'default';
         if ($srp != $price) {
@@ -199,9 +214,11 @@ class AuditScanner extends ScancoordDispatch
             }
         }
         
-        $data = array('cost'=>$cost,'price'=>$price,'desc'=>$desc,'brand'=>$brand,'vendor'=>$vd,'upc'=>$upc,
+        $passcost = $cost;
+        if ($cost != $adjcost) $passcost = $adjcost;
+        $data = array('cost'=>$passcost,'price'=>$price,'desc'=>$desc,'brand'=>$brand,'vendor'=>$vd,'upc'=>$upc,
             'dept'=>$dept,'margin'=>$margin,'rsrp'=>$rSrp,'srp'=>$srp,'smarg'=>$sMargin,'warning'=>$sWarn,
-            'pid'=>$pid,'dMargin'=>$dMargin);
+            'pid'=>$pid,'dMargin'=>$dMargin,'storeID'=>$storeID);
         $this->record_data_handler($data);
         
         $warning = array();
@@ -227,15 +244,31 @@ class AuditScanner extends ScancoordDispatch
             $warning['price'] = 'danger';
         }
      
+        if ($pid != 0) {
+            $price_rule = '<span style="text-shadow: 0.5px 0.5px tomato; color: orange">*</span>
+                <span class="text-tiny">pid</span>';
+        } else {
+            $price_rule = '';
+        }
+        
+        if ($adjcost != $cost) {
+            $adjCostStr = '<span class="text-tiny">adj cost: </span><span style="color: grey; text-shadow: 0px  0px 1px white">'.sprintf('%0.2f',$adjcost).'</span>';
+        } else {
+            $adjCostStr = '&nbsp;';
+        }
         $ret .= '
             <div align="center">
                 <div class="container">
                     <div class="row">
                         <div class="col-xs-4 info" > 
-                            <div style="float: left; color: grey">cost</div><br />'.$cost.'<br />&nbsp;
+                            <div style="float: left; color: grey">cost</div><br />'.$cost.'<br />
+                                '.$adjCostStr.'
                         </div> 
                         <div class="col-xs-4 info" > 
-                            <div style="float: left; color: grey">price</div><br /><span class="text-'.$warning['price'].'" style="font-weight: bold; ">'.$price.'</span><br />&nbsp;
+                            <div style="float: left; color: grey">price</div><br />
+                                <span class="text-'.$warning['price'].'" style="font-weight: bold; ">
+                                    '.$price.'</span>
+                                    '.$price_rule.'<br />&nbsp;
                         </div> 
                         <div class="col-xs-4 info" >
                             <div style="float: left; color: grey">margin</div><br /><span class="text-'.$warning['margin'].'">'.sprintf('%0.2f%%',$margin*100).'</span> 
@@ -405,8 +438,7 @@ class AuditScanner extends ScancoordDispatch
         $ret = '';
         include('../config.php');
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANALTDB, $SCANUSER, $SCANPASS);
-        //$storeID = scanLib::getStoreID();
-        
+        //echo '<h1>' . $data['upc'] . '</h1>';
         $prepA = $dbc->prepare("SELECT * FROM AuditScanner WHERE upc = ? LIMIT 1");
         $resA = $dbc->execute($prepA,$data['upc']);
         if ($dbc->numRows($resA) == 0) {
@@ -422,19 +454,21 @@ class AuditScanner extends ScancoordDispatch
                 $data['srp'],
                 $data['pid'],
                 $data['warning'],
-                $data['cost']
+                $data['cost'],
+                $data['storeID']
             );
             $prep = $dbc->prepare("
                 INSERT INTO AuditScanner 
                 (
                     upc, description, price, curMarg, desMarg, dept, 
-                        vendor, rsrp, srp, prid, flag, cost
+                        vendor, rsrp, srp, prid, flag, cost, store_id
                 ) VALUES (
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
                 );
             ");
             $dbc->execute($prep,$args);
-            if ($dbc->error()) echo '<div class="alert alert-warning>' . $dbc->error() . '</div>';
+            echo $data[$upc];
+            if ($dbc->error()) echo '<div class="alert alert-warning>' . $dbc->error() . '</div>';        
         } else {
             return false;
         }
@@ -456,7 +490,7 @@ class AuditScanner extends ScancoordDispatch
                 padding: 5px;
             }
             body {
-                background-image: url(\'../common/src/img/lbgrad.png\');
+                //background-image: url(\'../common/src/img/lbgrad.png\');
             }
             .vid {
                 color: #525259;
