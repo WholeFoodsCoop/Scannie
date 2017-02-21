@@ -37,8 +37,8 @@ class menu
                     <li><a href="" onclick="popitup(\'http://key/scancoord/item/PercentCalc.php\')">Percent Calc</a></li>
                 <li class="divider"></li><!-- divider with no header -->
                 <li class="dropdown-header">Scanning</li>
-                    <li><a href="http://key/scancoord/testing/AuditScanner.php">Audit Scanner</a></li>
-                    <li><a href="http://key/scancoord/testing/AuditScannerReport.php">Audit Scan Report</a></li>
+                    <li><a href="http://key/scancoord/item/AuditScanner.php">Audit Scanner</a></li>
+                    <li><a href="http://key/scancoord/item/AuditScannerReport.php">Audit Scan Report</a></li>
             </ul></li>
             
             <li class="dropdown"><a style="width:160px;" class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Batches<span class="caret"></span></a>
@@ -52,11 +52,12 @@ class menu
                     <li><a href="http://192.168.1.2/scancoord/item/Batches/unfiBreakdowns.php">Breakdowns</a></li>
                     <li><a href="http://192.168.1.2/scancoord/item/SignInfoHelper.php">Sign Info</a></li>
                     <li><a href="http://192.168.1.2/scancoord/item/Batches/prodBatchHistory.php">Item Batch History</a></li>
-                    <li><a href="http://192.168.1.2/scancoord/testing/CoopDealsSearchPage.php">Coop+Deals File</a></li>
+                    <li><a href="http://192.168.1.2/scancoord/item/Batches/CoopDealsSearchPage.php">Coop+Deals File</a></li>
                 <li class="divider"></li><!-- divider with no header -->
                 <li class="dropdown-header">Price Changes</li>
                     <li><a href="http://192.168.1.2/scancoord/item/Batches/batchForceCheck.php">Batch Force Check</a></li>
                     <li><a href="http://192.168.1.2/scancoord/item/Batches/BatchReview/">Batch Review</a></li>
+                    <li><a href="http://192.168.1.2/scancoord/item/Batches/CheckBatchPercent.php">Sales Batch %</a></li>
             </ul>
             </li>    
             
@@ -65,21 +66,12 @@ class menu
                 <li class="dropdown-header">Discrepancy Tasks</li>
                     <li><a href="http://192.168.1.2/scancoord/dataScanning/zeroPriceCheck.php">Bad Price Scan</a></li>
                     <li><a href="http://192.168.1.2/scancoord/dataScanning/ExceptionSaleItemTracker.php">Exception Sale Items</a></li>
-                    <li><a href="http://192.168.1.2/scancoord/dataScanning/multiStoreDiscrepanciesPage.php">Multi-Store Prod Discrep</a></li> 
+                    <li><a href="http://192.168.1.2/scancoord/dataScanning/MultiStoreDiscrepTable.php">Multi-Store Prod Discrep</a></li> 
+                    <li><a href="http://192.168.1.2/scancoord/dataScanning/CashlessCheckPage.php">Cashess Trans. Check</a></li>
                 </ul>
             </li>
             
-            
-            <li class="dropdown"><a style="width:160px;" class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Misc.<span class="caret"></span></a>
-                <ul class="dropdown-menu" role="menu">
-                    <li class="dropdown-header">Testing</li>
-                    <li><a href="http://192.168.1.2/scancoord/testing/ShelfAuditPage.php">Shelf Audit</a></li>
-                    <li><a href="http://192.168.1.2/scancoord/item/Batches/CheckBatchPercent.php">Sales Batch %</a></li>
-                <li class="divider"></li><!-- divider with no header -->
-                    <li><a href="http://192.168.1.2/scancoord/testing/CashlessCheckPage.php">Cashess Trans. Check</a></li>
-                </ul>
-            </li> 
-            
+            <li class="dropdown"><a class="menuNav" style="width:160px;" href="">Help<span class=""></span></a>
             
             <li class="dropdown"><a class="menuNav" style="width:160px;" href="http://key/git/fannie/item/ItemEditorPage.php">CORE-POS<span class=""></span></a>
             
