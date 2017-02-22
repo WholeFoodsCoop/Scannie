@@ -31,6 +31,10 @@ class ScancoordDispatch
     protected $add_css_content = false;
     protected $add_javascript_content = false;
     
+    public function help_content() { 
+        return 'No notes have been entered for this page.'; 
+    } 
+    
     function __construct() {
         $this->start_timestamp = microtime(true);
         $auth_default = NULL;
@@ -71,9 +75,32 @@ class ScancoordDispatch
             print menu::nav_menu();    
         }
         
-        print $this->body_content();        
+        print $this->body_content();   
+        print $this->get_help_content();
         print '</div></div></div>';
         print $this->footer();
+    }
+    
+    private function get_help_content()
+    {
+        return '
+            <div id="help" class="modal fade">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h3 class="modal-title" style="color: #8c7b70">'.$this->title.'</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                            style="position: absolute; top:20; right: 20">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        '.$this->help_content().'
+                      </div>
+                    </div>
+                </div>
+            </div>
+        ';
     }
     
     static public function conditionalExec($custom_errors=true)

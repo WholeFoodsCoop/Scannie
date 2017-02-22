@@ -61,17 +61,19 @@ class menu
             </ul>
             </li>    
             
-            <li class="dropdown"><a style="width:160px;" class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Data Monitor<span class="caret"></span></a>
+            <li class="dropdown"><a style="width:160px;" class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Data<span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                 <li class="dropdown-header">Discrepancy Tasks</li>
                     <li><a href="http://192.168.1.2/scancoord/dataScanning/zeroPriceCheck.php">Bad Price Scan</a></li>
                     <li><a href="http://192.168.1.2/scancoord/dataScanning/ExceptionSaleItemTracker.php">Exception Sale Items</a></li>
                     <li><a href="http://192.168.1.2/scancoord/dataScanning/MultiStoreDiscrepTable.php">Multi-Store Prod Discrep</a></li> 
                     <li><a href="http://192.168.1.2/scancoord/dataScanning/CashlessCheckPage.php">Cashess Trans. Check</a></li>
+                    <li><a href="http://192.168.1.2/scancoord/misc/ProdUserChangeReport.php">Prod User Change</a></li>
                 </ul>
             </li>
             
-            <li class="dropdown"><a class="menuNav" style="width:160px;" href="">Help<span class=""></span></a>
+            <li class="dropdown"><a class="menuNav" style="width:160px;" href=""
+                data-toggle="modal" data-target="#help">Help<span class=""></span></a>
             
             <li class="dropdown"><a class="menuNav" style="width:160px;" href="http://key/git/fannie/item/ItemEditorPage.php">CORE-POS<span class=""></span></a>
             

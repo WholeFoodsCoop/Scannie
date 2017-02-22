@@ -120,7 +120,7 @@ class CoopDealsSearchPage extends ScancoordDispatch
             }
             if ($dbc->error()) echo $dbc->error();
             $ret .= '<div class="panel panel-default">
-                <table class="table table-striped table-condensed small">';
+                <table class="table table-condensed small">';
 			$ret .= '
 				<thead>
 					<th>UPC</th>
@@ -136,7 +136,7 @@ class CoopDealsSearchPage extends ScancoordDispatch
 				</thead>
 			';
             foreach ($data as $upc => $row) {
-                $ret .= '<tr>';
+                $ret .= '<tr class="bhighlight">';
                 $ret .= '<td>' . $upc . '</td>';
                 foreach ($row as $k => $v) {
                     $ret .= '<td>' . $v . '</td>';
@@ -204,7 +204,7 @@ class CoopDealsSearchPage extends ScancoordDispatch
                     
 					<input type="hidden" name="month" value="'.$month.'">
                     <br><br>&nbsp;<button class="btn btn-default btn-sm">Narrow Search</button> &nbsp;&nbsp;
-          			<a class="btn btn-default btn-sm" href="http://key/scancoord/testing/CoopDealsSearchPage.php?month='.$month.'">Clear Search</a>      
+          			<a class="btn btn-default btn-sm" href="http://key/scancoord/item/Batches/CoopDealsSearchPage.php?month='.$month.'">Clear Search</a>      
                 </form>
         </div>
         ';

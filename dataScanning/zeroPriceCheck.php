@@ -35,25 +35,6 @@ class zeroPriceCheck extends ScancoordDispatch
     protected $title = "Bad Price Scan";
     protected $description = "[Bad Price Scan] Scan for in-use items with bad prices.";
     protected $ui = TRUE;
-    protected $about = '
-        <p>Scans products to locate prices that may be bad.</p>
-        <label>Scans for products that meet the following criteria</label>
-        <ul>
-            <li>price equlas zero</li>
-            <li>price > 99.99</li>
-            <li>price < cost</li>
-        </ul>
-        <label>Excludes</label>
-        <ul>
-            <li>Produce Super Department.</li>
-            <li>Deli Super Department.</li>
-            <li>Misc. Super Department.</li>
-            <li>Brand Super Department.</li>
-            <li>Wicable Products</li>
-            <li>Products with a Price Rule ID (variably priced items)</li>
-            <li>Products that are NOT in use.</li>
-        </ul>
-        ';
     
     public function body_content()
     {           
@@ -66,28 +47,6 @@ class zeroPriceCheck extends ScancoordDispatch
             $_GET['upc'] = trim($_GET['upc']);
             $upc = str_pad($_GET['upc'], 13, 0, STR_PAD_LEFT);
         }
-        
-        $ret .= '<button class="btn btn-default btn-xs" data-toggle="modal" data-target="#help">Help</button>';
-        $ret .= '
-            <div id="help" class="modal fade">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h3 class="modal-title" id="exampleModalLabel">Bad Price Scan</h3>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
-                        </button>
-                      </div>
-                      <div class="modal-body">
-                        '.$this->about.'
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                      </div>
-                    </div>
-                </div>
-            </div>
-        ';
         
         $item = array ( array() );
         $query = $dbc->prepare("SELECT 
@@ -161,8 +120,34 @@ class zeroPriceCheck extends ScancoordDispatch
             }
             $ret .=  '</table>';
         }
+        //$ret .= $this->help_content();
         
         return $ret;
+    }
+    
+    public function help_content()
+    {
+        return 
+        '
+            <p>Scans products to locate prices that may be bad.</p>
+            <label>Scans for products that meet the following criteria</label>
+            <ul>
+                <li>price equlas zero</li>
+                <li>price > 99.99</li>
+                <li>price < cost</li>
+            </ul>
+            <label>Excludes</label>
+            <ul>
+                <li>Produce Super Department.</li>
+                <li>Deli Super Department.</li>
+                <li>Misc. Super Department.</li>
+                <li>Brand Super Department.</li>
+                <li>Wicable Products</li>
+                <li>Products with a Price Rule ID (variably priced items)</li>
+                <li>Products that are NOT in use.</li>
+            </ul>
+        ';    
+        
     }
     
 }

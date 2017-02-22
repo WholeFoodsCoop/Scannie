@@ -91,15 +91,18 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
         $ret .=  '
             <thead>
                 <th>upc</th>
+                <th>batch history</th>
                 <th>brand</th>
                 <th>description</th>
                 <th>Hill | Den</th>
             </thead>';
         
         foreach ($data as $upc => $array) { 
-            $upcLink = '<a href="http://192.168.1.2/git/fannie/reports/ItemBatches/ItemBatchesReport.php?upc=' . $upc . '" target="_blank">' . $upc . '</a>';
+            $batchLink = '<a id="upcLink" href="http://192.168.1.2/git/fannie/reports/ItemBatches/ItemBatchesReport.php?upc=' . $upc . '" target="_blank">view</a>';
+            $upcLink = '<a id="upcLink" href="http://192.168.1.2/git/fannie/item/ItemEditorPage.php?searchupc=' . $upc . '" target="_blank">' . $upc . '</a>';
             $ret .= '<tr>';
             $ret .= '<td>' . $upcLink . '</td>';
+            $ret .= '<td align="center">' . $batchLink . '</td>';
             $ret .= '<td>' . $array['brand'] . '</td>';
             $ret .= '<td>' . $array['desc'] . '</td>';
             $ret .= '<td>' . $array['salePrice'][0];
@@ -129,6 +132,7 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
         
         return $ret;
     }
+    
     
 }
 

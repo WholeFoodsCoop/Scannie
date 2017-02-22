@@ -50,6 +50,7 @@ class SiteMap extends ScancoordDispatch
         $this->getDirContents('.././item/Batches/BatchReview','/scancoord/item/Batches/BatchReview/');
         $this->getDirContents('.././item/SalesChange','/scancoord/item/SalesChange/');
         $this->getDirContents('.././dataScanning','/scancoord/dataScanning/');
+        $this->getDirContents('.././misc','/scancoord/misc/');
 
         $ret .= '<div class="container">';
         $ret .= '<h3>Site Map</h3>';
