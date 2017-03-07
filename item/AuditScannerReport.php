@@ -71,6 +71,15 @@ class AuditScannerReport extends ScancoordDispatch
         
         $ret .= $this->form_content();
         
+        $options = $this->get_notes_options($dbc,$storeID);
+        $noteStr = '';
+        $noteStr .= '<select id="notes" class="" style="font-size: 10px; font-weight: normal; margin-left: 5px; width: 100px;">';
+        $noteStr .= '<option value="viewall">View All</option>';
+        foreach ($options as $k => $option) {
+            $noteStr .= '<option value="'.$k.'">'.$option.'</option>';
+        }
+        $noteStr .= '</select>';
+        
         $ret .= '
             <table class="table table-bordered table-condensed small" style="width: 500px;"> 
                 <tr><td>Key</td><td></td></tr>
@@ -132,18 +141,24 @@ class AuditScannerReport extends ScancoordDispatch
             <table class="table table-condensed" id="mytable">';
         $ret .=  '<thead class="float">';
         foreach ($headers as $v) {
-            $ret .=  '<th>' . $v . '</th>';
+            if ($v == 'notes') {
+                $ret .=  '<th>' . $v . $noteStr . '</th>';
+            } else {
+                $ret .=  '<th>' . $v . '</th>';
+            }
         }
         $ret .=  '</thead>';
         $prevKey = '1';
         $ret .= '<tbody>';
-        $ret .= '<tr style="background-color: grey"><td></td><td></td><td></td><td></td><td></td>
+        $ret .= '<tr style="background-color: grey; height: 35px;" class="blankrow"><td></td><td></td><td></td><td></td><td></td>
             <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
         $ret .=  '<tr class="highlight">';
         foreach ($data as $k => $array) { 
             foreach ($array as $kb => $v) {
                 if ($kb == 'store_id') {
                     $ret .=  '<td class="store_id">' . $v . '</td>'; 
+                } elseif ($kb == 'notes') {
+                    $ret .=  '<td class="notescell">' . $v . '</td>'; 
                 } else {
                     $ret .=  '<td>' . $v . '</td>'; 
                 }
@@ -191,6 +206,19 @@ class AuditScannerReport extends ScancoordDispatch
         return $ret;
     }
     
+    private function get_notes_options($dbc,$storeID)
+    {
+        $args = array($storeID);
+        $query = $dbc->prepare("SELECT notes FROM woodshed_no_replicate.AuditScanner WHERE store_id = ? GROUP BY notes;");    
+        $result = $dbc->execute($query,$args);
+        $options = array();
+        while ($row = $dbc->fetch_row($result)) {
+            $options[] = $row['notes'];
+        }
+        echo $dbc->error();
+        return $options;
+    }
+    
     private function form_content()
     {
         return '
@@ -224,6 +252,30 @@ class AuditScannerReport extends ScancoordDispatch
     $table.floatThead();
 </script>
 <script src="/scancoord/common/javascript/jquery.floatThead.min.js"></script>
+<script type="text/javascript">
+$("#notes").change( function() {
+    var noteKey = $("#notes").val();
+    var note = $("#notes").find(":selected").text();
+    $("#mytable").each(function() {
+        $(this).find("tr").each(function() {
+            $(this).show();
+        });
+    });
+    $("#mytable").each(function() {
+        $(this).find("tr").each(function() {
+        var notecell = $(this).find(".notescell").text();
+            if (note != notecell) {
+                //$(this).hide(); 
+                $(this).closest("tr").hide();
+            }
+            if (noteKey == "viewall") {
+                $(this).show();
+            }
+            $(".blankrow").show();
+        });
+    });
+});
+</script>
         ';
         return $ret;
     }

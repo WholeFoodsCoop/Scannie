@@ -46,12 +46,12 @@ class AuditScanner extends ScancoordDispatch
         if ($dbc->affectedRows()) {
             $ret .= '<div align="center" id="note-resp" class="alert alert-success" style="posotion: fixed; top: 0; left: 0; ">
                     Note Saved Successfully<br /><br />
-                    <a class="btn btn-success" href="http://192.168.1.2/scancoord/testing/AuditScanner.php">Continue</a><br />
+                    <a class="btn btn-success" href="http://192.168.1.2/scancoord/item/AuditScanner.php">Continue</a><br />
                 </div>';
         } else {
             $ret .= '<div align="center" id="note-resp" class="alert alert-danger">
                     Error Saving Note<br /><br />
-                    <a class="btn btn-danger" href="http://192.168.1.2/scancoord/testing/AuditScanner.php">Continue</a><br />
+                    <a class="btn btn-danger" href="http://192.168.1.2/scancoord/item/AuditScanner.php">Continue</a><br />
                 </div>';
         }
         
@@ -341,7 +341,7 @@ class AuditScanner extends ScancoordDispatch
                     <br />
                     <div class="row">
                         <div class="col-xs-4  clear btn btn-warning" onClick="queue('.$storeID.'); return false;">Print</div> 
-                        <div class="col-xs-4  clear " ><a class="btn btn-surprise" href="http://192.168.1.2/scancoord/testing/AuditScanner.php ">Refresh</a></div> 
+                        <div class="col-xs-4  clear " ><a class="btn btn-surprise" href="http://192.168.1.2/scancoord/item/AuditScanner.php ">Refresh</a></div> 
                         <div class="col-xs-4  clear btn btn-danger" data-toggle="collapse" data-target="#notepad">Note </div> 
                     </div>
                     <br /><br />
