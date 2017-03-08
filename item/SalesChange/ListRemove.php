@@ -20,15 +20,12 @@
 include('../../config.php');
 $dbc = mysql_connect($SCANHOST, $SCANUSER, $SCANPASS);
 mysql_select_db($SCANALTDB, $dbc);
-
-
 $sessions = array();
 $query = "select session, store_id from SaleChangeQueues group by session;";
 $result = mysql_query($query, $dbc);
 while ($row = mysql_fetch_assoc($result)) {
     $sessions[] = $row['session'] . $row['store_id'];
 }
-
 echo '
     <form method="get" class="form-inline">
         <select class="form-control" name="delSession">
@@ -42,7 +39,6 @@ foreach ($sessions as $key => $session) {
 echo   '</select>
         <input class="btn btn-default" type="submit" value="Delete Session">
     </form>';
-
 if(isset($_GET['delSession'])) {
     foreach ($_GET as $key => $value) {     
         $session = substr($value, 0, -1);
@@ -54,7 +50,6 @@ if(isset($_GET['delSession'])) {
     $msg = '\'' . $session . '\' Successfully Deleted.'; 
     sqlErr(mysql_errno(), 1, $msg);
 } 
-
 function sqlErr($error,$showMsg=FALSE,$msg)
 {
     if ($error > 0) {
@@ -64,7 +59,3 @@ function sqlErr($error,$showMsg=FALSE,$msg)
     }
     return $error;
 }
-
-    
-
-

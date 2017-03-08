@@ -42,11 +42,12 @@ class BatchReviewPage extends scancoordDispatch
         
         include('../../../config.php');
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
+        $curPage = basename($_SERVER['PHP_SELF']);
         
         $id = $_GET['id'];
         $ret = '';
         $ret .= '<div class="container">';
-        include('BatchReviewLinks.html');
+        include('BatchReviewLinks.php');
         $ret .= $this->form_content($id);
         
         $ret .= '<a href="http://key/git/fannie/batches/newbatch/EditBatchPage.php?id=' 

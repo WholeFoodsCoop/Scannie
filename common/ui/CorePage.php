@@ -45,16 +45,16 @@ class ScancoordDispatch
     {
         $obj = new $class();
         $obj->draw_page($class);
-        
     }
     
     private function draw_page($class)
     {
+        //$this->preflight();
+        print $this->header($class);
         if (!class_exists('MenuClass')) {
             include(dirname(__FILE__).'/MenuClass.php');
         }
         print "<br />";
-        print $this->header($class);
         
         if ($this->ui === TRUE) {
             print '
@@ -74,9 +74,13 @@ class ScancoordDispatch
             print '<div class="container" id="" style="min-height: 850px;width:95%;border:1px solid #f5ebd0; padding:5px; background-color: white">';
             print menu::nav_menu();    
         }
-        
+        /*
+        print '<a class="menuNav" style="width:160px;" href=""
+                data-toggle="modal" data-target="#quick_lookups">Quick Lookups<span class=""></span></a>';
+        */
         print $this->body_content();   
         print $this->get_help_content();
+        print $this->quick_lookups();
         print '</div></div></div>';
         print $this->footer();
     }
@@ -103,6 +107,151 @@ class ScancoordDispatch
         ';
     }
     
+    private function quick_lookups()
+    {
+        return '
+            <div id="quick_lookups" class="modal fade" >
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h3 class="modal-title" style="color: #8c7b70">Quick Lookups</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                            style="position: absolute; top:20; right: 20">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        '.$this->quick_lookups_content().'
+                      </div>
+                    </div>
+                </div>
+            </div>
+        ';
+    }
+    
+    private function quick_lookups_content()
+    {
+        
+        $ret = '';
+        $ret .= '
+            
+        ';
+        $subBtn = '&nbsp;<button type="submit" class="btn btn-info btn-xs" href=""><span class="go-icon">&nbsp;</span></a>';
+        $TrackChange = 'http://key/scancoord/item/TrackChangeNew.php';
+        $ItemEditor = 'http://key/git/fannie/item/ItemEditorPage.php';
+        $batch = 'http://key/git/fannie/batches/newbatch/EditBatchPage.php';
+        $LastSold = 'http://192.168.1.2/scancoord/item/last_sold_check.php';
+        $ItemBatchHistory = 'http://192.168.1.2/scancoord/item/Batches/prodBatchHistory.php';
+        $SalesBatchPercent = 'http://192.168.1.2/scancoord/item/Batches/CheckBatchPercent.php';
+        
+        
+        //$ret .= '<h4 align="center">Quick Lookups</h4>';
+        $ret .= '<div align="center">';
+        
+        $ret .= '
+            <form class="form-inline" method="get"   action="'.$TrackChange.'">
+                <div class="input-group">
+                    <span class="input-group-addon alert-info" style="width: 100px; ">Track Change</span>
+                    <input type="text" class="form-control" id="trackchange" name="upc" placeholder="enter upc" style="width: 200px; " autofocus>
+                    '.$subBtn.'
+                </div>
+            </form>     
+        ';
+        
+        $ret .= '
+            <form class="form-inline" method="get"   action="'.$LastSold.'">
+                <div class="input-group">
+                    <span class="input-group-addon alert-info" style="width: 100px; ">Last Sold</span>
+                    <input type="text" class="form-control" id="lastsold" name="upc" placeholder="enter upc" style="width: 200px; ">
+                    '.$subBtn.'
+                </div>
+                <input type="hidden" name="id" value="1">
+            </form>
+        ';
+        
+        $ret .= '
+            <form class="form-inline" method="get"   action="'.$ItemEditor.'">
+                <div class="input-group">
+                    <span class="input-group-addon alert-warning" style="width: 100px; ">Item Editor</span>
+                    <input type="text" class="form-control" id="itemeditor" name="searchupc" placeholder="enter upc" style="width: 200px; ">
+                    '.$subBtn.'
+                </div>
+                <input type="hidden" name="ntype" value="UPC">
+                <input type="hidden" name="searchBtn" value="">
+            </form>     
+        ';
+        
+        $ret .= '
+            <form class="form-inline" method="get"   action="'.$batch.'">
+                <div class="input-group">
+                    <span class="input-group-addon alert-warning" style="width: 100px; ">Sales Batches</span>
+                    <input type="text" class="form-control" id="itemeditor" name="id" placeholder="enter batch ID" style="width: 200px; ">
+                    '.$subBtn.'
+                </div>
+                <input type="hidden" name="ntype" value="UPC">
+                <input type="hidden" name="searchBtn" value="">
+            </form>     
+        ';
+        
+        $ret .= '
+            <form class="form-inline" method="get"   action="'.$ItemBatchHistory.'">
+                <div class="input-group">
+                    <span class="input-group-addon alert-info" style="width: 100px; ">Item Batch H</span>
+                    <input type="text" class="form-control" id="itembatchhistory" name="upc" placeholder="enter upc" style="width: 200px; ">
+                    '.$subBtn.'
+                </div>
+                <input type="hidden" name="id" value="1">
+            </form>     
+        ';
+        
+        
+        $ret .= '
+            <form class="form-inline" method="get"   action="'.$SalesBatchPercent.'">
+                <div class="input-group">
+                    <span class="input-group-addon alert-info" style="width: 100px; ">Sales Batch %</span>
+                    <input type="text" class="form-control" id="salesbatchpercent" name="batchID" placeholder="enter batch id" style="width: 200px; ">
+                    '.$subBtn.'
+                </div>
+            </form>     
+        '; 
+        
+        $ret .= '</div>';
+        
+        return $ret;
+    }
+    
+    public function keypress_js()
+    {
+        ob_start();
+?>
+<script type="text/javascript">
+function KeyDown(evt){
+    switch (evt.keyCode) {
+        case 39:  /* Right Arrow */
+            break;
+
+        case 37:  /* Left Arrow */
+            break;
+
+        case 40:  /* Down Arrow */
+            break;
+
+        case 38:  /* Up Arrow */
+            break;
+            
+        case 192:  /* Tilde */
+            $('#quick_lookups').modal('toggle');
+            //$('#quick_lookups').focus();
+            //$('#trackchange').focus();
+            break;
+    }
+}
+window.addEventListener('keydown', KeyDown);
+</script>
+<?php
+        return ob_get_clean();
+    }
+    
     static public function conditionalExec($custom_errors=true)
     {
         $frames = debug_backtrace();
@@ -120,11 +269,22 @@ class ScancoordDispatch
         }
     }
     
-    private function preflight() {}
+    private function preflight() 
+    {
+        /*  Will use once I can get user account pw to properly hash.
+        $userType = $_SESSION['user_type'];
+        if ($userType != 1) {
+            header('Location: http://key/scancoord/admin/login.php');
+        }
+        */
+    }
     
     private function header($class)
     {   
         $ret = '';
+        if ($this->use_preprocess == TRUE) {
+            $this->preprocess();
+        }
         $ret .= '
 <html>
 <head>
@@ -141,6 +301,7 @@ class ScancoordDispatch
         }
         $ret .= '
 </style>';
+        $ret .= $this->keypress_js();
         if ($this->add_javascript_content == TRUE) {
             $ret .= $class::javascript_content();
         }
@@ -169,6 +330,7 @@ class ScancoordDispatch
         ';
         return $ret;
     }
+    
     
     /*
     private function css_content()

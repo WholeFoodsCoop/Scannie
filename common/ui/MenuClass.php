@@ -25,7 +25,7 @@ class menu
     public function nav_menu()
     {
         return '
-<div class="container-fluid"  align="center" style="height:80px;width:900px; ">   
+<div class="container-fluid"  align="center" style="height:80px;width:1000px; ">   
     <div class="navbar navbar-default collapse in hidden-xs hidden-print" style="background-color:white;border:none">
         <ul class="nav navbar-nav">
         
@@ -77,67 +77,16 @@ class menu
             
             <li class="dropdown"><a class="menuNav" style="width:160px;" href="http://key/git/fannie/item/ItemEditorPage.php">CORE-POS<span class=""></span></a>
             
+            <li><a class="menuNav" style="width:160px;" href=""
+                data-toggle="modal" data-target="#quick_lookups">QLU<span class=""></span></a></li>
+            
             <li></li>
     </div>
 </div>
     ';
     }
     
-    public function css_content()
-    {
-        
-        /*
-        *   This function is not being called anywhere. 
-        */
-        
-        // ../src/img
-        $dirname = dirname(dirname(__FILE__));
-        
-        return '
-.menu-bar {
     
-}
-.left-sidebar {
-    padding: 0px;
-    margin: 0;
-    margin-left: 25px;
-    height: 100%;
-    width: 150px;
-    border: 1px solid lightgreen;
-    position: absolute;
-}
-.col-body {
-    border: 1px solid lightblue;
-    margin-left: 300px;
-    margin-right: 25px;
-}
-.row-menu {
-    width: 300px;
-}
-.top-toolbar {
-    width: 100%;
-}
-td.toolbar {
-    width: 100px;
-    text-align: center;
-    font-size: 10px;
-}
-td.ltgrey {
-    color: lightgrey;
-}
-.image {
-    width: 150px;
-    height: 100px;
-    border: 1px dotted black;
-    padding: 50px;
-}
-#border {
-    border: 10px solid transparent;
-    border-image-repeat: repeat;
-    border-image: url(../common/src/img/greyborder.png) 25 round;
-}
-        ';
-    }
 }
 
 ?>

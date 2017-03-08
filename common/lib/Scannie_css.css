@@ -94,6 +94,20 @@ thead.float {
     background-color: white;
 }
 
+/* Pre-loaded Images */
+span.go-icon {
+    background-image: url("../src/img/go.png");
+    background-size: 15px 15px;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: inline-block;
+    width: 40px;
+    height: 30px;
+}
+.text-tiny {
+    font-size: 10px;
+}
+
 
 
 /*  Cmder Themed

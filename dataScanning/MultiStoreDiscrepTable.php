@@ -38,7 +38,7 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
     protected $add_css_content = TRUE;
     
     public function body_content()
-    {           
+    {          
         $ret = '';
         include('../config.php');
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
@@ -81,6 +81,7 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
         }
         
         $ret .= $this->getProdInfo($dbc,$data,$fields);
+        $ret .= $this->js();
         
         return $ret;
     }
@@ -158,7 +159,7 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
         
         $headers = array('Hill Desc','Den Desc','Hill Cost','Den Cost');
         $ret .= '<table class="table table-condensed table-bordered small">';
-        $ret .= '<thead><th>upc</th><th>sup_dept</th>';
+        $ret .= '<thead><th>upc</th><th>Track</th><th>sup_dept</th>';
         foreach ($fields as $field) { 
             if ($field != 'super_name') {
                 $ret .= '<th><b>[H]</b>'.$field.'</th><th><b>[D]</b>'.$field.'</th>';
@@ -169,8 +170,9 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
         foreach ($itemH as $upc => $row) {
             $ret .= '<tr>';
             $ret .= '<td class="okay"><a href="http://192.168.1.2/git/fannie/item/ItemEditorPage.php?searchupc='.$upc.'"
-                target="_blank">' . $upc . '</a>&nbsp; 
-                <a href="http://key/scancoord/item/TrackChangeNew.php?upc=' . $upc . '" target="_blank"><img src="../common/src/img/q.png" style="height: 15px;"></a></td>';
+                target="_blank">' . $upc . '</a></td> 
+                <td class="okay"><a href="http://key/scancoord/item/TrackChangeNew.php?upc=' . $upc . '" target="_blank">
+                    <img src="../common/src/img/q.png" style="height: 15px;">&nbsp;<span class="text-tiny">info</span></a></td>';
             $ret .= '<td class="'.$row['super_name'].'">' . $row['super_name'] . '</td>';
             foreach ($fields as $field) {
                 if ($field != 'super_name') {
@@ -188,7 +190,6 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
                 }
                 
             }
-            
             $ret .= '</tr>';
         }
         $ret .= '</tbody></table>';
@@ -228,12 +229,37 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
             table {
                 background: linear-gradient(#ffdba1, #ffffa1);
             }
+            td:hover, tr:hover {
+                border: 1px solid purple;
+            }
+            .row:focus {
+                background-color: red;
+            }
         ';
+    }
+    
+    public function js()
+    {
+        ob_start();?>
+
+        <?php 
+        return ob_get_clean();
     }
     
     public function help_content()
     {
-        return '';
+        return '
+            <p>
+                The <b>'.$this->title.'</b> checks POS for discrepancies in several fields for 
+                all products that are in use at either store. 
+                <lu>
+                    <li>Cells shaded out in grey are product fields that do not have an issue.</li>
+                    <li>Cells that are highlighted reflect discrepancies that should be checked/corrected.</lii>
+                </lu>
+            </p>
+            
+        
+        ';
     }
     
 
