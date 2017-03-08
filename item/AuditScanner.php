@@ -33,6 +33,24 @@ class AuditScanner extends ScancoordDispatch
     protected $ui = FALSE;
     protected $add_css_content = TRUE;
     protected $add_javascript_content = TRUE;
+    protected $use_preprocess = TRUE;
+    
+    public function preprocess()
+    {
+        
+        include('../config.php');
+        $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
+        if (isset($_GET['note'])) {
+            $note = $_GET['note'];
+            $error = $this->notedata_handler($dbc,$note);
+            if (!$error) {
+                header('location: http://key/scancoord/item/AuditScanner.php?success=true');
+            } else {
+                header('location: http://key/scancoord/item/AuditScanner.php?success=false');
+            }
+        } 
+        
+    }
     
     private function notedata_handler($dbc,$note)
     {
@@ -41,28 +59,40 @@ class AuditScanner extends ScancoordDispatch
         $args = array($note,$upc);
         $query = $dbc->prepare("UPDATE woodshed_no_replicate.AuditScanner SET notes = ? WHERE upc = ?;");
         $result = $dbc->execute($query,$args);
-        if ($dbc->error()) $ret .= '<div class="alert alert-danger">'.$dbc->error().'</div>';
-        
-        if ($dbc->affectedRows()) {
-            $ret .= '<div align="center" id="note-resp" class="alert alert-success" style="posotion: fixed; top: 0; left: 0; ">
-                    Note Saved Successfully<br /><br />
-                    <a class="btn btn-success" href="http://192.168.1.2/scancoord/item/AuditScanner.php">Continue</a><br />
-                </div>';
-        } else {
-            $ret .= '<div align="center" id="note-resp" class="alert alert-danger">
-                    Error Saving Note<br /><br />
-                    <a class="btn btn-danger" href="http://192.168.1.2/scancoord/item/AuditScanner.php">Continue</a><br />
-                </div>';
+        $error = 0;
+        if ($dbc->error()) {
+            $error = 1;
         }
         
-        return $ret;
+        if ($dbc->affectedRows()) {
+            $error = 0;
+        } else {
+            $error = 2;
+            
+        }
+        
+        return $error;
         
     }
     
     public function body_content()
-    {           
-        
+    {
+    
         $ret = '';
+        $response = $_GET['success'];
+        $newscan = $_POST['success'];
+        if ($response && $newscan != 'empty') {
+            if ($response == TRUE) {
+                $ret .= '<div align="center" id="note-resp" class="alert alert-success" style="posotion: fixed; top: 0; left: 0; ">
+                    Saved! <span style="font-size: 14px; font-weight: bold; float: right; cursor: pointer;" onclick="$(\'#note-resp\').hide(); return false;"> &nbsp;x </span>
+                    </div>';
+            } elseif ($response == FALSE) {
+                $ret .= '<div align="center" id="note-resp" class="alert alert-danger">
+                    Error Saving <span style="font-size: 14px; font-weight: bold; float: right; cursor: pointer;" onclick="$(\'#note-resp\').hide(); return false;"> &nbsp;x </span>
+                    </div>';
+            }
+        }
+        
         include('../config.php');
         include('../common/lib/scanLib.php');
         include('../common/lib/PriceRounder.php');
@@ -70,11 +100,6 @@ class AuditScanner extends ScancoordDispatch
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         $storeID = scanLib::getStoreID(); 
         $upc = str_pad($_POST['upc'], 13, 0, STR_PAD_LEFT);
-        
-        if (isset($_GET['note'])) {
-            $note = $_GET['note'];
-            $ret .= $this->notedata_handler($dbc,$note);
-        }
         
         $ret .= '<div align="center"><h4 id="heading">AUDIE: THE AUDIT SCANNER</h4></div>';
         $ret .= $this->form_content();
@@ -418,6 +443,7 @@ class AuditScanner extends ScancoordDispatch
                 <form method="post" class="form-inline" id="my-form">
                     <input class="form-control input-sm info" name="upc" id="upc" value="'.$upc.'"
                         style="text-align: center; width: 140px; border: none;">
+                    <input type="hidden" name="success" value="empty"/>
                     <button type="submit" hidden></button>
                 </form>
             </div>
