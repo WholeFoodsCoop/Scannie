@@ -138,7 +138,7 @@ class AuditScannerReport extends ScancoordDispatch
         }
         
         $ret .=  '<div class="panel panel-default">
-            <table class="table table-condensed" id="mytable">';
+            <table class="table table-condensed">';
         $ret .=  '<thead class="float">';
         foreach ($headers as $v) {
             if ($v == 'notes') {
@@ -149,9 +149,7 @@ class AuditScannerReport extends ScancoordDispatch
         }
         $ret .=  '</thead>';
         $prevKey = '1';
-        $ret .= '<tbody>';
-        $ret .= '<tr style="background-color: grey; height: 35px;" class="blankrow"><td></td><td></td><td></td><td></td><td></td>
-            <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+        $ret .= '<tbody id="mytable">';
         $ret .=  '<tr class="highlight">';
         foreach ($data as $k => $array) { 
             foreach ($array as $kb => $v) {
@@ -236,8 +234,8 @@ class AuditScannerReport extends ScancoordDispatch
     public function javascript_content($e)
     {
         
-        $ret = '';
-        $ret .= '
+        ob_start();
+        ?>
 <script type="text/javascript">
     $("tr").each(function() { 
         var op_store = '.$e.';
@@ -247,11 +245,7 @@ class AuditScannerReport extends ScancoordDispatch
         }
     });
 </script>
-<script type="text/javascript">
-    var $table = $(\'#mytable\');
-    $table.floatThead();
-</script>
-<script src="/scancoord/common/javascript/jquery.floatThead.min.js"></script>
+
 <script type="text/javascript">
 $("#notes").change( function() {
     var noteKey = $("#notes").val();
@@ -265,7 +259,6 @@ $("#notes").change( function() {
         $(this).find("tr").each(function() {
         var notecell = $(this).find(".notescell").text();
             if (note != notecell) {
-                //$(this).hide(); 
                 $(this).closest("tr").hide();
             }
             if (noteKey == "viewall") {
@@ -276,8 +269,8 @@ $("#notes").change( function() {
     });
 });
 </script>
-        ';
-        return $ret;
+        <?php
+        return ob_get_clean();
     }
     
     
