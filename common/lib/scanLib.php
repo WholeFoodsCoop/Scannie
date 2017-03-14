@@ -183,6 +183,24 @@ class scanLib
         return join('', $ret);
     }
     
+    public function getUser()
+    {
+        if (!empty($_SESSION['user_name'])) {
+            return $_SESSION['user_name'];
+        } else {
+            return false;
+        }
+    }
+    
+    public function isDeviceIpod()
+    {
+        $device = $_SERVER['HTTP_USER_AGENT'];
+        if (strstr($device,'iPod')) {
+            return true;
+        }
+        return false;
+    }
+    
 }
 
 
