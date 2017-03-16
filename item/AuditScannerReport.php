@@ -33,11 +33,11 @@ class AuditScannerReport extends ScancoordDispatch
     protected $add_javascript_content = TRUE;
     protected $must_authenticate = TRUE;
     
-    private function clear_scandata_hander($dbc,$storeID) 
+    private function clear_scandata_hander($dbc,$storeID,$username) 
     {
         
-        $args = array($storeID);
-        $query = $dbc->prepare("DELETE FROM woodshed_no_replicate.AuditScanner WHERE store_id = ?");
+        $args = array($storeID,$username);
+        $query = $dbc->prepare("DELETE FROM woodshed_no_replicate.AuditScanner WHERE store_id = ? AND username = ?");
         $dbc->execute($query,$args);
         
         return '
@@ -60,9 +60,10 @@ class AuditScannerReport extends ScancoordDispatch
         $rounder = new PriceRounder();
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         $storeID = scanLib::getStoreID(); 
+        $username = scanLib::getUser();
         
         if ($_POST['cleardata']) {
-            $ret .= $this->clear_scandata_hander($dbc,$storeID);
+            $ret .= $this->clear_scandata_hander($dbc,$storeID,$username);
         }
         
         if($_GET['upc']) {
@@ -94,9 +95,10 @@ class AuditScannerReport extends ScancoordDispatch
         $query = $dbc->prepare("
         	SELECT upc, brand, description, cost, price, curMarg, desMarg, rsrp, srp, prid, flag, dept, vendor, notes, store_id
 			FROM woodshed_no_replicate.AuditScanner 
+            WHERE username = ?
             ORDER BY vendor, dept;
         ");    
-        $result = $dbc->execute($query);
+        $result = $dbc->execute($query,$username);
         $data = array();
         $headers = array();
         $i = 0;

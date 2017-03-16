@@ -99,13 +99,13 @@ class AuditScanner extends ScancoordDispatch
         }
         
         include('../config.php');
-        //include('../common/lib/scanLib.php');
         include('../common/lib/PriceRounder.php');
         $rounder = new PriceRounder();
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         $storeID = scanLib::getStoreID(); 
         $upc = str_pad($_POST['upc'], 13, 0, STR_PAD_LEFT);
         
+        $ret .= $this->mobile_menu($upc);
         $ret .= '<div align="center"><h4 id="heading">AUDIE: THE AUDIT SCANNER</h4></div>';
         $ret .= $this->form_content();
         
@@ -244,7 +244,7 @@ class AuditScanner extends ScancoordDispatch
         $data = array('cost'=>$passcost,'price'=>$price,'desc'=>$desc,'brand'=>$brand,'vendor'=>$vd,'upc'=>$upc,
             'dept'=>$dept,'margin'=>$margin,'rsrp'=>$rSrp,'srp'=>$srp,'smarg'=>$sMargin,'warning'=>$sWarn,
             'pid'=>$pid,'dMargin'=>$dMargin,'storeID'=>$storeID,'username'=>$username);
-        $ret .= $this->record_data_handler($data);
+        $ret .= $this->record_data_handler($data,$username);
         
         $warning = array();
         $margOff = ($margin / $dMargin);
@@ -457,11 +457,11 @@ class AuditScanner extends ScancoordDispatch
         $ret .= '';
         $ret .= '
             <div align="center">
-                <form method="post" class="form-inline" id="my-form">
+                <form method="post" class="form-inline" id="my-form" name="main_form">
                     <input class="form-control input-sm info" name="upc" id="upc" value="'.$upc.'"
                         style="text-align: center; width: 140px; border: none;">
                     <input type="hidden" name="success" value="empty"/>
-                    <button type="submit" hidden></button>
+                    <button type="submit" class="btn btn-xs"><span class="go-icon"></span></button>
                 </form>
             </div>
         ';
@@ -470,15 +470,16 @@ class AuditScanner extends ScancoordDispatch
         
     }
     
-    private function record_data_handler($data)
+    private function record_data_handler($data,$username)
     {
         
         $ret = '';
         include('../config.php');
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANALTDB, $SCANUSER, $SCANPASS);
         //echo '<h1>' . $data['upc'] . '</h1>';
-        $prepA = $dbc->prepare("SELECT * FROM AuditScanner WHERE upc = ? LIMIT 1");
-        $resA = $dbc->execute($prepA,$data['upc']);
+        $argsA = array($data['upc'],$username);
+        $prepA = $dbc->prepare("SELECT * FROM AuditScanner WHERE upc = ? AND username = ? LIMIT 1");
+        $resA = $dbc->execute($prepA,$argsA);
         if ($dbc->numRows($resA) == 0) {
             $args = array(
                 $data['upc'],
@@ -591,16 +592,116 @@ class AuditScanner extends ScancoordDispatch
         ';
     }
     
+    private function mobile_menu($upc)
+    {
+        $ret = '';
+        $ret .= '
+            <style>
+                .btn-mobile {
+                    width: 50px;
+                    height: 45px;
+                    background-color: #272822;
+                    color: #cacaca;
+                    position: fixed; 
+                    top: 20px;
+                    right: 5px;
+                    border-radius: 3px;
+                    padding: 8px;
+                    border: none;
+                    opacity: 0.2;
+                }
+                .btn-mobile-lines {
+                    border: 2px solid #cacaca;
+                    width: 35px;
+                    height: 1px;
+                    border-radius: 5px;
+                }
+                .btn-mobile-sp {
+                    height: 8px;
+                }
+                .btn-keypad {
+                    height: 50px;
+                    width: 50px;
+                    border: 5px solid white;
+                    border-radius: 2px;
+                    background-color: lightgrey;
+                    text-align: center;
+                    cursor: pointer;
+                }
+            </style>
+        ';
+        $ret .= '
+            <button class="btn-mobile" data-toggle="modal" data-target="#keypad">
+                <div class="btn-mobile-lines">&nbsp;</div>
+                <div class="btn-mobile-sp">&nbsp;</div>
+                <div class="btn-mobile-lines">&nbsp;</div>
+                <div class="btn-mobile-sp">&nbsp;</div>
+                <div class="btn-mobile-lines">&nbsp;</div>
+                <div class="btn-mobile-sp">&nbsp;</div>
+            </button>';
+            
+        $ret .= '
+            <div class="modal fade" tabindex="-1" role="dialog" id="keypad">
+            <br /><br /><br /><br /><br />
+              <div class="" role="document">
+                <div class="" >
+                    <h4 class="modal-title"></h4>
+                  <div class=""  align="center">
+                    
+                    <table><form type="hidden" method="get">
+                        <input type="hidden" name="upc" id="keypadupc" value="0" />
+                        <input type="hidden" name="success" value="empty"/>
+                    
+                        <thead></thead>
+                        <tbody>
+                            <tr>
+                            <td class="btn-keypad" id="key7">7</td>
+                                 <td class="btn-keypad" id="key8">8</td>
+                                  <td class="btn-keypad" id="key9">9</td>
+                            </tr><tr>
+                                <td class="btn-keypad" id="key4">4</td>
+                                 <td class="btn-keypad" id="key5">5</td>
+                                  <td class="btn-keypad" id="key6">6</td>
+                                   
+                            </tr><tr>
+                                <td class="btn-keypad" id="key1">1</td>
+                                 <td class="btn-keypad" id="key2">2</td>
+                                  <td class="btn-keypad" id="key3">3</td>
+                                    
+                            </tr><tr>
+                                <td ></td>
+                                 <td class="btn-keypad" id="key0">0</td>
+                                  <td ></td>
+                            </tr><tr>
+                                <td class="btn-keypad btn-info" id="keyCL">CL</td>
+                                 <td></td>
+                                  <td><button type="button" class="close btn-keypad" data-dismiss="modal" aria-label="Close">X</button></td>   
+                            </tr>
+                        </tbody>
+                    </form></table>
+                    
+                  </div>
+                  
+                </div><!-- /.modal-content -->
+              </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
+        ';
+        
+        return $ret;
+
+    }
+    
     public function javascript_content()
     {
-        return '
+        ob_start();
+        ?>
 <script type="text/javascript" src="/git/fannie/src/javascript/jquery.js"></script>
 <script type="text/javascript" src="/git/fannie/src/javascript/linea/cordova-2.2.0.js"></script>
 <script type="text/javascript" src="/git/fannie/src/javascript/linea/ScannerLib-Linea-2.0.0.js"></script>
 <script type="text/javascript" src="../item/SalesChange/scanner.js"></script>
 <script type="text/javascript">
 $(document).ready(function(){
-    enableLinea(\'#upc\', function(){$(\'#my-form\').submit();});
+    enableLinea('#upc', function(){$('#my-form').submit();});
 });
 </script>
 <script type="text/javascript">
@@ -608,16 +709,16 @@ function queue(store_id)
 {
     var upcB = document.getElementById("upc").value;
     $.ajax({
-		type: \'post\',
-        url: \'AuditUpdate.php\',
-        data: \'upc=\'+upcB+\'&store_id=\'+store_id,
+		type: 'post',
+        url: 'AuditUpdate.php',
+        data: 'upc='+upcB+'&store_id='+store_id,
 		error: function(xhr, status, error)
 		{ 
-			alert(\'error:\' + status + \':\' + error + \':\' + xhr.responseText) 
+			alert('error:' + status + ':' + error + ':' + xhr.responseText) 
 		},
         success: function(response)
         {
-            $(\'#ajax-resp\').html(response);
+            $('#ajax-resp').html(response);
         }
     })
 	.done(function(data){
@@ -637,7 +738,58 @@ function qm(msg)
     document.getElementById("note").value = msg;
 }
 </script>
-        ';
+<script type="text/javascript">
+$(document).ready(function(){
+    var upc = $('#upc').val() + '';
+    $( "#keyCL" ).click(function() {
+        $('#upc').val('0');
+        upc = 0;
+       //alert( $('#upc').val() );
+    });
+    $( "#key1" ).click(function() {
+        $('#upc').val(upc+'1');
+        upc = $('#upc').val();
+    });
+    $( "#key2" ).click(function() {
+        $('#upc').val(upc+'2');
+        upc = $('#upc').val();
+    });
+    $( "#key3" ).click(function() {
+        $('#upc').val(upc+'3');
+        upc = $('#upc').val();
+    });
+    $( "#key4" ).click(function() {
+        $('#upc').val(upc+'4');
+        upc = $('#upc').val();
+    });
+    $( "#key5" ).click(function() {
+        $('#upc').val(upc+'5');
+        upc = $('#upc').val();
+    });
+    $( "#key6" ).click(function() {
+        $('#upc').val(upc+'6');
+        upc = $('#upc').val();
+    });
+    $( "#key7" ).click(function() {
+        $('#upc').val(upc+'7');
+        upc = $('#upc').val();
+    });
+    $( "#key8" ).click(function() {
+        $('#upc').val(upc+'8');
+        upc = $('#upc').val();
+    });
+    $( "#key9" ).click(function() {
+        $('#upc').val(upc+'9');
+        upc = $('#upc').val();
+    });
+    $( "#key0" ).click(function() {
+        $('#upc').val(upc+'0');
+        upc = $('#upc').val();
+    });
+});
+</script>
+        <?php
+        return ob_get_clean();
     }
     
 }
