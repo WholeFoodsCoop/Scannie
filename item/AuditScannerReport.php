@@ -100,20 +100,20 @@ class AuditScannerReport extends ScancoordDispatch
         $data = array();
         $headers = array();
         $i = 0;
-        //  Add items to data
+        //  Define <th> & <td> data
         while ($row = $dbc->fetch_row($result)) {
             foreach ($row as $k => $v) {
                 if(!is_numeric($k)) {
-                    //  var $data[x][header] = row
+                    //  @data[x][header] = row
                     $data[$i][$k] =  $v;
-                    //  var $headers[header] = header
+                    //  @headers[header] = header
                     $headers[$k] = $k;
                 }
             }
             $i++;
         }
         
-        //  Add a column
+        //  Add columns to talbe
         $i = 0;
         $flags = array();
         foreach ($data as $k => $array) { 
@@ -141,6 +141,8 @@ class AuditScannerReport extends ScancoordDispatch
         foreach ($headers as $v) {
             if ($v == 'notes') {
                 $ret .=  '<th>' . $v . $noteStr . '</th>';
+            } elseif($v == 'store_id') {
+                $ret .=  '<th>' . 'store' . '</th>';
             } else {
                 $ret .=  '<th>' . $v . '</th>';
             }
@@ -160,14 +162,6 @@ class AuditScannerReport extends ScancoordDispatch
                 }
             }
             if($prevKey != $k) {
-                /*
-                if (in_array(($k+1),$flags['danger'])) {
-                    $ret .=  '</tr><tr class="" style="background-color:tomato;color:white">';
-	                } elseif (in_array(($k+1),$flags['warning'])) {
-                    $ret .=  '</tr><tr class="" style="background-color:#FFF457;">';
-                } else {
-                    $ret .=  '</tr><tr>';
-                }*/
                 if ($data[$k+1]['cost'] == 0) {
                     $ret .=  '</tr><tr class="highlight" style="background-color:lightgrey; ">';
                 } elseif (in_array(($k+1),$flags['danger']) && $data[$k+1]['prid'] == 0) {
@@ -179,17 +173,10 @@ class AuditScannerReport extends ScancoordDispatch
                 } else {
                     $ret .=  '</tr><tr class="highlight">';
                 }
-                
             } 
-            
             $prevKey = $k;
         }
         $ret .=  '</tbody></table></div>';
-        
-        /*
-        $upcLink = "<a href='http://key/git/fannie/item/ItemEditorPage.php?searchupc=" 
-                . $upc . "&ntype=UPC&searchBtn=' target='_blank'>{$upc}</a>";
-        */
         if ($dbc->error()) $ret .=  $dbc->error();
         
         if ($storeID == 1) {
