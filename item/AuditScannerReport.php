@@ -31,6 +31,7 @@ class AuditScannerReport extends ScancoordDispatch
     protected $description = "[Audit Scanner Report] View data from recent scan job.";
     protected $ui = TRUE;
     protected $add_javascript_content = TRUE;
+    protected $must_authenticate = TRUE;
     
     private function clear_scandata_hander($dbc,$storeID) 
     {
@@ -41,7 +42,7 @@ class AuditScannerReport extends ScancoordDispatch
         
         return '
         <div align="center">
-            <div class="alert alert-success">Data Cleared<br /> <a href="http://key/scancoord/item/AuditScannerReport.php" 
+            <div class="alert alert-success">Data Cleared<br /> <a href="http://192.168.1.2/scancoord/item/AuditScannerReport.php" 
                 class="btn btn-success btn-xs">Please - Click Me - </a>
             </div>
         </div>
@@ -91,7 +92,7 @@ class AuditScannerReport extends ScancoordDispatch
         ';
         
         $query = $dbc->prepare("
-        	SELECT upc, description, cost, price, curMarg, desMarg, rsrp, srp, prid, flag, dept, vendor, notes, store_id
+        	SELECT upc, brand, description, cost, price, curMarg, desMarg, rsrp, srp, prid, flag, dept, vendor, notes, store_id
 			FROM woodshed_no_replicate.AuditScanner 
             ORDER BY vendor, dept;
         ");    
@@ -103,7 +104,9 @@ class AuditScannerReport extends ScancoordDispatch
         while ($row = $dbc->fetch_row($result)) {
             foreach ($row as $k => $v) {
                 if(!is_numeric($k)) {
+                    //  var $data[x][header] = row
                     $data[$i][$k] =  $v;
+                    //  var $headers[header] = header
                     $headers[$k] = $k;
                 }
             }
@@ -119,19 +122,14 @@ class AuditScannerReport extends ScancoordDispatch
             $difference = sprintf("%0.3f",$srp - $price);
             $margin = $data[$k]['curMarg'];
             $dMargin = $data[$k]['desMarg'];
-            //CREATE FLAGS FOR <TR> STYLE
+            //  Create flags to change color of <tr>
             $margOff = ($margin / $dMargin);
             if ($margOff > 1.05) {
-                //$warning['margin'] = 'info';
                 $flags['info'][] = $i;
             } elseif ($margOff > 0.95) {
-                //$warning['margin'] = 'none';
-                //$flags['none'] = 'none';
             } elseif ($margOff < 0.95 && $margOff > 0.90) {
-                //$warning['margin'] = 'warning';
                 $flags['warning'][] = $i;
             } else {
-                //$warning['margin'] = 'danger';
                 $flags['danger'][] = $i;
             }
             $i++;
@@ -152,10 +150,10 @@ class AuditScannerReport extends ScancoordDispatch
         $ret .= '<tbody id="mytable">';
         $ret .=  '<tr class="highlight">';
         foreach ($data as $k => $array) { 
-            foreach ($array as $kb => $v) {
-                if ($kb == 'store_id') {
+            foreach ($array as $column_name  => $v) {
+                if ($column_name == 'store_id') {
                     $ret .=  '<td class="store_id">' . $v . '</td>'; 
-                } elseif ($kb == 'notes') {
+                } elseif ($column_name == 'notes') {
                     $ret .=  '<td class="notescell">' . $v . '</td>'; 
                 } else {
                     $ret .=  '<td>' . $v . '</td>'; 

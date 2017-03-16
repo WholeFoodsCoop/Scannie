@@ -34,6 +34,7 @@ class AuditScanner extends ScancoordDispatch
     protected $add_css_content = TRUE;
     protected $add_javascript_content = TRUE;
     protected $use_preprocess = TRUE;
+    protected $must_authenticate = TRUE;
     
     public function preprocess()
     {
@@ -44,9 +45,9 @@ class AuditScanner extends ScancoordDispatch
             $note = $_GET['note'];
             $error = $this->notedata_handler($dbc,$note);
             if (!$error) {
-                header('location: http://key/scancoord/item/AuditScanner.php?success=true');
+                header('location: http://192.168.1.2/scancoord/item/AuditScanner.php?success=true');
             } else {
-                header('location: http://key/scancoord/item/AuditScanner.php?success=false');
+                header('location: http://12.168.1.2/scancoord/item/AuditScanner.php?success=false');
             }
         } 
         
@@ -78,7 +79,11 @@ class AuditScanner extends ScancoordDispatch
     public function body_content()
     {
     
+        if (!class_exists('scanLib')) {
+            include('../common/lib/scanLib.php');
+        }
         $ret = '';
+        $username = scanLib::getUser();
         $response = $_GET['success'];
         $newscan = $_POST['success'];
         if ($response && $newscan != 'empty') {
@@ -94,7 +99,7 @@ class AuditScanner extends ScancoordDispatch
         }
         
         include('../config.php');
-        include('../common/lib/scanLib.php');
+        //include('../common/lib/scanLib.php');
         include('../common/lib/PriceRounder.php');
         $rounder = new PriceRounder();
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
@@ -238,8 +243,8 @@ class AuditScanner extends ScancoordDispatch
         if ($cost != $adjcost) $passcost = $adjcost;
         $data = array('cost'=>$passcost,'price'=>$price,'desc'=>$desc,'brand'=>$brand,'vendor'=>$vd,'upc'=>$upc,
             'dept'=>$dept,'margin'=>$margin,'rsrp'=>$rSrp,'srp'=>$srp,'smarg'=>$sMargin,'warning'=>$sWarn,
-            'pid'=>$pid,'dMargin'=>$dMargin,'storeID'=>$storeID);
-        $this->record_data_handler($data);
+            'pid'=>$pid,'dMargin'=>$dMargin,'storeID'=>$storeID,'username'=>$username);
+        $ret .= $this->record_data_handler($data);
         
         $warning = array();
         $margOff = ($margin / $dMargin);
@@ -365,9 +370,21 @@ class AuditScanner extends ScancoordDispatch
                     <div class="container">
                     <br />
                     <div class="row">
-                        <div class="col-xs-4  clear btn btn-warning" onClick="queue('.$storeID.'); return false;">Print</div> 
-                        <div class="col-xs-4  clear " ><a class="btn btn-surprise" href="http://192.168.1.2/scancoord/item/AuditScanner.php ">Refresh</a></div> 
-                        <div class="col-xs-4  clear btn btn-danger" data-toggle="collapse" data-target="#notepad">Note </div> 
+                        <!-- <div class="col-xs-4  clear btn btn-warning" onClick="queue('.$storeID.'); return false;">Print</div> -->
+                        <div class="col-xs-4 clear">
+                            <form method="get" type="hidden">
+                            <button class="btn btn-warning" onClick="alert(\''.$upc.' queued to print\'); return true;" type="submit"
+                                style="width: 100%;">Print
+                            </button> 
+                            <input type="hidden" name="note" value="Print Tag" />
+                            <input type="hidden" name="upc" value="'.$upc.'" />
+                        </div>
+                        </form>
+                        <div class="col-xs-4  clear "><a class="btn btn-surprise" href="http://192.168.1.2/scancoord/item/AuditScanner.php ">Refresh</a></div> 
+                        <div class="col-xs-4  clear">
+                            <button class="btn btn-danger" data-toggle="collapse" data-target="#notepad" 
+                                style="width: 100%;">Note 
+                            </button></div> 
                     </div>
                     <br /><br />
                     <div class="row">
@@ -387,12 +404,12 @@ class AuditScanner extends ScancoordDispatch
         
         //  Commonly used NOTES.
         $ret .= '
-            <div id="notepad" class="collapse">
+            <div id="notepad" class="collapse" >
                 <div style="position: relative; top: 25%; opacity: 1;">
                     <form method="get" name="notepad" class="form-inline " >
                         <input type="text" name="note" id="note" class="form-control" style="max-width: 90%; "><br /><br />
                         <input type="hidden" name="upc" value="'.$upc.'">
-                        <button type="submit" class="btn btn-danger">Submit Note</button>
+                        <button type="submit" class="btn btn-danger" onClick="$("#notepad").collapse("hide"); return false;">Submit Note</button>
                     </form>
                     <!-- Purple Buttons -->
                     <div align="left" style="padding: 10px; float: left; width: 40vw">
@@ -465,6 +482,7 @@ class AuditScanner extends ScancoordDispatch
         if ($dbc->numRows($resA) == 0) {
             $args = array(
                 $data['upc'],
+                $data['brand'],
                 $data['desc'],
                 $data['price'],
                 $data['margin'],
@@ -476,22 +494,26 @@ class AuditScanner extends ScancoordDispatch
                 $data['pid'],
                 $data['warning'],
                 $data['cost'],
-                $data['storeID']
+                $data['storeID'],
+                $data['username']
             );
             $prep = $dbc->prepare("
                 INSERT INTO AuditScanner 
                 (
-                    upc, description, price, curMarg, desMarg, dept, 
-                        vendor, rsrp, srp, prid, flag, cost, store_id
+                    upc, brand, description, price, curMarg, desMarg, dept, 
+                        vendor, rsrp, srp, prid, flag, cost, store_id,
+                        username
                 ) VALUES (
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
                 );
             ");
             $dbc->execute($prep,$args);
-            echo $data[$upc];
-            if ($dbc->error()) echo '<div class="alert alert-warning>' . $dbc->error() . '</div>';        
-        } else {
-            return false;
+            //echo $data[$upc];
+            if ($dbc->error()) {
+                return '<div class="alert alert-danger">' . $dbc->error() . '</div>';        
+            } else {
+                return false;
+            }
         }
         
     }
