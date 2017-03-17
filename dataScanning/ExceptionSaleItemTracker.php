@@ -36,11 +36,6 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
     protected $description = "[Exception Sales] Monitor special prices of sale items.";
     protected $ui = TRUE;
     
-    function preprocess()
-    {
-        
-    }
-    
     public function body_content()
     {           
         $ret = '';
@@ -69,13 +64,15 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
         
         list($in_sql, $args) = $dbc->safeInClause($items);
         $query = '
-            select 
-                upc, 
-                brand, 
-                description,
-                special_price 
-            from products 
-            WHERE upc IN (SELECT upc FROM woodshed_no_replicate.exceptionItems)
+            SELECT 
+                p.upc, 
+                p.brand, 
+                p.description,
+                p.special_price,
+                e.note
+            FROM products AS p
+                LEFT JOIN woodshed_no_replicate.exceptionItems AS e ON e.upc=p.upc
+            WHERE p.upc IN (SELECT upc FROM woodshed_no_replicate.exceptionItems)
         ';
         $prep = $dbc->prepare($query);
         $result = $dbc->execute($prep,$args);
@@ -84,10 +81,11 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
             $data[$row['upc']]['brand'] = $row['brand'];
             $data[$row['upc']]['desc'] = $row['description'];
             $data[$row['upc']]['salePrice'][] = $row['special_price'];
+            $data[$row['upc']]['note'] = $row['note'];
         }
         if ($dbc->error()) $ret .=  $dbc->error();
         
-        $ret .=  '<div class="panel panel-default" style="width:800px"><table class="table table-striped">';
+        $ret .=  '<div class="panel panel-default" style="width:1000px"><table class="table table-striped">';
         $ret .=  '
             <thead>
                 <th>upc</th>
@@ -95,6 +93,7 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
                 <th>brand</th>
                 <th>description</th>
                 <th>Hill | Den</th>
+                <th>Notes</th>
             </thead>';
         
         foreach ($data as $upc => $array) { 
@@ -107,6 +106,7 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
             $ret .= '<td>' . $array['desc'] . '</td>';
             $ret .= '<td>' . $array['salePrice'][0];
             $ret .= ' | ' . $array['salePrice'][1] . '</td>';
+            $ret .= '<td>' . $array['note'] . '</td>';
         }
         $ret .=  '</table></div>';
         $ret .= '</div>';
