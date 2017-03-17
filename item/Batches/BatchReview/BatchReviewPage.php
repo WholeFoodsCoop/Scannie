@@ -149,6 +149,25 @@ class BatchReviewPage extends scancoordDispatch
         return $ret;
     }
     
+    public function help_content()
+    {
+        return '
+            <ul>
+            <li><b>Non-UNFI Review</b> Review non-UNFI vendors.</li>
+            <li><b>UNFI Review</b> Review UNFI batches</li>
+            <li><b>UNFI-MILK Review</b> Has not been updated in a long time, use with discretion.</li>
+            </ul>
+            <ul><label>Things to pay attention to </label>
+            <div style="border: 1px solid lightgrey;"></div>
+            <li><b>UNFI Batches</b> Make sure that POS Dept. matches UNFI Category. If 
+                these categories do not match, check that the margin POS is using is correct.</li>
+            <li><b>Diff</b> Diff. is the difference between what the new actual margin will be 
+                and the desired margin. If this number is off by more than 0.05, there 
+                is likely an issue with the new SRP.</li>
+
+            </ul>';
+    }
+    
 }
 
 scancoordDispatch::conditionalExec();
