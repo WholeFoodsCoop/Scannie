@@ -49,7 +49,7 @@ class ScancoordDispatch
     
     private function draw_page($class)
     {
-        //$this->preflight();
+        $this->preflight();
         print $this->header($class);
         if (!class_exists('MenuClass')) {
             include(dirname(__FILE__).'/MenuClass.php');
@@ -137,9 +137,9 @@ class ScancoordDispatch
             
         ';
         $subBtn = '&nbsp;<button type="submit" class="btn btn-info btn-xs" href=""><span class="go-icon">&nbsp;</span></a>';
-        $TrackChange = 'http://key/scancoord/item/TrackChangeNew.php';
-        $ItemEditor = 'http://key/git/fannie/item/ItemEditorPage.php';
-        $batch = 'http://key/git/fannie/batches/newbatch/EditBatchPage.php';
+        $TrackChange = 'http://192.168.1.2/scancoord/item/TrackChangeNew.php';
+        $ItemEditor = 'http://192.168.1.2/git/fannie/item/ItemEditorPage.php';
+        $batch = 'http://192.168.1.2/git/fannie/batches/newbatch/EditBatchPage.php';
         $LastSold = 'http://192.168.1.2/scancoord/item/last_sold_check.php';
         $ItemBatchHistory = 'http://192.168.1.2/scancoord/item/Batches/prodBatchHistory.php';
         $SalesBatchPercent = 'http://192.168.1.2/scancoord/item/Batches/CheckBatchPercent.php';
@@ -269,14 +269,18 @@ window.addEventListener('keydown', KeyDown);
         }
     }
     
-    private function preflight() 
+    private function preflight($class) 
     {
-        /*  Will use once I can get user account pw to properly hash.
-        $userType = $_SESSION['user_type'];
-        if ($userType != 1) {
-            header('Location: http://key/scancoord/admin/login.php');
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
         }
-        */
+        
+        if ($this->must_authenticate == TRUE) {
+            $userPrivilege = $_SESSION['user_type'];
+            if ($userPrivilege != 1) {
+                header('Location: http://192.168.1.2/scancoord/admin/login.php');
+            }
+        }
     }
     
     private function header($class)
@@ -316,13 +320,18 @@ window.addEventListener('keydown', KeyDown);
     private function footer()
     {
         $ret ='';
+        $user = $_SESSION['user_name'];
+        if (empty($user)) {
+            $user = 'Generic User';
+        }
         $ret .= '
 <div class="container" id="" style="width:96%;">
         ';
         $ret .= '
-            You are logged in as <strong>User</strong>. <a href="">[Logout]</a><br />
+            You are logged in as <strong>'.$user.'</strong>. 
+            <a href="../admin/logout.php">[Logout]</a><br />
             Current version: 0.0.1-dev<br />
-            <a href="http://key/scancoord/testing/SiteMap.php">Site Map</a><br />
+            <a href="http://192.168.1.2/scancoord/testing/SiteMap.php">Site Map</a><br />
             <br />
        ';
         $ret .= '

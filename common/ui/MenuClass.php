@@ -24,66 +24,108 @@ class menu
 {
     public function nav_menu()
     {
-        return '
+        include('../../config.php');
+        $ret = '';
+        
+        $ret .= '
+            <style>
+            span.hd.grey {
+                background-color: grey;
+            }
+            span.hd.green {
+                background-color: green;
+                color: white;
+                font-size: 12px; 
+                padding: 2px;
+                font-family: consolas;
+                border-radius: 2px;
+                
+            }
+            span.hd.blue {
+                background-color: lightblue;
+            }
+            a.menuNav {
+                width: 160px;
+            }
+            a.menu-opt {
+                color: red;
+                //background-color: #e8e8e8;
+                border: 1px solid white;
+                border-radius: 2px;
+            }
+            
+            
+            
+            
+            .tooltip1 { position: relative; }
+            .tooltip1 a span { display: none; color: #FFFFFF; }
+            .tooltip1 a:hover span { display: block; position: absolute; width: 200px; background: #aaa url(images/horses200x50.jpg); height: 50px; left: 100px; top: -10px; color: #FFFFFF; padding: 0 5px; }
+
+            </style>
+        ';
+        
+        $ret .=  '
 <div class="container-fluid"  align="center" style="height:80px;width:1000px; ">   
     <div class="navbar navbar-default collapse in hidden-xs hidden-print" style="background-color:white;border:none">
         <ul class="nav navbar-nav">
         
-            <li class="dropdown"><a style="width:160px;" class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Item<span class="caret"></span></a>
+            <li class="dropdown"><a  class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Item<span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
-                    <li><a href="http://192.168.1.2/scancoord/item/last_sold_check.php">Last Sold</a></li>
-                    <li><a href="http://192.168.1.2/scancoord/item/TrackChangeNew.php">Track Change</a></li>
-                    <li><a href="" onclick="popitup(\'http://key/scancoord/item/MarginCalcNew.php\')">Margin Calc</a></li>
-                    <li><a href="" onclick="popitup(\'http://key/scancoord/item/PercentCalc.php\')">Percent Calc</a></li>
+                    <li><a class="menu-opt" href="http://192.168.1.2/scancoord/item/last_sold_check.php">Last Sold</a></li>
+                    <li><a class="menu-opt" href="http://192.168.1.2/scancoord/item/TrackChangeNew.php">Track Change</a></li>
+                    <li><a class="menu-opt" href="" onclick="popitup(\'http://192.168.1.2/scancoord/item/MarginCalcNew.php\')">Margin Calc</a></li>
+                    <li><a class="menu-opt" href="" onclick="popitup(\'http://192.168.1.2/scancoord/item/PercentCalc.php\')">Percent Calc</a></li>
                 <li class="divider"></li><!-- divider with no header -->
                 <li class="dropdown-header">Scanning</li>
-                    <li><a href="http://key/scancoord/item/AuditScanner.php">Audit Scanner</a></li>
-                    <li><a href="http://key/scancoord/item/AuditScannerReport.php">Audit Scan Report</a></li>
+                    <li><a class="menu-opt" href="http://192.168.1.2/scancoord/item/AuditScanner.php">Audit Scanner</a></li>
+                    <li><a class="menu-opt" href="http://192.168.1.2/scancoord/item/AuditScannerReport.php">Audit Scan Report</a></li>
             </ul></li>
             
-            <li class="dropdown"><a style="width:160px;" class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Batches<span class="caret"></span></a>
+            <li class="dropdown"><a  class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Batches<span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                 <li class="dropdown-header">Basics</li>
-                    <li><a href="http://192.168.1.2/scancoord/item/coopBasicsScanPage.php">Basics Scan</a></li>
+                    <li><a class="menu-opt" href="http://192.168.1.2/scancoord/item/coopBasicsScanPage.php">Basics Scan</a></li>
                 <li class="divider"></li><!-- divider with no header -->
                 <li class="dropdown-header">UNFI Sales Change</li>
-                    <li><a href="http://192.168.1.2/scancoord/item/SalesChange/SalesChangeIndex.php">Batch Check </a></li>
-                    <li><a href="http://192.168.1.2/scancoord/item/SalesChange/CoopDealsReview.php">Quality Assurance</a></li>
-                    <li><a href="http://192.168.1.2/scancoord/item/Batches/unfiBreakdowns.php">Breakdowns</a></li>
-                    <li><a href="http://192.168.1.2/scancoord/item/SignInfoHelper.php">Sign Info</a></li>
-                    <li><a href="http://192.168.1.2/scancoord/item/Batches/prodBatchHistory.php">Item Batch History</a></li>
-                    <li><a href="http://192.168.1.2/scancoord/item/Batches/CoopDealsSearchPage.php">Coop+Deals File</a></li>
+                    <li class="test"><a class="test" href="http://192.168.1.2/scancoord/item/SalesChange/SalesChangeIndex.php"> Batch Check </a></li>
+                    <li><a class="menu-opt" href="http://192.168.1.2/scancoord/item/SalesChange/CoopDealsReview.php">Quality Assurance</a></li>
+                    <li><a class="menu-opt" href="http://192.168.1.2/scancoord/item/Batches/unfiBreakdowns.php">Breakdowns</a></li>
+                    <li><a class="menu-opt" href="http://192.168.1.2/scancoord/item/SignInfoHelper.php">Sign Info</a></li>
+                    <li><a class="menu-opt" href="http://192.168.1.2/scancoord/item/Batches/prodBatchHistory.php">Item Batch History</a></li>
+                    <li><a class="menu-opt" href="http://192.168.1.2/scancoord/item/Batches/CoopDealsSearchPage.php">Coop+Deals File</a></li>
                 <li class="divider"></li><!-- divider with no header -->
                 <li class="dropdown-header">Price Changes</li>
-                    <li><a href="http://192.168.1.2/scancoord/item/Batches/batchForceCheck.php">Batch Force Check</a></li>
-                    <li><a href="http://192.168.1.2/scancoord/item/Batches/BatchReview/">Batch Review</a></li>
-                    <li><a href="http://192.168.1.2/scancoord/item/Batches/CheckBatchPercent.php">Sales Batch %</a></li>
+                    <li><a class="menu-opt" href="http://192.168.1.2/scancoord/item/Batches/batchForceCheck.php">Batch Force Check</a></li>
+                    <li><a class="menu-opt" href="http://192.168.1.2/scancoord/item/Batches/BatchReview/">Batch Review</a></li>
+                    <li><a class="menu-opt" href="http://192.168.1.2/scancoord/item/Batches/CheckBatchPercent.php">Sales Batch %</a></li>
             </ul>
             </li>    
             
-            <li class="dropdown"><a style="width:160px;" class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Data<span class="caret"></span></a>
+            <li class="dropdown"><a  class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Data<span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                 <li class="dropdown-header">Discrepancy Tasks</li>
-                    <li><a href="http://192.168.1.2/scancoord/dataScanning/zeroPriceCheck.php">Bad Price Scan</a></li>
-                    <li><a href="http://192.168.1.2/scancoord/dataScanning/ExceptionSaleItemTracker.php">Exception Sale Items</a></li>
-                    <li><a href="http://192.168.1.2/scancoord/dataScanning/MultiStoreDiscrepTable.php">Multi-Store Prod Discrep</a></li> 
-                    <li><a href="http://192.168.1.2/scancoord/dataScanning/CashlessCheckPage.php">Cashess Trans. Check</a></li>
-                    <li><a href="http://192.168.1.2/scancoord/misc/ProdUserChangeReport.php">Prod User Change</a></li>
+                    <li><a class="menu-opt" href="http://192.168.1.2/scancoord/dataScanning/zeroPriceCheck.php">Bad Price Scan</a></li>
+                    <li><a class="menu-opt" href="http://192.168.1.2/scancoord/dataScanning/ExceptionSaleItemTracker.php">Exception Sale Items</a></li>
+                    <li><a class="menu-opt" href="http://192.168.1.2/scancoord/dataScanning/MultiStoreDiscrepTable.php">Multi-Store Prod Discrep</a></li> 
+                    <li><a class="menu-opt" href="http://192.168.1.2/scancoord/dataScanning/CashlessCheckPage.php">Cashess Trans. Check</a></li>
+                    <li><a class="menu-opt" href="http://192.168.1.2/scancoord/misc/ProdUserChangeReport.php">Prod User Change</a></li>
                 </ul>
             </li>
             
-            <li class="dropdown"><a class="menuNav" style="width:160px;" href=""
+            <li class="dropdown"><a class="menuNav"  href=""
                 data-toggle="modal" data-target="#help">Help<span class=""></span></a>
             
-            <li class="dropdown"><a class="menuNav" style="width:160px;" href="http://key/git/fannie/item/ItemEditorPage.php">CORE-POS<span class=""></span></a>
+            <li class="dropdown"><a class="menuNav"  href="http://192.168.1.2/git/fannie/item/ItemEditorPage.php">CORE-POS<span class=""></span></a>
             
-            <li><a class="menuNav" style="width:160px;" href=""
+            <li><a class="menuNav"  href=""
                 data-toggle="modal" data-target="#quick_lookups">QLU<span class=""></span></a></li>
             
             <li></li>
     </div>
 </div>
-    ';
+        ';
+        
+        return $ret;
     }
     
     
