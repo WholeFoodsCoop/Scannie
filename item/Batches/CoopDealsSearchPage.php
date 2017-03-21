@@ -1,9 +1,9 @@
 <?php
 /*******************************************************************************
     Copyright 2016 Whole Foods Community Co-op.
-    
+
     This file is a part of Scannie.
-    
+
     Scannie is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     in the file LICENSE along with Scannie; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-    
+
 *********************************************************************************/
 include('../../config.php');
 if (!class_exists('ScancoordDispatch')) {
@@ -26,32 +26,52 @@ if (!class_exists('SQLManager')) {
 }
 class CoopDealsSearchPage extends ScancoordDispatch
 {
-    
+
     protected $title = "Search Coop Deals";
     protected $description = "[Search Coop Deals] Look through Co-op Deals commitmend worksheet.";
     protected $ui = TRUE;
     
+    private function js()
+    {
+        ob_start();
+        ?>
+            <script type="text/javascript">
+            $(document).ready(function() {
+                $('.row').click(function() {
+                    if ( $(this).hasClass('click-highlight') ) {
+                        $(this).removeClass('click-highlight');
+                    } else {
+                        $(this).addClass('click-highlight'); 
+                    }
+                });
+            });
+            </script>
+        <?php
+        return ob_get_clean();
+    }
+
     public function body_content()
-    {           
+    {
         $ret = '';
+        $ret .= $this->js();
         include('../../config.php');
-        $dbc = new SQLManager($SCANHOST, 'pdo_mysql', 'woodshed_no_replicate', $SCANUSER, $SCANPASS);        
+        $dbc = new SQLManager($SCANHOST, 'pdo_mysql', 'woodshed_no_replicate', $SCANUSER, $SCANPASS);
         $ret .= $this->form_content();
-        
+
         if (isset($_GET['brand'])) {
             $brand = str_replace("'","\'",$_GET['brand']);
         }
         if (isset($_GET['description'])) {
             $description = $_GET['description'];
         }
-        
+
         if ($month = $_GET['month']) {
             $ret .= 'Month Selected: <strong>' . $month . '</strong>';
-            
+
             $ret .= $this->form_ext_content($dbc,$month);
-            
+
             $query = $dbc->prepare("
-                SELECT 
+                SELECT
                     upc,
                     flyerPeriod,
                     department,
@@ -66,7 +86,7 @@ class CoopDealsSearchPage extends ScancoordDispatch
                 ORDER BY upc ASC
             ;");
             $queryBrand = $dbc->prepare("
-                SELECT 
+                SELECT
                     upc,
                     flyerPeriod,
                     department,
@@ -82,7 +102,7 @@ class CoopDealsSearchPage extends ScancoordDispatch
                 ORDER BY upc ASC
             ");
             $queryDesc = $dbc->prepare("
-                SELECT 
+                SELECT
                     upc,
                     flyerPeriod,
                     department,
@@ -97,7 +117,7 @@ class CoopDealsSearchPage extends ScancoordDispatch
 					WHERE description like '% ? %'
                 ORDER BY upc ASC
             ");
-            
+
 			if (isset($_GET['brand'])) {
 				$result = $dbc->execute($queryBrand);
 			} elseif (isset($_GET['description'])) {
@@ -136,7 +156,7 @@ class CoopDealsSearchPage extends ScancoordDispatch
 				</thead>
 			';
             foreach ($data as $upc => $row) {
-                $ret .= '<tr class="bhighlight">';
+                $ret .= '<tr class="row">';
                 $ret .= '<td>' . $upc . '</td>';
                 foreach ($row as $k => $v) {
                     $ret .= '<td>' . $v . '</td>';
@@ -145,15 +165,15 @@ class CoopDealsSearchPage extends ScancoordDispatch
             }
             $ret .= '</table></div>';
         }
-        
+
         return $ret;
     }
-    
+
     private function form_content()
     {
-        
+
         return '
-            <form class ="form-inline"  method="get" > 
+            <form class ="form-inline"  method="get" >
                 <select name="month" class="form-control">
                     <option value="">Select A Month</option>
                     <option value="Jan">January</option>
@@ -172,9 +192,9 @@ class CoopDealsSearchPage extends ScancoordDispatch
                 <button class="btn btn-default">Submit</button><br>
             </form>
         ';
-        
+
     }
-    
+
     private function form_ext_content($dbc,$month)
     {
         $prep = $dbc->prepare("SELECT brand FROM CoopDeals".$month." GROUP BY brand");
@@ -183,9 +203,9 @@ class CoopDealsSearchPage extends ScancoordDispatch
         while ($row = $dbc->fetch_row($res)) {
             $brands[] = $row['brand'];
         }
-        
+
         //foreach ($brands as $value) echo $value . '<br>';
-        
+
         $ret = '';
         $ret .= '
         <br><br>
@@ -195,22 +215,22 @@ class CoopDealsSearchPage extends ScancoordDispatch
                         <span class="input-group-addon">Brand</span>
                         <select class="form-control" name="brand">
                             <option value=""></option>';
-                            
+
         foreach ($brands as $brand) $ret .= '<option value="'.$brand.'">'.$brand.'</option>';
-                            
+
         $ret .= '
                         </select>
                     </div>
-                    
+
 					<input type="hidden" name="month" value="'.$month.'">
                     <br><br>&nbsp;<button class="btn btn-default btn-sm">Narrow Search</button> &nbsp;&nbsp;
-          			<a class="btn btn-default btn-sm" href="http://key/scancoord/item/Batches/CoopDealsSearchPage.php?month='.$month.'">Clear Search</a>      
+          			<a class="btn btn-default btn-sm" href="http://key/scancoord/item/Batches/CoopDealsSearchPage.php?month='.$month.'">Clear Search</a>
                 </form>
         </div>
         ';
-        
+
         return $ret;
     }
-    
+
 }
 ScancoordDispatch::conditionalExec();

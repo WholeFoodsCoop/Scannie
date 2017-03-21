@@ -93,6 +93,10 @@ tr.bhighlight:hover {
     background-color: #fcc679;
     background: linear-gradient(#fad9aa,#fcc679);
 }
+tr.click-highlight {
+    background-color: #fcc679;
+    background: linear-gradient(#fad9aa,#fcc679);
+}
 thead.float {
     background-color: white;
 }
