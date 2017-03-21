@@ -37,7 +37,7 @@ class CoopDealsSearchPage extends ScancoordDispatch
         ?>
             <script type="text/javascript">
             $(document).ready(function() {
-                $('.row').click(function() {
+                $('.rowz').click(function() {
                     if ( $(this).hasClass('click-highlight') ) {
                         $(this).removeClass('click-highlight');
                     } else {
@@ -156,7 +156,7 @@ class CoopDealsSearchPage extends ScancoordDispatch
 				</thead>
 			';
             foreach ($data as $upc => $row) {
-                $ret .= '<tr class="row">';
+                $ret .= '<tr class="rowz">';
                 $ret .= '<td>' . $upc . '</td>';
                 foreach ($row as $k => $v) {
                     $ret .= '<td>' . $v . '</td>';
