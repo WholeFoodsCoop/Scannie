@@ -72,18 +72,22 @@ class CoopDealsSearchPage extends ScancoordDispatch
 
             $query = $dbc->prepare("
                 SELECT
-                    upc,
-                    flyerPeriod,
-                    department,
-                    sku,
-                    brand,
-                    description,
-                    packSize,
-                    srp,
-                    lineNotes,
-  					promoDiscount
-                FROM CoopDeals".$month."
-                ORDER BY upc ASC
+                    c.upc,
+                    c.flyerPeriod,
+                    c.department,
+                    c.sku,
+                    c.brand,
+                    c.description AS posDesc,
+                    c.packSize,
+                    c.srp,
+                    c.lineNotes,
+  					c.promoDiscount,
+                    p.normal_price,
+                    pu.description AS signDesc
+                FROM CoopDeals".$month." AS c
+                    LEFT JOIN is4c_op.productUser AS pu ON pu.upc=c.upc
+                    LEFT JOIN is4c_op.products AS p ON c.upc=p.upc
+                ORDER BY c.upc ASC
             ;");
             $queryBrand = $dbc->prepare("
                 SELECT
@@ -132,9 +136,11 @@ class CoopDealsSearchPage extends ScancoordDispatch
                 $data[$upc]['dept'] = $row['department'];
                 $data[$upc]['sku'] = $row['sku'];
                 $data[$upc]['brand'] = $row['brand'];
-                $data[$upc]['desc'] = $row['description'];
+                $data[$upc]['desc'] = $row['posDesc'];
+                $data[$upc]['desc2'] = $row['signDesc'];
                 $data[$upc]['size'] = $row['packSize'];
                 $data[$upc]['price'] = $row['srp'];
+                $data[$upc]['normal_price'] = $row['normal_price'];
                 $data[$upc]['lineNotes'] = $row['lineNotes'];
 				$data[$upc]['promoDiscount'] = $row['promoDiscount'].'% OFF';
             }
@@ -148,9 +154,11 @@ class CoopDealsSearchPage extends ScancoordDispatch
 					<th>Department</th>
 					<th>SKU</th>
 					<th>Brand</th>
-					<th>Description</th>
+					<th>Description 1</th>
+					<th>Description 2</th>
 					<th>Size</th>
 					<th>Sale Price</th>
+					<th>Normal Price</th>
 					<th>Line Notes</th>
 					<th>PromoDisc</th>
 				</thead>
