@@ -20,4 +20,9 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     
 *********************************************************************************/
-header('location: http://key/scancoord/item/TrackChangeNew.php');
+$device = $_SERVER['HTTP_USER_AGENT'];
+if (strstr($device,'iPod')) {
+    header('location: http://192.168.1.2/scancoord/misc/mobile.php');
+} else {
+    header('location: http://192.168.1.2/scancoord/item/TrackChangeNew.php');
+}
