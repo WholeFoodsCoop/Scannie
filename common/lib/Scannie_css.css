@@ -51,6 +51,9 @@ body {
     color: white;
     border: 1px solid #f2b6e1;	
 }
+.text-surprise {
+    color: #c674cc;
+}
 .btn-inverse {
     background: #c674cc; /* For browsers that do not support gradients */
     background: linear-gradient(#545454,#323632); /* Standard syntax */
