@@ -207,7 +207,8 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
             td.produce {
                 background-color: #71c98a;
             }
-            td.grocery {
+            td.grocery, td.gen, 
+            td.frozen, td.refrigerated {
                 background-color: #ffa72b;
             }
             td.deli {
