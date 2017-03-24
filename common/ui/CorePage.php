@@ -294,7 +294,7 @@ window.addEventListener('keydown', KeyDown);
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/scancoord/common/bootstrap/bootstrap.min.css">
-    <link rel="stylesheet" href="/scancoord/common/lib/Scannie_css.css?foo=bar">
+    <link rel="stylesheet" href="/scancoord/common/css/Scannie_css.css?foo=bar">
     <script src="/scancoord/common/bootstrap/jquery.min.js"></script>
     <script src="/scancoord/common/bootstrap/bootstrap.min.js"></script>
     <title>' . $this->title . '</title>
