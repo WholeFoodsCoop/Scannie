@@ -623,7 +623,7 @@ class AuditScanner extends ScancoordDispatch
                     height: 50px;
                     width: 50px;
                     border: 5px solid white;
-                    border-radius: 2px;
+                    //border-radius: 2px;
                     background-color: lightgrey;
                     text-align: center;
                     cursor: pointer;
@@ -675,7 +675,7 @@ class AuditScanner extends ScancoordDispatch
                             </tr><tr>
                                 <td class="btn-keypad btn-info" id="keyCL">CL</td>
                                  <td></td>
-                                  <td><button type="button" class="close btn-keypad" data-dismiss="modal" aria-label="Close">X</button></td>   
+                                  <td><button type="button" class="btn-keypad" data-dismiss="modal" aria-label="Close"><span style="color: white; font-weight: bold">X</span></button></td>   
                             </tr>
                         </tbody>
                     </form></table>
