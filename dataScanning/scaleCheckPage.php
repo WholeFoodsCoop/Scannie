@@ -80,7 +80,8 @@ class scaleCheckPage extends ScancoordDispatch
             958,
             983,
             984,
-            985
+            985,
+            917
         );
          
         $query = $dbc->prepare("select upc, brand, description, normal_price from products where upc < 1000 and scale = 0 group by upc;");
@@ -122,7 +123,10 @@ class scaleCheckPage extends ScancoordDispatch
         
         $ret .=  '<h4>Bulk Product Scale Settings Check</h4>
             <p>If no table is drawn, there are no bulk products that need to be checked for scale settings.
-            Products that appear in table should be investigated.</p>';
+            Products that appear in table should be investigated.</p>
+            <p><span class="alert-info" style="font-weight: bold;">&nbsp;I.T. </span>&nbsp;if a new item was entered with 
+            a 3 digit PLU and it is not a scale item, you need to add it to the list of exceptions 
+            <span class="text-info">$dontCheck</span></p>';
         $ret .=  '<div class="panel panel-default" style="width:1000px"><table class="table table-striped">';
         $ret .=  '<thead>';
         foreach ($headers as $v) {
