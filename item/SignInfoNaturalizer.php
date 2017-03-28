@@ -32,7 +32,7 @@ class SignInfoNaturalizer extends ScancoordDispatch
         
         $args = array($startID,$endID);
         $query = $dbc->prepare("
-            SELECT p.brand FROM productUser AS p LEFT JOIN batchList AS b ON p.upc=b.upc WHERE b.batchID BETWEEN ? AND ?;
+            SELECT p.brand, p.upc FROM productUser AS p LEFT JOIN batchList AS b ON p.upc=b.upc WHERE b.batchID BETWEEN ? AND ?;
         ");
         $result = $dbc->execute($query,$args);
         $brands = array();
@@ -43,32 +43,42 @@ class SignInfoNaturalizer extends ScancoordDispatch
         }
         if ($dbc->error()) $ret .=  '<div class="alert alert-warning">'.$dbc->error().'</div>';
         
-        
-        echo '<div class="panel panel-default" style="width: 200px;">';
-        echo '<table id="mytable" class="table table-striped table-condensed small" >';
-        $headers = array();
-        echo '<thead>';
-        foreach ($headers as $header) echo '<th>'.$header.'</th>';
-        echo '</thead>';
-        
-        /** Don't order these yet. At least for Co-op Deals, the order is following batch order, which will put like 
-         *  brands together, which is very useful for finding products that are off buy a brand.
-         *  
-         *  What to add next? In this loop, create a hidden div with id="$brand"; 
-         *  Click on a brand to view all of the upcs associated with that brand.
-         *  
-         */
+        $count = 0;
+        echo '<div align="center">';
+        echo '<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" style="width: 200px;">';
         foreach ($brands as $brand => $ary) {
-            echo '<tr>';
-            if ($brand == '') {
-                $brand = 'NO_SIGN_INFO';
-            }
-            echo '<td>'.$brand.'</td>';
-            echo '<td>'.count($ary).'</td>';
-            echo '</tr>';
+
+            
+            echo '
+              <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="heading'.$count.'">
+                  <h4 class="panel-title" style="text-align: left;">
+                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse'.$count.'" aria-expanded="true" aria-controls="collapse'.$count.'">
+                      '.$brand.'<span style="float: right">'.count($ary).'</span>
+                    </a>
+                  </h4>
+                </div>
+                <div id="collapse'.$count.'" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading'.$count.'">
+                  <div class="panel-body">
+                    
+            ';
+            foreach ($ary as $k => $v) {
+                $upcln = '<a href="http://'.$CORE_POS_PATH.'/item/ItemEditorPage.php?searchupc='.$v.'&ntype=UPC&searchBtn=0#ProdUserFieldsetContent" target="_BLANK">'.$v.'</a>';
+                echo $upcln . '<br />';
+            }            
+            echo '
+                  </div>
+                </div>
+              </div>
+            ';
+            
+            $count++;
         }
-        echo "</table>";
-        echo '</div>';
+        //echo "</table>";
+        echo '</div></div>'; //accordion/accordion wrapper
+        
+        //test
+        echo '<a href="http://wholefoods.coop#top">wfc test link</a>';
     }
     
     private function form_content()
