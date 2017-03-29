@@ -29,6 +29,14 @@ class SignInfoNaturalizer extends ScancoordDispatch
         $startID = 7578;
         $endID = 7599;
         
+        echo '
+            <style>
+                a:hover {
+                    cursor: pointer;
+                }
+            </style>
+        ';
+        
         
         $args = array($startID,$endID);
         $query = $dbc->prepare("
@@ -44,10 +52,12 @@ class SignInfoNaturalizer extends ScancoordDispatch
         if ($dbc->error()) $ret .=  '<div class="alert alert-warning">'.$dbc->error().'</div>';
         
         $count = 0;
-        echo '<div align="center">';
-        echo '<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" style="width: 200px;">';
+        echo '<div align="center"><div  style="width: 1300px;">';
+        echo '<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" style="width: 250px; float: left">';
         foreach ($brands as $brand => $ary) {
-
+            if ($brand == '') {
+                $brand = '<span class="text-danger">MISSING BRAND</span>';
+            }
             
             echo '
               <div class="panel panel-default">
@@ -63,7 +73,8 @@ class SignInfoNaturalizer extends ScancoordDispatch
                     
             ';
             foreach ($ary as $k => $v) {
-                $upcln = '<a href="http://'.$CORE_POS_PATH.'/item/ItemEditorPage.php?searchupc='.$v.'&ntype=UPC&searchBtn=0#ProdUserFieldsetContent" target="_BLANK">'.$v.'</a>';
+                // $upcln = '<a class="upc" href="http://'.$CORE_POS_PATH.'/item/ItemEditorPage.php?searchupc='.$v.'&ntype=UPC&searchBtn=0#ProdUserFieldsetContent" target="_BLANK">'.$v.'</a>';
+                $upcln = '<a class="upc" value="'.$v.'">'.$v.'</a>';
                 echo $upcln . '<br />';
             }            
             echo '
@@ -75,10 +86,14 @@ class SignInfoNaturalizer extends ScancoordDispatch
             $count++;
         }
         //echo "</table>";
-        echo '</div></div>'; //accordion/accordion wrapper
+        echo '</div>'; //accordion //accordion wrapper
         
-        //test
-        echo '<a href="http://wholefoods.coop#top">wfc test link</a>';
+        
+        echo '
+            <iframe id="iframe" src="http://192.168.1.2" style="position: fixed; width: 1000px;height: 600px;; left: 600px; border: 2px solid grey;" seamless></iframe>
+            </div></div>
+        ';
+        
     }
     
     private function form_content()
@@ -116,16 +131,24 @@ class SignInfoNaturalizer extends ScancoordDispatch
     
     public function javascript_content()
     {
-        
-        $ret = '';
-        $ret .= '
+        ob_start();
+        ?>
 <script type="text/javascript">
-    var $table = $(\'#mytable\');
-    $table.floatThead();
+function load_iframe() {
+    $('.upc').click(function () {
+        var upc = $(this).html();
+        var addy = "http://192.168.1.2/git/fannie/item/ItemEditorPage.php?searchupc="+upc+"&ntype=UPC&searchBtn=0 #ProdUserFieldsetContent";
+        $('#iframe').attr('src',addy);
+        $('#iframe').contentWindow.$('#lf_brand').focus();
+    });
+}
+
+$(document).ready(function () {
+   load_iframe(); 
+});
 </script>
-<script src="/scancoord/common/javascript/jquery.floatThead.min.js"></script>
-        ';
-        return $ret;
+        <?php
+        return ob_get_clean();
     }
     
 }
