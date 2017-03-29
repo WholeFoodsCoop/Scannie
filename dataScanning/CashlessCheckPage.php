@@ -39,7 +39,13 @@ class CashlessCheckPage extends ScancoordDispatch
         include('../config.php');
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANTRANSDB, $SCANUSER, $SCANPASS);
         
-        if ($_GET['store_id']) $_SESSION['store_id'] = $_GET['store_id'];
+        if ($_GET['store_id']) {
+            $_SESSION['store_id'] = $_GET['store_id'];
+        } else {
+            if (empty($_SESSION['store_id'])) {
+                $ret .= '<div align="center"><div class="alert alert-danger md-w">You must select a store ID to check Cashless Transactions.</div></div>';
+            }
+        }
         $view_by = $_GET['view_by'];
         $ext = $_GET['ext'];
         $issuer = $_GET['issuer'];
@@ -49,13 +55,13 @@ class CashlessCheckPage extends ScancoordDispatch
         
         $ret .= '
             <div align="center" class="container" style="padding:5px;">
-                <button class="btn btn-default btn-xs" onclick="$(\'#xResScan\').show(); return false;" >View xResData</button>
+                <!-- <button class="btn btn-default btn-xs" onclick="$(\'#xResScan\').show(); return false;" >View xResData</button> -->
+                <button class="btn btn-default btn-xs" data-toggle="collapse" data-target="#xResScan" >View xResData</button>
         ';
         $xResScan = $this->getResultScan($dbc,100); //subtracting 100 goes back 1 month UNLESS the month you're looking at is Jan. 
         $xResScanT = $this->getResultScan($dbc,0);
         $ret .= '
                 <div class="collapse" id="xResScan">
-                    <a onclick="$(\'#xResScan\').hide(); return false;">[<i>collapse</i>]</a>
                     <div class="row" align="center">
                         <div class="col-xs-6">
                             <h4>xResultMessages in last 30 days</h4>
@@ -92,29 +98,30 @@ class CashlessCheckPage extends ScancoordDispatch
         
         $ret .= '
             <form method="get" id="tabs">
-            <div align="center"><div class="container">
-                <button class="btn btn-default btn-xs" name="store_id" value="1" >Hillside</button>
-                <button class="btn btn-default btn-xs" name="store_id" value="2" >Denfeld</button>
-                <button class="btn btn-default btn-xs" name="store_id" value="*" >* Stores</button>
-                    <br>
-                <button class="btn btn-default btn-xs" name="view_by" value="time" >*/Time</button>
-                <button class="btn btn-default btn-xs" onclick="$(\'#issuer\').show(); return false;" >/issuer</button>
-                <button class="btn btn-default btn-xs" onclick="$(\'#cardType\').show(); return false;" >/cardType</button>
-                <button class="btn btn-default btn-xs" onclick="$(\'#processor\').show(); return false;" name="view_by" value="processor">/processor</button>
-                <br />
-                <button class="btn btn-warning btn-xs" name="inProcess" value="1">SCAN: Failed Voids from previous day</button>
-                <br>
+                <div align="center"><div class="container">
+                    <button class="btn btn-default btn-xs" name="store_id" value="1" >Hillside</button>
+                    <button class="btn btn-default btn-xs" name="store_id" value="2" >Denfeld</button>
+                    <button class="btn btn-default btn-xs" name="store_id" value="*" >ALL Stores</button>
+                    <button class="btn btn-warning btn-xs" name="inProcess" value="1">SCAN: Yesterday</button>
+                    <br /><br />
+                    <div class="panel panel-default md-w" style="padding: 10px;"><label>View transactions in respect to</label><br />
+                        <button class="btn btn-default btn-xs" name="view_by" value="time" >time/recent</button>
             </form>
+                        <a class="btn btn-default btn-xs" data-toggle="collapse" data-target="#issuer">issuer</a>
+                        <a class="btn btn-default btn-xs" data-toggle="collapse" data-target="#cardType">cardType</a>
+                        <a class="btn btn-default btn-xs" data-toggle="collapse" data-target="#processor" name="view_by" value="processor">processor</a>
+                        <br />
+                    </div>
         ';
         $issuers = array('American Express','AMEX','DCVR','DEBIT','Discover','EBT','M/C','MasterCard','Mercury','Visa');
         $cardTypes = array('Credit',' Debit', 'EBTFOOD', 'EMV', 'Gift');
         $processors = array('GoEMerchant','MercuryE2E','MercuryGift');
-        $ret .= '<div id="processor" class="collapse"><strong>Issuer : </strong>';
+        $ret .= '<div id="processor" class="collapse"><strong>Processor : </strong>';
         foreach ($processors as $processor) {
             $ret .= '<button class="btn btn-default btn-xs" name="ext" value="'.$processor.'" >'.$processor.'</button>';
         }
         $ret .= '</div>';
-        $ret .= '<div id="cardType" class="collapse"><strong>Issuer : </strong>';
+        $ret .= '<div id="cardType" class="collapse"><strong>Card Type : </strong>';
         foreach ($cardTypes as $cardType) {
             $ret .= '<button class="btn btn-default btn-xs" name="ext" value="'.$cardType.'" >'.$cardType.'</button>';
         }
@@ -256,6 +263,14 @@ class CashlessCheckPage extends ScancoordDispatch
 				$data[$row['PID']]['refnum'] = '<span style="color: grey; font-size: 10;">'.$row['refnum'].'</span>';
             }
             
+            $ret .= '
+                <style>
+                    .panel-default {
+                        box-shadow: 5px 5px 5px #cacaca;
+                    }
+                </style>
+            ';
+            
             $ret .= '<div align="center"><div class="panel panel-default" style="width:800px;" id="table'.$lane.'">
                 <div class="panel-heading"><strong>Register No.'.$lane.'</strong></div>
                 <table class="table table-striped table-condensed small">';
@@ -306,13 +321,15 @@ class CashlessCheckPage extends ScancoordDispatch
         $dateID = $_GET['dateID'];
         return '
             <div class="container" align="center">
-            <button class="btn btn-default btn-xs" onclick="$(\'#transLookup\').show(); return false;" >Transaction Lookup</button>
+            <!-- <button class="btn btn-default btn-xs" onclick="$(\'#transLookup\').show(); return false;" >Transaction Lookup</button> -->
+            <button class="btn btn-default btn-xs" data-toggle="collapse" data-target="#transLookup">Transaction Lookup</button> 
             <form method="get" class="form-inline collapse" id="transLookup" >
+               <br />
                 <div class="input-group" >
                     <span class="input-group-addon">
                         DateID 
                     </span>
-                    <input type="text" class="form-control" id="dateID" value="'.$dateID.'" style="width: 175px" name="dateID">&nbsp;&nbsp;
+                    <input type="text" class="form-control" id="dateID" value="'.$dateID.'" style="width: 175px" name="dateID" placeholder="YYYYMMDD">&nbsp;&nbsp;
                 </div>
                 
                 <div class="input-group">
@@ -322,7 +339,7 @@ class CashlessCheckPage extends ScancoordDispatch
                     <input type="text" class="form-control" id="regNo" style="width: 175px" name="regNo" >&nbsp;&nbsp;
                 </div>
                 <input type="hidden" name="LU" value="1">
-                <button class="btn btn-default btn-xs" type="submit" class="btn btn-default">L/U Transaction</button>
+                <button class="btn btn-default btn-xs" type="submit" class="btn btn-default">L/U Transactions</button>
                 <br>
             </form>
             </div>
