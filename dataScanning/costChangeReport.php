@@ -106,7 +106,7 @@ class costChangeReport extends ScancoordDispatch
         $ret .= '<div style="border: 1px solid lightgrey; width: 550px; ">';
         $ret .= '<table class="table-condensed table-striped small">';
         $ret .= '<thead>';
-        $headers = array('upc','brand','description','prev_cost','cost',' ');
+        $headers = array('upc','brand','description','prev_cost','cost',' ',' ');
         foreach ($headers as $header) $ret .= '<th>'.$header.'</th>';
         $ret .= '</thead>';
         
@@ -128,9 +128,11 @@ class costChangeReport extends ScancoordDispatch
             if ($curChange == 0 || $prevCost[$upc] == 0) {
                 $curChange = '--';
             } elseif ($curChange > 0) {
-                $curChange = '<span style="color: grey;">&#x394;</span><span style="color:orange;">&#11014</span>'.abs($curChange);
+                $curChangeArrow = '<span style="color:orange; width: 10px">&#11014</span>';
+                $curChange = round(abs($curChange),2);
             } else {
-                $curChange = '<span style="color: grey;">&#x394;</span><span style="color:green ;">&#11015</span>'.abs($curChange);
+                $curChangeArrow = '<span style="color:lightblue; width: 10px">&#11015</span>';
+                $curChange = round(abs($curChange),2);
             }
             
             if ($curChange != '--') {
@@ -139,7 +141,7 @@ class costChangeReport extends ScancoordDispatch
                 $ret .= '<td>'.$brand[$upc].'</td>';
                 $ret .= '<td>'.$description[$upc].'</td>';
                 $ret .= '<td>'.$prevCost[$upc].'</td>';
-                $ret .= '<td>'.$cost[$upc].'</td>';
+                $ret .= '<td>'.$cost[$upc].'</td><td>'.$curChangeArrow.'</td>';
                 $ret .= '<td>'.$curChange.'</td>';    
                 $ret .= '</tr>';
             }
