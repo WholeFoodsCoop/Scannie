@@ -104,7 +104,7 @@ class CashlessCheckPage extends ScancoordDispatch
                     <button class="btn btn-default btn-xs" name="store_id" value="*" >ALL Stores</button>
                     <button class="btn btn-warning btn-xs" name="inProcess" value="1">SCAN: Yesterday</button>
                     <br /><br />
-                    <div class="panel panel-default md-w" style="padding: 10px;"><label>View transactions in respect to</label><br />
+                    <div class="well md-w" style="padding: 10px;"><label>View transactions in respect to</label><br />
                         <button class="btn btn-default btn-xs" name="view_by" value="time" >time/recent</button>
             </form>
                         <a class="btn btn-default btn-xs" data-toggle="collapse" data-target="#issuer">issuer</a>
