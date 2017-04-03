@@ -52,82 +52,71 @@ class generic_dScan_page extends ScancoordDispatch
             $upc = str_pad($_GET['upc'], 13, 0, STR_PAD_LEFT);
         }
          
-        /*
-        $query = $dbc->prepare("");
-        $result = $dbc->execute($query);
-        while ($row = $dbc->fetch_row($result)) {
-        }
-        if ($dbc->error()) $ret .=  $dbc->error();
-        */
-         
-        $query = $dbc->prepare("select upc, brand, description from products limit 25");
-        $result = $dbc->execute($query);
-        $data = array();
-        $headers = array();
-        $i = 0;
-        while ($row = $dbc->fetch_row($result)) {
-            foreach ($row as $k => $v) {
-                if(!is_numeric($k)) {
-                    $data[$i][$k] =  $v;
-                    $headers[$k] = $k;
+        $ret .= '
+            <style>
+                div.column {
+                    width: 44vw;
+                    height: 70vh;
+                    //border: 1px solid orange;
+                    float: left;
                 }
-            }
-            $i++;
-        }
+            </style>
+        ';
         
-        /*  Add a column
-        $i = 0;
-        foreach ($data as $k => $array) { 
-            $newColumnName = 'column_name';
-            $data[$i][$newColumnName] = 'data_to_put_into_column';
-            $headers[$newColumnName] = $newColumnName;
-            $i++;
-        }
-        */
+        $ret .= '<div style="height: 70vh;">';
+        $ret .= '<div class="column">';
+
         
-        /*  Add a flags
-        $i = 0;
-        $flags = array();
-        foreach ($data as $k => $array) { 
-            if ('condition') {
-                $flags['flag_type'][] = $i;
-            }
-            $i++;
-        }
-        */
+        $ret .= '
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="headingOne">
+      <h4 class="panel-title">
+        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+          Collapsible Group Item #1
+        </a>
+      </h4>
+    </div>
+    <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+      <div class="panel-body">
+        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven\'t heard of them accusamus labore sustainable VHS.
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="headingTwo">
+      <h4 class="panel-title">
+        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+          Collapsible Group Item #2
+        </a>
+      </h4>
+    </div>
+    <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+      <div class="panel-body">
+        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven\'t heard of them accusamus labore sustainable VHS.
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="headingThree">
+      <h4 class="panel-title">
+        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+          Collapsible Group Item #3
+        </a>
+      </h4>
+    </div>
+    <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+      <div class="panel-body">
+        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven\'t heard of them accusamus labore sustainable VHS.
+      </div>
+    </div>
+  </div>
+</div>
+        ';
         
-        $ret .=  '<div class="panel panel-default"><table class="table table-striped">';
-        $ret .=  '<thead>';
-        foreach ($headers as $v) {
-            $ret .=  '<th>' . $v . '</th>';
-        }
-        $ret .=  '</thead>';
-        $prevKey = '1';
-        $ret .=  '<tr>';
-        foreach ($data as $k => $array) { 
-            foreach ($array as $kb => $v) {
-                $ret .=  '<td> ' . $v . '</td>'; 
-            }
-            if($prevKey != $k) {
-                /*  highlight Flagged rows
-                if (in_array(($k+1),$flags['flag_name'])) {
-                    $ret .=  '</tr><tr class="" style="background-color:tomato;color:white">';
-                } else {
-                    $ret .=  '</tr><tr>';
-                }
-                */
-                /*  rows w/ no flags */
-                $ret .=  '</tr><tr>';
-            } 
-            $prevKey = $k;
-        }
-        $ret .=  '</table></div>';
-        
-        /*
-        $upcLink = "<a href='http://key/git/fannie/item/ItemEditorPage.php?searchupc=" 
-                . $upc . "&ntype=UPC&searchBtn=' target='_blank'>{$upc}</a>";
-        */
-        if ($dbc->error()) $ret .=  $dbc->error();
+        $ret .= '</div>';
+        $ret .= '<div class="column"></div>';
+        $ret .= '</div>';
         
         return $ret;
     }
