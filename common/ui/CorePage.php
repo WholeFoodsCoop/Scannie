@@ -323,13 +323,16 @@ window.addEventListener('keydown', KeyDown);
         $user = $_SESSION['user_name'];
         if (empty($user)) {
             $user = 'Generic User';
+            $logVerb = 'Login';
+        } else {
+            $logVerb = 'Logout';
         }
         $ret .= '
 <div class="container" id="" style="width:96%;">
         ';
         $ret .= '
             You are logged in as <strong>'.$user.'</strong>. 
-            <a href="../admin/logout.php">[Logout]</a><br />
+            <a href="../admin/logout.php">['.$logVerb.']</a><br />
             Current version: 0.0.1-dev<br />
             <a href="http://192.168.1.2/scancoord/testing/SiteMap.php">Site Map</a><br />
             <br />
