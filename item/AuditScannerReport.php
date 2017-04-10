@@ -84,11 +84,11 @@ class AuditScannerReport extends ScancoordDispatch
         
         $ret .= '
             <table class="table table-bordered table-condensed small" style="width: 500px;"> 
-                <tr><td>Key</td><td></td></tr>
-                <tr><td style="background-color: lightgrey">&nbsp;</td><td>Product Missing Cost</td>
-                <td style="background-color: lightblue; width: 30px">&nbsp;</td><td>Price Above Margin</td></tr>
-                <tr><td style="background-color: #FFF457">&nbsp;</td><td>Price Below Margin (M)</td>
-                <td style="background-color: tomato; width: 30px; ">&nbsp;</td><td>Price Below Margin (L)</td></tr>
+                <tr class="key"><td>Key</td><td></td></tr>
+                <tr class="key"><td id="grey-toggle" style="background-color: lightgrey">&nbsp;</td><td>Product Missing Cost</td>
+                <td id="blue-toggle" style="background-color: lightblue; width: 30px">&nbsp;</td><td>Price Above Margin</td></tr>
+                <tr class="key"><td id="yellow-toggle" style="background-color: #FFF457">&nbsp;</td><td>Price Below Margin (M)</td>
+                <td id="red-toggle" style="background-color: tomato; width: 30px; ">&nbsp;</td><td>Price Below Margin (L)</td></tr>
             </table>
         ';
         
@@ -138,21 +138,22 @@ class AuditScannerReport extends ScancoordDispatch
         }
         
         $ret .=  '<div class="panel panel-default">
-            <table class="table table-condensed">';
-        $ret .=  '<thead class="float">';
+            <table class="table table-condensed" id="dataTable">';
+        $ret .=  '<thead class="float key" id="dataTableThead">
+            <tr class="key">';
         foreach ($headers as $v) {
             if ($v == 'notes') {
-                $ret .=  '<th>' . $v . $noteStr . '</th>';
+                $ret .=  '<th class="key"><th class="key">' . $v . $noteStr . '</th>';
             } elseif($v == 'store_id') {
-                $ret .=  '<th>' . 'store' . '</th>';
+                $ret .=  '<th class="key">' . 'store' . '</th>';
             } else {
-                $ret .=  '<th>' . $v . '</th>';
+                $ret .=  '<th class="key">' . $v . '</th>';
             }
         }
-        $ret .=  '</thead>';
+        $ret .=  '</tr></thead>';
         $prevKey = '1';
         $ret .= '<tbody id="mytable">';
-        $ret .=  '<tr class="highlight">';
+        $ret .=  '<tr class="key" class="highlight">';
         foreach ($data as $k => $array) { 
             foreach ($array as $column_name  => $v) {
                 if ($column_name == 'store_id') {
@@ -163,17 +164,51 @@ class AuditScannerReport extends ScancoordDispatch
                     $ret .=  '<td>' . $v . '</td>'; 
                 }
             }
+            $ret .= '</tr>';
+            
+            $ret .= '
+                <style>
+                    .grey {
+                        background-color:lightgrey;
+                    }
+                    #grey-toggle:hover {
+                        cursor: pointer;
+                    }
+                    .red {
+                        background-color:tomato; 
+                        color:#700404
+                    }
+                    #red-toggle:hover {
+                        cursor: pointer;
+                    }
+                    .yellow {
+                        background-color:#FFF457; 
+                        color: #635d00
+                    }
+                    #yellow-toggle:hover {
+                        cursor: pointer;
+                    }
+                    .blue {
+                        background-color:lightblue; 
+                        color: #344c57
+                    }
+                    #blue-toggle:hover {
+                        cursor: pointer;
+                    }
+                </style>
+            ';
+            
             if($prevKey != $k) {
                 if ($data[$k+1]['cost'] == 0) {
-                    $ret .=  '</tr><tr class="highlight" style="background-color:lightgrey; ">';
+                    $ret .=  '</tr><tr class="highlight grey" style="background-color:lightgrey">';
                 } elseif (in_array(($k+1),$flags['danger']) && $data[$k+1]['prid'] == 0) {
-                    $ret .=  '</tr><tr class="highlight" style="background-color:tomato; color:#700404">';
+                    $ret .=  '</tr><tr class="highlight red" style="background-color:tomato; color:#700404">';
 	            } elseif (in_array(($k+1),$flags['warning']) && $data[$k+1]['prid'] == 0) {
-                    $ret .=  '</tr><tr class="highlight" style="background-color:#FFF457; color: #635d00">';
+                    $ret .=  '</tr><tr class="highlight yellow" style="background-color:#FFF457; color: #635d00">';
                 } elseif (in_array(($k+1),$flags['info']) && $data[$k+1]['prid'] == 0) {
-                    $ret .=  '</tr><tr class="highlight" style="background-color:lightblue; color: #344c57">';
+                    $ret .=  '</tr><tr class="highlight blue" style="background-color:lightblue; color: #344c57">';
                 } else {
-                    $ret .=  '</tr><tr class="highlight">';
+                    $ret .=  '</tr><tr class="highlight normal">';
                 }
             } 
             $prevKey = $k;
@@ -220,7 +255,6 @@ class AuditScannerReport extends ScancoordDispatch
     
     public function javascript_content($e)
     {
-        
         ob_start();
         ?>
 <script type="text/javascript">
@@ -255,6 +289,62 @@ $("#notes").change( function() {
         });
     });
 });
+</script>
+
+<script type="text/javascript">    
+    function redrawDataTable()
+    {
+        $('#dataTable').each(function() {
+            $('tr').each(function () {
+                $(this).show();
+            });
+        });   
+    }
+    
+
+
+    $(document).ready(function () {
+        $('#red-toggle').click(function () {
+            redrawDataTable();
+            $('#dataTable').each(function() {
+                $('tr').each(function () {
+                    if ( !$(this).hasClass('red') && !$(this).hasClass('key') ) {
+                        $(this).hide();
+                    }
+                });
+            });       
+        });
+        $('#yellow-toggle').click(function () {
+            redrawDataTable();
+            $('#dataTable').each(function() {
+                $('tr').each(function () {
+                    if ( !$(this).hasClass('yellow') && !$(this).hasClass('key') ) {
+                        $(this).hide();
+                    }
+                });
+            });       
+        });
+        $('#blue-toggle').click(function () {
+            redrawDataTable();
+            $('#dataTable').each(function() {
+                $('tr').each(function () {
+                    if ( !$(this).hasClass('blue') && !$(this).hasClass('key') ) {
+                        $(this).hide();
+                    }
+                });
+            });       
+        });
+        $('#grey-toggle').click(function () {
+            redrawDataTable();
+            $('#dataTable').each(function() {
+                $('tr').each(function () {
+                    if ( !$(this).hasClass('grey') && !$(this).hasClass('key') ) {
+                        $(this).hide();
+                    }
+                });
+            });       
+        });
+    });
 </script>
         <?php
         return ob_get_clean();
