@@ -110,13 +110,16 @@ class AuditScanner extends ScancoordDispatch
         $ret .= $this->form_content();
         
         //Gather product SALE information
+        $saleQueryArgs = array($storeID,$upc);
         $saleQuery = $dbc->prepare("
             SELECT b.batchName, bl.salePrice, b.batchID
             FROM batches AS b 
                 LEFT JOIN batchList AS bl ON b.batchID=bl.batchID 
+                INNER JOIN StoreBatchMap AS sbm ON b.batchID=sbm.batchID
             WHERE curdate() BETWEEN b.startDate AND b.endDate 
+                AND sbm.storeID = ?
                 AND bl.upc = ?;");
-        $saleQres = $dbc->execute($saleQuery,$upc);
+        $saleQres = $dbc->execute($saleQuery,$saleQueryArgs);
         //$batchList = array( 'price' => array(), 'batchID' => array(), 'batchName' => array() );
         while ($row = $dbc->fetchRow($saleQres)) {
             $batchList['price'][] = $row['salePrice'];
