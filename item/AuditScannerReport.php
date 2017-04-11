@@ -137,6 +137,15 @@ class AuditScannerReport extends ScancoordDispatch
             $i++;
         }
         
+        $ret .= '
+            <style>
+                .price {
+                    color: darkslategrey;
+                    font-weight: bold;
+                }
+            </style>
+        ';
+        
         $ret .=  '<div class="panel panel-default">
             <table class="table table-condensed" id="dataTable">';
         $ret .=  '<thead class="float key" id="dataTableThead">
@@ -160,6 +169,8 @@ class AuditScannerReport extends ScancoordDispatch
                     $ret .=  '<td class="store_id">' . $v . '</td>'; 
                 } elseif ($column_name == 'notes') {
                     $ret .=  '<td class="notescell">' . $v . '</td>'; 
+                } elseif ($column_name == 'price' || $column_name == 'srp') {
+                    $ret .=  '<td class="price">' . $v . '</td>'; 
                 } else {
                     $ret .=  '<td>' . $v . '</td>'; 
                 }
