@@ -152,9 +152,11 @@ class AuditScannerReport extends ScancoordDispatch
             <tr class="key">';
         foreach ($headers as $v) {
             if ($v == 'notes') {
-                $ret .=  '<th class="key"><th class="key">' . $v . $noteStr . '</th>';
+                $ret .=  '<th class="key">' . $v . $noteStr . '</th>';
             } elseif($v == 'store_id') {
                 $ret .=  '<th class="key">' . 'store' . '</th>';
+            } elseif($v == NULL ) {
+                //do nothing
             } else {
                 $ret .=  '<th class="key">' . $v . '</th>';
             }
@@ -168,6 +170,9 @@ class AuditScannerReport extends ScancoordDispatch
                 if ($column_name == 'store_id') {
                     $ret .=  '<td class="store_id">' . $v . '</td>'; 
                 } elseif ($column_name == 'notes') {
+                    if ($v == NULL) {
+                        $v = 'n/a';
+                    }
                     $ret .=  '<td class="notescell">' . $v . '</td>'; 
                 } elseif ($column_name == 'price' || $column_name == 'srp') {
                     $ret .=  '<td class="price">' . $v . '</td>'; 
