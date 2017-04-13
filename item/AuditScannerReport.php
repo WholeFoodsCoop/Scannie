@@ -56,7 +56,7 @@ class AuditScannerReport extends ScancoordDispatch
         
         include('../config.php');
         include('../common/lib/PriceRounder.php');
-        include('../common/lib/scanLib.php');
+        
         $rounder = new PriceRounder();
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         $storeID = scanLib::getStoreID(); 

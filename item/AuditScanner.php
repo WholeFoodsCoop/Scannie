@@ -40,9 +40,7 @@ class AuditScanner extends ScancoordDispatch
     {
         
         include('../config.php');
-        if (!class_exists('scanLib')) {
-            include('../common/lib/scanLib.php');
-        }
+        
         $username = scanLib::getUser();
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         if (isset($_GET['note'])) {
@@ -84,9 +82,7 @@ class AuditScanner extends ScancoordDispatch
     public function body_content()
     {
     
-        if (!class_exists('scanLib')) {
-            include('../common/lib/scanLib.php');
-        }
+        
         $ret = '';
         $username = scanLib::getUser();
         $response = $_GET['success'];

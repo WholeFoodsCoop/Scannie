@@ -43,6 +43,9 @@ class ScancoordDispatch
     
     private function runPage($class)
     {
+        if(!class_exists('scanLib')) {
+            include(dirname(dirname(__FILE__)).'/lib/scanLib.php');
+        }
         $obj = new $class();
         $obj->draw_page($class);
     }
