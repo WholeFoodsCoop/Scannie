@@ -40,10 +40,14 @@ class AuditScanner extends ScancoordDispatch
     {
         
         include('../config.php');
+        if (!class_exists('scanLib')) {
+            include('../common/lib/scanLib.php');
+        }
+        $username = scanLib::getUser();
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         if (isset($_GET['note'])) {
             $note = $_GET['note'];
-            $error = $this->notedata_handler($dbc,$note);
+            $error = $this->notedata_handler($dbc,$note,$username);
             if (!$error) {
                 header('location: http://192.168.1.2/scancoord/item/AuditScanner.php?success=true');
             } else {
@@ -53,12 +57,13 @@ class AuditScanner extends ScancoordDispatch
         
     }
     
-    private function notedata_handler($dbc,$note)
+    private function notedata_handler($dbc,$note,$username)
     {
         $ret = '';
         $upc = $_GET['upc'];
-        $args = array($note,$upc);
-        $query = $dbc->prepare("UPDATE woodshed_no_replicate.AuditScanner SET notes = ? WHERE upc = ?;");
+        $args = array($note,$upc,$username);
+        $query = $dbc->prepare("UPDATE woodshed_no_replicate.AuditScanner 
+            SET notes = ? WHERE upc = ? AND username = ?;");
         $result = $dbc->execute($query,$args);
         $error = 0;
         if ($dbc->error()) {
