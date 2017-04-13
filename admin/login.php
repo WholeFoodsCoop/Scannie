@@ -152,7 +152,7 @@ class admin
                 <form method="post" class="form-inline">
                     <h2 class="login">Scannie Login</h2><br /><br />
                     <label style="width:120px">Username:</label>
-                        <input type="text" name="username" class="form-control" style="max-width: 200px;"><br><br>
+                        <input type="text" name="username" class="form-control" style="max-width: 200px;" autofocus><br><br>
                     <label style="width:120px">Password:</label>
                         <input type="password" name="pw" class="form-control" style="max-width: 200px;"><br><br><br><br>
                         <input type="submit" value="LOG IN" class="btn btn-default btn-login" style="width: 150px; "><br /><br /><br /> 
