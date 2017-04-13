@@ -64,7 +64,7 @@ class coopBasicsScanPage
     {        
     
         include('../config.php');
-        include('../common/lib/scanLib.php');
+        
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         
         $store_id = scanLib::getStoreID();
