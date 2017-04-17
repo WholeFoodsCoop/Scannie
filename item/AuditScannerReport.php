@@ -115,7 +115,7 @@ class AuditScannerReport extends ScancoordDispatch
             $i++;
         }
         
-        //  Add columns to talbe
+        //  Add columns to table
         $i = 0;
         $flags = array();
         foreach ($data as $k => $array) { 
@@ -126,7 +126,7 @@ class AuditScannerReport extends ScancoordDispatch
             $dMargin = $data[$k]['desMarg'];
             //  Create flags to change color of <tr>
             $margOff = ($margin / $dMargin);
-            if ($margOff > 1.05) {
+            if ($margOff > 1.05 && $srp != $price) {
                 $flags['info'][] = $i;
             } elseif ($margOff > 0.95) {
             } elseif ($margOff < 0.95 && $margOff > 0.90) {
