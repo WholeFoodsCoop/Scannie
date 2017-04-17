@@ -129,9 +129,9 @@ class AuditScannerReport extends ScancoordDispatch
             if ($margOff > 1.05 && $srp != $price) {
                 $flags['info'][] = $i;
             } elseif ($margOff > 0.95) {
-            } elseif ($margOff < 0.95 && $margOff > 0.90) {
+            } elseif ($margOff < 0.95 && $margOff > 0.90 && $srp != $price) {
                 $flags['warning'][] = $i;
-            } else {
+            } elseif ($srp != $price) {
                 $flags['danger'][] = $i;
             }
             $i++;
