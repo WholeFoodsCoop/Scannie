@@ -96,7 +96,7 @@ class AuditScannerReport extends ScancoordDispatch
         	SELECT upc, brand, description, cost, price, curMarg, desMarg, rsrp, srp, prid, flag, dept, vendor, notes, store_id
 			FROM woodshed_no_replicate.AuditScanner 
             WHERE username = ?
-            ORDER BY vendor, dept;
+            ORDER BY vendor, dept, brand;
         ");    
         $result = $dbc->execute($query,$username);
         $data = array();
