@@ -2,9 +2,9 @@
 /*******************************************************************************
 
     Copyright 2016 Whole Foods Community Co-op.
-    
+
     This file is a part of Scannie.
-    
+
     Scannie is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -18,7 +18,7 @@
     You should have received a copy of the GNU General Public License
     in the file LICENSE along with Scannie; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-    
+
 *********************************************************************************/
 
 include('../config.php');
@@ -31,36 +31,35 @@ if (!class_exists('SQLManager')) {
 
 class costChangeReport extends ScancoordDispatch
 {
-    
+
     protected $title = "Cost Change Report";
     protected $description = "[Cost Change Report] Find the resent change in cost
         for all products under a select vendor.";
     protected $ui = TRUE;
-    protected $readme = 'Select a vendor to review costs and the previous cost, if 
+    protected $readme = 'Select a vendor to review costs and the previous cost, if
         there was a change, for each product.';
-    
+
     public function body_content()
     {
         $ret = '';
         include('../config.php');
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
-        
+
         $mo = date('m');
         $da = date('d');
         $ye = date('Y');
         $prevmo = $m - 1;
-        
+
         $vendorID = $_GET['vendorID'];
         $curDate = date('Y-m-d');
         $date = $_GET['date'];
-        
-        require('../common/lib/scanLib.php');
+
         $prep = $dbc->prepare("
-            SELECT 
+            SELECT
                 p.upc,
                 p.brand,
                 p.description,
-                p.cost 
+                p.cost
             FROM products AS p
             WHERE p.default_vendor_id = ?
             GROUP BY p.upc
@@ -78,12 +77,12 @@ class costChangeReport extends ScancoordDispatch
                 $description[$row['upc']] = $row['description'];
                 $brand[$row['upc']] = $row['brand'];
             }
-        } 
-        
+        }
+
         foreach ($cost as $upc => $curCost) {
             $args = array($upc,$date);
             $prep = $dbc->prepare("
-                SELECT 
+                SELECT
                     u.cost,
                     u.modified
                 FROM prodUpdate AS u
@@ -97,7 +96,7 @@ class costChangeReport extends ScancoordDispatch
                 break;
             }
         }
-        
+
         $ret .= '<div class="row">';
         //  Column 1
         $ret .= '<div class="col-xs-6" style="width:600px">';
@@ -109,19 +108,19 @@ class costChangeReport extends ScancoordDispatch
         $headers = array('upc','brand','description','prev_cost','cost',' ',' ');
         foreach ($headers as $header) $ret .= '<th>'.$header.'</th>';
         $ret .= '</thead>';
-        
+
         $count = array('all'=>0,'green'=>0,'yellow'=>0,'orange'=>0,'red'=>0);
         $change = array();
         $countChange = 0;
         foreach ($cost as $upc => $value) {
             $curChange = $cost[$upc]-$prevCost[$upc];
-            
+
             if ($curChange != 0 && $prevCost[$upc] != 0 && !is_null($prevCost[$upc])) {
                 $change[$upc] = $curChange;
             } else {
                 $change[$upc] = 0;
             }
-            
+
             if ($curChange != 0 && $prevCost[$upc] != 0 && !is_null($prevCost[$upc])) {
                 $countChange++;
             }
@@ -134,7 +133,7 @@ class costChangeReport extends ScancoordDispatch
                 $curChangeArrow = '<span style="color:lightblue; width: 10px">&#11015</span>';
                 $curChange = round(abs($curChange),2);
             }
-            
+
             if ($curChange != '--') {
                 $ret .= '<tr>';
                 $ret .= '<td>'.$upc.'</td>';
@@ -142,24 +141,24 @@ class costChangeReport extends ScancoordDispatch
                 $ret .= '<td>'.$description[$upc].'</td>';
                 $ret .= '<td>'.$prevCost[$upc].'</td>';
                 $ret .= '<td>'.$cost[$upc].'</td><td>'.$curChangeArrow.'</td>';
-                $ret .= '<td>'.$curChange.'</td>';    
+                $ret .= '<td>'.$curChange.'</td>';
                 $ret .= '</tr>';
             }
-            
+
             $count['all']++;
-           
+
         }
-        
+
         $ret .= '</table>';
         $ret .= '</div></div>';
-        
+
         //  Second Column
         $ret .= '<div class="col-xs-6">';
         $ret .= '<h3>Results</h3>
-            '.$gKey.' 
+            '.$gKey.'
             '.$countChange.'/'.$count['all'].' product costs have changed. <br /><br />
         ';
-        
+
         $avg = 0;
         $i = 0;
         foreach ($change as $upc => $v) {
@@ -176,7 +175,7 @@ class costChangeReport extends ScancoordDispatch
             $ret .= '<span style="color:green ;">&#11015</span> ';
         }
         $ret .= sprintf('$%0.2f',abs($avg)).' <br />';
-        
+
         $stdev = 0;
         $stdevArg = array();
         foreach ($change as $upc => $value) {
@@ -194,12 +193,12 @@ class costChangeReport extends ScancoordDispatch
         $stdev = sqrt($stdev);
         $ret .= '<span style="background-color:  lightgrey;">&sigma;</span> : '.sprintf('%0.2f',$stdev).' <br />';
         $ret .= '<span style="color: red">STDEV is not correct. Logic issue requires resolution.</span><br />';
-        
+
         $ret .= '</div></div></div> <!-- End Second Column -->';
-        
+
         return $ret;
     }
-    
+
     private function form_content($dbc)
     {
         $date = date('Y-m-d');
@@ -214,29 +213,29 @@ class costChangeReport extends ScancoordDispatch
         while ($row = $dbc->fetch_row($res)) {
             $vendors[$row['vendorID']] = $row['vendorName'];
         }
-        
+
         $ret = '';
         $ret .= '
             <div class="">
-                <form class ="form-inline"  method="get" > 
+                <form class ="form-inline"  method="get" >
                     <br>
-                    <div class="form-group">    
+                    <div class="form-group">
                         <select name="vendorID" class="form-control">
         ';
-        
+
         foreach ($vendors as $id => $name) {
             $ret .= '<option value="'.$id.'"';
             if ($_GET['vendorID'] == $id) $ret .= ' selected ';
             $ret .='>'.$name.'</option>';
         }
-        
+
         $ret .= '
                         </select>
                     </div>
                     <br /><br />
                     <div class="input-group">
                         <span class="input-group-addon">Updated on:</span>
-                        <input type="text" class="form-control" style="width: 120px;" 
+                        <input type="text" class="form-control" style="width: 120px;"
                             name="date" value="'.$date.'">&nbsp;&nbsp;
                     </div>
                     <div class="form-group">
@@ -245,12 +244,12 @@ class costChangeReport extends ScancoordDispatch
                 </form>
             </div>
         ';
-        
+
         return $ret;
     }
-    
+
 }
 
 ScancoordDispatch::conditionalExec();
 
- 
+
