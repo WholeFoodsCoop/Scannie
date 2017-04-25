@@ -418,29 +418,27 @@ class AuditScanner extends ScancoordDispatch
                     <!-- Purple Buttons -->
                     <div align="left" style="padding: 10px; float: left; width: 40vw">
                         <div>
-                            <button class="btn btn-surprise btn-xs btn-msg" onClick="qm(\'Missing Sign Info.\'); return false; ">
-                                Missing Sign Info</button><br /><br />
-                            <button class="btn btn-surprise btn-xs btn-msg" onClick="qm(\'Incorrect Sign Info.\'); return false; ">
-                                Incorrect Sign Info.</button><br /><br />
-                            <button class="btn btn-surprise btn-xs btn-msg" onClick="qm(\'Line Price Issue. Line Price: \'); return false; ">
-                                Line Price Issue</button><br /><br />
-                            <button class="btn btn-surprise btn-xs btn-msg" onClick="qm(\'Price Change: \'); return false; ">
-                                Price Change</button><br /><br />
+                            <button class="btn btn-surprise btn-xs btn-msg" onClick="qm(\'Change Sign Text: \'); return false; ">
+                                Change Sign Text</button><br /><br />
+                            <button class="btn btn-surprise btn-xs btn-msg" onClick="qm(\'Line Price\'); return false; ">
+                                Line Price</button><br /><br />
+                            <button class="btn btn-surprise btn-xs btn-msg" onClick="qm(\'Change Price: \'); return false; ">
+                                Change Price</button><br /><br />
                             <button class="btn btn-warning btn-xs btn-msg" onClick="qm(\'Print Tag \'); return false; ">
                                 Print Tag</button><br /><br />
-                    </div>
+                        </div>
                     <!-- Green Buttons -->
                     </div>
                     <div align="left" style="padding: 10px; float: left; width: 10vw"></div>
                     <div align="left" style="padding: 10px; float: left; width: 40vw">
                         <button class="btn btn-success btn-xs btn-msg" onClick="qm(\'Missing Sale Sign\'); return false; ">
-                            Missing Sale Sign</button><br /><br />
+                            Sale Sign Missing</button><br /><br />
                         <button class="btn btn-success btn-xs btn-msg" onClick="qm(\'Queue Narrow Tag \'); return false; ">
                             Narrow Tag</button><br /><br />
                         <button class="btn btn-success btn-xs btn-msg" onClick="qm(\'Product Not In Use\'); return false; ">
                             Not In Use</button><br /><br />
-                        <button class="btn btn-success btn-xs btn-msg" onClick="qm(\'Price Discrepancy: \'); return false; ">
-                            Price Discrapancy</button><br /><br />
+                        <button class="btn btn-success btn-xs btn-msg" onClick="qm(\'Remove This Item From Queue\'); return false; ">
+                            Remove From Queue</button><br /><br />
                     </div>
                 </div>
             </div>
