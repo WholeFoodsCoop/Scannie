@@ -42,11 +42,86 @@ class AuditScannerReport extends ScancoordDispatch
         
         return '
         <div align="center">
-            <div class="alert alert-success">Data Cleared<br /> <a href="http://192.168.1.2/scancoord/item/AuditScannerReport.php" 
-                class="btn btn-success btn-xs">Please - Click Me - </a>
+            <div class="alert alert-success">Data Cleared - <a href="AuditScannerReport.php">collapse message</a>
             </div>
         </div>
         ';
+    }
+    
+    private function update_scandata_handler($dbc,$storeID,$username)
+    {
+        
+        $args = array($storeID,$username);
+        $query = $dbc->prepare("SELECT upc FROM woodshed_no_replicate.AuditScanner WHERE store_id = ? AND username = ?");
+        $res = $dbc->execute($query,$args);
+        $upcs = array();
+        while ($row = $dbc->fetchRow($res)) {
+            $upcs[] = $row['upc'];
+        }
+        
+        foreach ($upcs as $upc) {
+            //$args = array($upc);
+
+            $args = array($upc,$upc,$upc,$upc,$upc,$upc);
+            $prep = $dbc->prepare("
+                UPDATE woodshed_no_replicate.AuditScanner 
+                SET price = (select normal_price from is4c_op.products where upc = ? group by upc),
+                    prid = (select price_rule_id from is4c_op.products where upc = ? group by upc),
+                    cost= (select cost from is4c_op.products where upc = ? group by upc),
+                    description = (select description from is4c_op.products where upc = ? group by upc),
+                    brand = (select brand from is4c_op.products where upc = ? group by upc)
+                WHERE upc = ?;
+            ");
+            $dbc->execute($prep,$args);
+            
+            /*
+            $prep = $dbc->prepare("SELECT normal_price,cost,brand,description,price_rule_id FROM products WHERE upc = ? GROUP BY upc");
+            $res = $dbc->execute($prep,$upc);
+            while ($row = $dbc->fetchRow($res)) {
+                $description = $row['description'];
+                $price = $row['normal_price'];
+                $prid = $row['price_rule_id'];
+                $cost = $row['cost'];
+                $brand = $row['brand'];
+            }
+            
+            $updateA = array($description,$price,$prid,$cost,$brand,$upc,$username,$store_id);
+            $updateP = $dbc->prepare("
+                UPDATE woodshed_no_replicate.AuditScanner
+                SET description = ?, price = ?, prid = ?, cost = ?, brand = ?
+                WHERE upc = ?
+                    AND username = ?
+                    AND store_id = ?
+            ");
+            $dbc->execute($updateP,$updateA);
+            unset($description);
+            unset($price);
+            unset($prid);
+            unset($cost);
+            unset($brand);
+            */
+        }
+        
+        if ($er = $dbc->error()) {
+            return '
+                <div align="center">
+                    <div class="alert alert-danger">'.$er.'</div>
+                </div>
+            ';
+        } else {
+            return '
+                <div align="center">
+                    <div class="alert alert-success">
+                        Update Successful - 
+                        <a href="AuditScannerReport.php">collapse message</a>
+                    </div>
+                    
+                </div>
+            ';
+        }
+        
+        return false;
+        
     }
     
     public function body_content()
@@ -64,6 +139,10 @@ class AuditScannerReport extends ScancoordDispatch
         
         if ($_POST['cleardata']) {
             $ret .= $this->clear_scandata_hander($dbc,$storeID,$username);
+        }
+        
+        if ($_POST['update']) {
+            $ret .= $this->update_scandata_handler($dbc,$storeID,$username);
         }
         
         if($_GET['upc']) {
@@ -84,13 +163,15 @@ class AuditScannerReport extends ScancoordDispatch
         
         $ret .= '
             <table class="table table-bordered table-condensed small" style="width: 500px;"> 
-                <tr class="key"><td>Key</td><td></td></tr>
+                <tr class="key"><td>Key</td><td>
+                </td></tr>
                 <tr class="key"><td id="grey-toggle" style="background-color: lightgrey">&nbsp;</td><td>Product Missing Cost</td>
                 <td id="blue-toggle" style="background-color: lightblue; width: 30px">&nbsp;</td><td>Price Above Margin</td></tr>
                 <tr class="key"><td id="yellow-toggle" style="background-color: #FFF457">&nbsp;</td><td>Price Below Margin (M)</td>
                 <td id="red-toggle" style="background-color: tomato; width: 30px; ">&nbsp;</td><td>Price Below Margin (L)</td></tr>
             </table>
         ';
+        //$ret .= $btnUpdate;
         
         $query = $dbc->prepare("
         	SELECT upc, brand, description, cost, price, curMarg, desMarg, rsrp, srp, prid, flag, dept, vendor, notes, store_id
@@ -167,6 +248,7 @@ class AuditScannerReport extends ScancoordDispatch
         $prevKey = '1';
         $ret .= '<tbody id="mytable">';
         $ret .=  '<tr class="key" class="highlight">';
+        $upcs = array();
         foreach ($data as $k => $array) { 
             foreach ($array as $column_name  => $v) {
                 if ($column_name == 'store_id') {
@@ -259,15 +341,23 @@ class AuditScannerReport extends ScancoordDispatch
     
     private function form_content()
     {
+        
+        $msgClear = 'Pressing OK will delete all data from your queue.';
+        $msgUpdate = 'Pressing OK will update product data from Fannie.';
+        
         return '
-            <form method="post" id="myform">
-                <div align="right">
-                    <button type="submit" name="cleardata" id="cleardata" value="1" class="btn btn-danger " 
-                        onclick="return confirm(\'Are you sure?\')" style="border: 2px solid red; ">Clear Scan Data</button><br />
-                        <br />
-                    <a class="text-info" style="width: 132px" href="AuditScanner.php ">Goto Scanner</a>&nbsp;&nbsp;&nbsp;&nbsp;
-                </div>
-            </form>
+            <div style="float: right;">
+                <form method="post" id="myform">
+                    <button type="submit" name="cleardata" id="cleardata" value="1" class="btn btn-danger btn-xs" 
+                        onclick="return confirm(\''.$msgClear.'\')"  ">&nbsp;Clear&nbsp;</button> data
+                </form>
+                <form method="post">
+                    <button type="submit" class="btn btn-default btn-xs" onclick="return confirm(\''.$msgUpdate.'\');">
+                        update</button> data
+                    <input type="hidden" name="update" value="1">
+                </form>
+                <a class="text-info" style="width: 132px" href="AuditScanner.php ">Goto Scanner</a><br />
+            </div>
         ';
     }
     
@@ -318,8 +408,6 @@ $("#notes").change( function() {
             });
         });   
     }
-    
-
 
     $(document).ready(function () {
         $('#red-toggle').click(function () {
