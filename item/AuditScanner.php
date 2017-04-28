@@ -407,11 +407,34 @@ class AuditScanner extends ScancoordDispatch
 
             <div id="ajax-resp"></div>
         ';
-
+        
+        //  Get easy re-use notes for this session
+        $args = array($username,$storeID);
+        $prep = $dbc->prepare("SELECT notes FROM woodshed_no_replicate.AuditScanner WHERE username = ? AND store_id = ?");
+        $res = $dbc->execute($prep,$args);
+        $notes = array();
+        $preLoadedNotes = array(
+            'Change Sign Text: ',
+            'Line Price',
+            'Change Price: ',
+            'Print Tag ',
+            'Missing Sale Sign',
+            'Queue Narrow Tag ',
+            'Product Not In Use',
+            'Remove This Item From Queue',
+            'n/a'
+        );
+        while ($row = $dbc->fetchRow($res)) {
+            //echo $row['notes'];
+            if (!in_array($row['notes'],$notes) && !in_array($row['notes'],$preLoadedNotes)) {
+                $notes[] = $row['notes'];
+            }
+        }
+        
         //  Commonly used NOTES.
         $ret .= '
             <div id="notepad" class="collapse" >
-                <div style="position: relative; top: 25%; opacity: 1;">
+                <div style="position: relative; top: 10%; opacity: 1;">
                     <form method="get" name="notepad" class="form-inline " >
                         <input type="text" name="note" id="note" class="form-control" style="max-width: 90%; "><br /><br />
                         <input type="hidden" name="upc" value="'.$upc.'">
@@ -427,7 +450,14 @@ class AuditScanner extends ScancoordDispatch
                             <span onClick="qm(\'Change Price: \'); return false; ">
                                 <b>Change Price</b></span><br /><br />
                             <span onClick="qm(\'Print Tag \'); return false; ">
-                                <b>Print Tag</b></span><br /><br />
+                                <b>Print Tag</b></span><br /><br />';
+                                
+        foreach ($notes as $note) {
+            $ret .= '<span onClick="qm(\''.$note.'\'); return false; ">
+                         <b>'.$note.'</b></span><br /><br />';
+        }
+        
+        $ret .= '
                         </div>
                     <!-- Green Buttons -->
                     </div>
