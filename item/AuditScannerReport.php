@@ -172,14 +172,15 @@ class AuditScannerReport extends ScancoordDispatch
             </table>
         ';
         //$ret .= $btnUpdate;
-        
+        $args = array($username,$storeID);
         $query = $dbc->prepare("
         	SELECT upc, brand, description, cost, price, curMarg, desMarg, rsrp, srp, prid, flag, dept, vendor, notes, store_id
 			FROM woodshed_no_replicate.AuditScanner 
-            WHERE username = ?
+            WHERE username = ? 
+                AND store_id = ?
             ORDER BY vendor, dept, brand;
         ");    
-        $result = $dbc->execute($query,$username);
+        $result = $dbc->execute($query,$args);
         $data = array();
         $headers = array();
         $i = 0;

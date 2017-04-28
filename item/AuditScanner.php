@@ -248,7 +248,7 @@ class AuditScanner extends ScancoordDispatch
         $data = array('cost'=>$passcost,'price'=>$price,'desc'=>$desc,'brand'=>$brand,'vendor'=>$vd,'upc'=>$upc,
             'dept'=>$dept,'margin'=>$margin,'rsrp'=>$rSrp,'srp'=>$srp,'smarg'=>$sMargin,'warning'=>$sWarn,
             'pid'=>$pid,'dMargin'=>$dMargin,'storeID'=>$storeID,'username'=>$username);
-        $ret .= $this->record_data_handler($data,$username);
+        $ret .= $this->record_data_handler($data,$username,$storeID);
         
         $warning = array();
         $margOff = ($margin / $dMargin);
@@ -416,29 +416,29 @@ class AuditScanner extends ScancoordDispatch
                         <button type="submit" class="btn btn-danger" onClick="$("#notepad").collapse("hide"); return false;">Submit Note</button>
                     </form>
                     <!-- Purple Buttons -->
-                    <div align="left" style="padding: 10px; float: left; width: 40vw">
+                    <div align="left" style="padding: 10px; float: left; text-align:center; width: 45vw">
                         <div>
-                            <button class="btn btn-surprise btn-xs btn-msg" onClick="qm(\'Change Sign Text: \'); return false; ">
-                                Change Sign Text</button><br /><br />
-                            <button class="btn btn-surprise btn-xs btn-msg" onClick="qm(\'Line Price\'); return false; ">
-                                Line Price</button><br /><br />
-                            <button class="btn btn-surprise btn-xs btn-msg" onClick="qm(\'Change Price: \'); return false; ">
-                                Change Price</button><br /><br />
-                            <button class="btn btn-warning btn-xs btn-msg" onClick="qm(\'Print Tag \'); return false; ">
-                                Print Tag</button><br /><br />
+                            <span onClick="qm(\'Change Sign Text: \'); return false; ">
+                                <b>Change Sign Text</b></span><br /><br />
+                            <span onClick="qm(\'Line Price\'); return false; ">
+                                <b>Line Price</b></span><br /><br />
+                            <span onClick="qm(\'Change Price: \'); return false; ">
+                                <b>Change Price</b></span><br /><br />
+                            <span onClick="qm(\'Print Tag \'); return false; ">
+                                <b>Print Tag</b></span><br /><br />
                         </div>
                     <!-- Green Buttons -->
                     </div>
-                    <div align="left" style="padding: 10px; float: left; width: 10vw"></div>
-                    <div align="left" style="padding: 10px; float: left; width: 40vw">
-                        <button class="btn btn-success btn-xs btn-msg" onClick="qm(\'Missing Sale Sign\'); return false; ">
-                            Sale Sign Missing</button><br /><br />
-                        <button class="btn btn-success btn-xs btn-msg" onClick="qm(\'Queue Narrow Tag \'); return false; ">
-                            Narrow Tag</button><br /><br />
-                        <button class="btn btn-success btn-xs btn-msg" onClick="qm(\'Product Not In Use\'); return false; ">
-                            Not In Use</button><br /><br />
-                        <button class="btn btn-success btn-xs btn-msg" onClick="qm(\'Remove This Item From Queue\'); return false; ">
-                            Remove From Queue</button><br /><br />
+                    <div align="left" style="padding: 10px; float: left; width: 5vw"></div>
+                    <div align="left" style="padding: 10px; float: left; text-align:center; width: 45vw">
+                        <span onClick="qm(\'Missing Sale Sign\'); return false; ">
+                            <b>Sale Sign Missing</b></span><br /><br />
+                        <span onClick="qm(\'Queue Narrow Tag \'); return false; ">
+                            <b>Narrow Tag</b></span><br /><br />
+                        <span onClick="qm(\'Product Not In Use\'); return false; ">
+                            <b>Not In Use</b></span><br /><br />
+                        <span onClick="qm(\'Remove This Item From Queue\'); return false; ">
+                            <b>Remove From Queue</b></span><br /><br />
                     </div>
                 </div>
             </div>
@@ -472,15 +472,15 @@ class AuditScanner extends ScancoordDispatch
         
     }
     
-    private function record_data_handler($data,$username)
+    private function record_data_handler($data,$username,$storeID)
     {
         
         $ret = '';
         include('../config.php');
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANALTDB, $SCANUSER, $SCANPASS);
         //echo '<h1>' . $data['upc'] . '</h1>';
-        $argsA = array($data['upc'],$username);
-        $prepA = $dbc->prepare("SELECT * FROM AuditScanner WHERE upc = ? AND username = ? LIMIT 1");
+        $argsA = array($data['upc'],$username,$storeID);
+        $prepA = $dbc->prepare("SELECT * FROM AuditScanner WHERE upc = ? AND username = ? AND store_id = ? LIMIT 1");
         $resA = $dbc->execute($prepA,$argsA);
         if ($dbc->numRows($resA) == 0) {
             $args = array(
