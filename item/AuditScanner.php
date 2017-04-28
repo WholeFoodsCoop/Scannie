@@ -1,9 +1,9 @@
 <?php
 /*******************************************************************************
     Copyright 2016 Whole Foods Community Co-op.
-    
+
     This file is a part of Scannie.
-    
+
     Scannie is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     in the file LICENSE along with Scannie; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-    
+
 *********************************************************************************/
 include('../config.php');
 if (!class_exists('ScancoordDispatch')) {
@@ -26,21 +26,21 @@ if (!class_exists('SQLManager')) {
 }
 class AuditScanner extends ScancoordDispatch
 {
-    
+
     protected $title = "Audit Scanner";
-    protected $description = "[Audit Scanner] Scan page designed solely for shelf 
+    protected $description = "[Audit Scanner] Scan page designed solely for shelf
         tag auditing.";
     protected $ui = FALSE;
     protected $add_css_content = TRUE;
     protected $add_javascript_content = TRUE;
     protected $use_preprocess = TRUE;
     protected $must_authenticate = TRUE;
-    
+
     public function preprocess()
     {
-        
+
         include('../config.php');
-        
+
         $username = scanLib::getUser();
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         if (isset($_GET['note'])) {
@@ -51,38 +51,38 @@ class AuditScanner extends ScancoordDispatch
             } else {
                 header('location: http://12.168.1.2/scancoord/item/AuditScanner.php?success=false');
             }
-        } 
-        
+        }
+
     }
-    
+
     private function notedata_handler($dbc,$note,$username)
     {
         $ret = '';
         $upc = $_GET['upc'];
         $args = array($note,$upc,$username);
-        $query = $dbc->prepare("UPDATE woodshed_no_replicate.AuditScanner 
+        $query = $dbc->prepare("UPDATE woodshed_no_replicate.AuditScanner
             SET notes = ? WHERE upc = ? AND username = ?;");
         $result = $dbc->execute($query,$args);
         $error = 0;
         if ($dbc->error()) {
             $error = 1;
         }
-        
+
         if ($dbc->affectedRows()) {
             $error = 0;
         } else {
             $error = 2;
-            
+
         }
-        
+
         return $error;
-        
+
     }
-    
+
     public function body_content()
     {
-    
-        
+
+
         $ret = '';
         $username = scanLib::getUser();
         $response = $_GET['success'];
@@ -98,26 +98,26 @@ class AuditScanner extends ScancoordDispatch
                     </div>';
             }
         }
-        
+
         include('../config.php');
         include('../common/lib/PriceRounder.php');
         $rounder = new PriceRounder();
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
-        $storeID = scanLib::getStoreID(); 
+        $storeID = scanLib::getStoreID();
         $upc = str_pad($_POST['upc'], 13, 0, STR_PAD_LEFT);
-        
+
         $ret .= $this->mobile_menu($upc);
         $ret .= '<div align="center"><h4 id="heading">AUDIE: THE AUDIT SCANNER</h4></div>';
         $ret .= $this->form_content();
-        
+
         //Gather product SALE information
         $saleQueryArgs = array($storeID,$upc);
         $saleQuery = $dbc->prepare("
             SELECT b.batchName, bl.salePrice, b.batchID
-            FROM batches AS b 
-                LEFT JOIN batchList AS bl ON b.batchID=bl.batchID 
+            FROM batches AS b
+                LEFT JOIN batchList AS bl ON b.batchID=bl.batchID
                 INNER JOIN StoreBatchMap AS sbm ON b.batchID=sbm.batchID
-            WHERE curdate() BETWEEN b.startDate AND b.endDate 
+            WHERE curdate() BETWEEN b.startDate AND b.endDate
                 AND sbm.storeID = ?
                 AND bl.upc = ?;");
         $saleQres = $dbc->execute($saleQuery,$saleQueryArgs);
@@ -137,8 +137,8 @@ class AuditScanner extends ScancoordDispatch
         $saleInfoStr = '';
         foreach ($batchList['price'] as $k => $v) {
             $saleInfoStr .= '
-                <span class="sm-label">PRICE: </span>$<span class="text-sale">'.$v.'</span> 
-                <span class="sm-label">ID: </span>'.$batchList['batchID'][$k].'<br /> 
+                <span class="sm-label">PRICE: </span>$<span class="text-sale">'.$v.'</span>
+                <span class="sm-label">ID: </span>'.$batchList['batchID'][$k].'<br />
                 <span class="sm-label">BATCH: </span>'.$batchList['batchName'][$k].'
                 <br /><br />
                 <div style="border: 1px solid lightgrey; width: 20vw"></div>
@@ -146,13 +146,13 @@ class AuditScanner extends ScancoordDispatch
             ';
         }
         //echo '<h1>'.$saleInfoStr.'</h1>';
-        
+
         //Gather product information
         $args = array($storeID,$upc);
         $query = $dbc->prepare("
             SELECT
-                p.cost, 
-                p.normal_price,  
+                p.cost,
+                p.normal_price,
                 p.description,
                 p.brand,
                 p.default_vendor_id,
@@ -167,18 +167,18 @@ class AuditScanner extends ScancoordDispatch
                 d.margin AS deptMarg,
                 pu.description AS signdesc,
                 pu.brand AS signbrand,
-                v.shippingMarkup, 
+                v.shippingMarkup,
                 v.discountRate,
                 case when n.upc is not null then '<span class=\'alert-warning\'>Flagged Narrow</span>' else NULL end as narrow
             FROM products AS p
                 LEFT JOIN productUser AS pu ON p.upc = pu.upc
                 LEFT JOIN departments AS d ON p.department=d.dept_no
-                LEFT JOIN vendors AS v ON p.default_vendor_id=v.vendorID 
-                LEFT JOIN vendorItems AS vi 
+                LEFT JOIN vendors AS v ON p.default_vendor_id=v.vendorID
+                LEFT JOIN vendorItems AS vi
                     ON p.upc = vi.upc
                         AND p.default_vendor_id = vi.vendorID
-                LEFT JOIN vendorDepartments AS vd 
-                    ON vd.vendorID = p.default_vendor_id 
+                LEFT JOIN vendorDepartments AS vd
+                    ON vd.vendorID = p.default_vendor_id
                         AND vd.deptID = vi.vendorDept
                 LEFT JOIN NarrowTags AS n ON p.upc=n.upc
             WHERE p.store_id = ?
@@ -204,35 +204,35 @@ class AuditScanner extends ScancoordDispatch
             $markup = $row['shippingMarkup'];
             $discount = $row['discountRate'];
             $ret .= '<input type="hidden" id="auto_par_value" value="'.$row['auto_par'].'"/>';
-            
+
             $adjcost = $cost;
             if ($markup > 0) $adjcost += $cost * $markup;
             if ($discount > 0) $adjcost -= $cost * $discount;
-            
+
             if ($row['default_vendor_id'] == 1) {
                 $dMargin = $row['unfiMarg'];
             } else {
                 $dMargin = $row['deptMarg'];
-            }   
+            }
         }
         if ($dbc->error()) echo $dbc->error();
-        
-        /* This was used before $adjcost was introduced. 
+
+        /* This was used before $adjcost was introduced.
         $margin = ($price - $cost) / $price;
         $rSrp = $cost / (1 - $dMargin);
         $srp = $rounder->round($rSrp);
-        $sMargin = ($srp - $cost ) / $srp;    
+        $sMargin = ($srp - $cost ) / $srp;
         */
         $margin = ($price - $adjcost) / $price;
         $rSrp = $adjcost / (1 - $dMargin);
         $srp = $rounder->round($rSrp);
-        $sMargin = ($srp - $adjcost ) / $srp;  
-        
-        
+        $sMargin = ($srp - $adjcost ) / $srp;
+
+
         $sWarn = 'default';
         if ($srp != $price) {
             if ($srp > $price) {
-                
+
             } else { //$srp < $price
                 $peroff = $srp / $price;
                 if ($peroff < .05) {
@@ -244,14 +244,14 @@ class AuditScanner extends ScancoordDispatch
                 }
             }
         }
-        
+
         $passcost = $cost;
         if ($cost != $adjcost) $passcost = $adjcost;
         $data = array('cost'=>$passcost,'price'=>$price,'desc'=>$desc,'brand'=>$brand,'vendor'=>$vd,'upc'=>$upc,
             'dept'=>$dept,'margin'=>$margin,'rsrp'=>$rSrp,'srp'=>$srp,'smarg'=>$sMargin,'warning'=>$sWarn,
             'pid'=>$pid,'dMargin'=>$dMargin,'storeID'=>$storeID,'username'=>$username);
         $ret .= $this->record_data_handler($data,$username,$storeID);
-        
+
         $warning = array();
         $margOff = ($margin / $dMargin);
         if ($margOff > 1.05) {
@@ -263,7 +263,7 @@ class AuditScanner extends ScancoordDispatch
         } else {
             $warning['margin'] = 'danger';
         }
-        
+
         $priceOff = ($price / $srp);
         if ($priceOff > 1.05) {
             $warning['price'] = 'info';
@@ -274,14 +274,14 @@ class AuditScanner extends ScancoordDispatch
         } else {
             $warning['price'] = 'danger';
         }
-     
+
         if ($pid != 0) {
             $price_rule = '<span style="text-shadow: 0.5px 0.5px tomato; color: orange">*</span>
                 <span class="text-tiny">pid</span>';
         } else {
             $price_rule = '';
         }
-        
+
         if ($adjcost != $cost) {
             $adjCostStr = '<span class="text-tiny">adj cost: </span><span style="color: grey; text-shadow: 0px  0px 1px white">'.sprintf('%0.2f',$adjcost).'</span>';
         } else {
@@ -291,66 +291,66 @@ class AuditScanner extends ScancoordDispatch
             <div align="center">
                 <div class="container">
                     <div class="row">
-                        <div class="col-xs-4 info" > 
+                        <div class="col-xs-4 info" >
                             <div style="float: left; color: grey">cost</div><br />'.$cost.'<br />
                                 '.$adjCostStr.'
-                        </div> 
-                        <div class="col-xs-4 info" > 
+                        </div>
+                        <div class="col-xs-4 info" >
                             <div style="float: left; color: grey">price</div><br />
                                 <span class="text-'.$warning['price'].'" style="font-weight: bold; ">
                                     '.$price.'</span>
                                     '.$price_rule.'<br />&nbsp;
-                        </div> 
+                        </div>
                         <div class="col-xs-4 info" >
-                            <div style="float: left; color: grey">margin</div><br /><span class="text-'.$warning['margin'].'">'.sprintf('%0.2f%%',$margin*100).'</span> 
+                            <div style="float: left; color: grey">margin</div><br /><span class="text-'.$warning['margin'].'">'.sprintf('%0.2f%%',$margin*100).'</span>
                                 <br /> <span class="text-tiny">target: </span><span style="color: grey; text-shadow: 0px  0px 1px white">'.($dMargin*100).'%</span>
-                        </div> 
+                        </div>
                     </div>
                     <div class="row">
-                        <div class="col-xs-4 info" > 
+                        <div class="col-xs-4 info" >
                             <div style="float: left; color: grey"> raw </div><br />'.sprintf('%0.2f',$rSrp).'
-                        </div> 
+                        </div>
                         <div class="col-xs-4 info" >
                             <div style="float: left; color: grey" class="text-'.$sWarn.'">srp</div><br />'.$srp.'
-                        </div> 
+                        </div>
                         <div class="col-xs-4 info" >
                             <div style="float: left; color: grey">newMarg</div><br />'.sprintf('%0.2f%%',$sMargin*100).'
-                        </div> 
+                        </div>
                     </div>
                     <br />
                     <div class="row">
-                        <div class="col-xs-12 info" >'.$desc.' </div> 
+                        <div class="col-xs-12 info" >'.$desc.' </div>
                     </div>
                     <div class="row">
-                        <div class="col-xs-12 info" ><span class="sm-label">BRAND: </span> '.$brand.' </div> 
+                        <div class="col-xs-12 info" ><span class="sm-label">BRAND: </span> '.$brand.' </div>
                     </div>
                     <div class="row">
-                        <div class="col-xs-12 info" ><span class="sm-label">VENDOR: </span> '.$vendor.' </div> 
+                        <div class="col-xs-12 info" ><span class="sm-label">VENDOR: </span> '.$vendor.' </div>
                     </div>
                     <div class="row">
-                        <div class="col-xs-12 info" ><span class="sm-label">DEPT: </span> '.$dept.' </div> 
+                        <div class="col-xs-12 info" ><span class="sm-label">DEPT: </span> '.$dept.' </div>
                     </div>'
                 ;
-                    
+
                 if (!$inUse) {
                     $ret .= '
                         <div class="row">
                             <div class="col-xs-12 info" ><span class="text-danger" style="font-weight: bold;">
                                 THIS PRODUCT IS NOT IN USE
-                            </span></div> 
+                            </span></div>
                         </div>
                     ';
                 }
-                    
+
                 $ret .= '
                     <div class="row">
-                        <div class="col-xs-12" > &nbsp;</div> 
+                        <div class="col-xs-12" > &nbsp;</div>
                     </div>
                     <div class="row">
-                        <div class="col-xs-12 info" ><span class="sm-label">SIGN: </span> '.$signDesc.' </div> 
+                        <div class="col-xs-12 info" ><span class="sm-label">SIGN: </span> '.$signDesc.' </div>
                     </div>
                     <div class="row">
-                        <div class="col-xs-12 info" ><span class="sm-label">S.BRAND: </span> '.$signBrand.' </div> 
+                        <div class="col-xs-12 info" ><span class="sm-label">S.BRAND: </span> '.$signBrand.' </div>
                     </div>
                     <div class="row">
                         <div class="col-xs-12 info" >
@@ -359,10 +359,10 @@ class AuditScanner extends ScancoordDispatch
                                 <span class="caret text-'.$saleButtonClass.'"></span>
                             </button>
                             '.$narrow.'
-                        </div> 
+                        </div>
                     </div>
-                    
-                    
+
+
                         <div class="collapse" id="sale-info">
                             <div class="row">
                                 <div class="col-xs-12 info">
@@ -370,9 +370,9 @@ class AuditScanner extends ScancoordDispatch
                                 </div>
                             </div>
                         </div>
-                    
-                    
-                    
+
+
+
                     <div class="container">
                     <br />
                     <div class="row">
@@ -381,21 +381,21 @@ class AuditScanner extends ScancoordDispatch
                             <form method="get" type="hidden">
                             <button class="btn btn-warning" onClick="alert(\''.$upc.' queued to print\'); return true;" type="submit"
                                 style="width: 100%;">Print
-                            </button> 
+                            </button>
                             <input type="hidden" name="note" value="Print Tag" />
                             <input type="hidden" name="upc" value="'.$upc.'" />
                         </div>
                         </form>
-                        <div class="col-xs-4  clear "><a class="btn btn-surprise" href="http://192.168.1.2/scancoord/item/AuditScanner.php ">Refresh</a></div> 
+                        <div class="col-xs-4  clear "><a class="btn btn-surprise" href="http://192.168.1.2/scancoord/item/AuditScanner.php ">Refresh</a></div>
                         <div class="col-xs-4  clear">
-                            <button class="btn btn-danger" data-toggle="collapse" data-target="#notepad" 
-                                style="width: 100%;">Note 
-                            </button></div> 
+                            <button class="btn btn-danger" data-toggle="collapse" data-target="#notepad"
+                                style="width: 100%;">Note
+                            </button></div>
                     </div>
                     <br /><br />
                     <div class="row">
                         <div class="col-xs-4">
-                            <a class="text-info" href="AuditScannerReport.php ">View Report</a>                    
+                            <a class="text-info" href="AuditScannerReport.php ">View Report</a>
                         </div>
                         <div class="col-xs-4">
                         </div>
@@ -404,10 +404,10 @@ class AuditScanner extends ScancoordDispatch
                     </div>
                 </div>
             </div>
-            
+
             <div id="ajax-resp"></div>
         ';
-        
+
         //  Commonly used NOTES.
         $ret .= '
             <div id="notepad" class="collapse" >
@@ -446,17 +446,17 @@ class AuditScanner extends ScancoordDispatch
             </div>
         </div>
         ';
-        
-        
-        
+
+
+
         $ret .= '<br /><br /><br /><br /><br /><br />';
-        
+
         return $ret;
     }
-    
-    private function form_content($dbc) 
+
+    private function form_content($dbc)
     {
-        
+
         $upc = str_pad($_POST['upc'], 13, 0, STR_PAD_LEFT);
         $ret .= '';
         $ret .= '
@@ -470,14 +470,14 @@ class AuditScanner extends ScancoordDispatch
                 </form>
             </div>
         ';
-        
+
         return $ret;
-        
+
     }
-    
+
     private function record_data_handler($data,$username,$storeID)
     {
-        
+
         $ret = '';
         include('../config.php');
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANALTDB, $SCANUSER, $SCANPASS);
@@ -504,9 +504,9 @@ class AuditScanner extends ScancoordDispatch
                 $data['username']
             );
             $prep = $dbc->prepare("
-                INSERT INTO AuditScanner 
+                INSERT INTO AuditScanner
                 (
-                    upc, brand, description, price, curMarg, desMarg, dept, 
+                    upc, brand, description, price, curMarg, desMarg, dept,
                         vendor, rsrp, srp, prid, flag, cost, store_id,
                         username
                 ) VALUES (
@@ -516,15 +516,15 @@ class AuditScanner extends ScancoordDispatch
             $dbc->execute($prep,$args);
             //echo $data[$upc];
             if ($dbc->error()) {
-                return '<div class="alert alert-danger">' . $dbc->error() . '</div>';        
+                return '<div class="alert alert-danger">' . $dbc->error() . '</div>';
             } else {
                 return false;
             }
         }
-        
+
     }
-    
-    public function css_content() 
+
+    public function css_content()
     {
         return '
             #heading {
@@ -580,16 +580,16 @@ class AuditScanner extends ScancoordDispatch
                 background-color: #fceded;
             }
             .sm-label {
-                font-size: 10px; 
+                font-size: 10px;
                 color: #6f6f80;
             }
             .text-tiny {
-                font-size: 8px; 
+                font-size: 8px;
                 color: #6f6f80;
             }
             .text-sale {
-                color: green; 
-                font-weight: bold;     
+                color: green;
+                font-weight: bold;
             }
             .btn-msg {
                 width: 150px;
@@ -600,7 +600,7 @@ class AuditScanner extends ScancoordDispatch
             }
         ';
     }
-    
+
     private function mobile_menu($upc)
     {
         $ret = '';
@@ -611,7 +611,7 @@ class AuditScanner extends ScancoordDispatch
                     height: 45px;
                     background-color: #272822;
                     color: #cacaca;
-                    position: fixed; 
+                    position: fixed;
                     top: 20px;
                     right: 5px;
                     border-radius: 3px;
@@ -648,7 +648,7 @@ class AuditScanner extends ScancoordDispatch
                 <div class="btn-mobile-lines">&nbsp;</div>
                 <div class="btn-mobile-sp">&nbsp;</div>
             </button>';
-            
+
         $ret .= '
             <div class="modal fade" tabindex="-1" role="dialog" id="keypad">
             <br /><br /><br /><br /><br />
@@ -656,11 +656,11 @@ class AuditScanner extends ScancoordDispatch
                 <div class="" >
                     <h4 class="modal-title"></h4>
                   <div class=""  align="center">
-                    
+
                     <table><form type="hidden" method="get">
                         <input type="hidden" name="upc" id="keypadupc" value="0" />
                         <input type="hidden" name="success" value="empty"/>
-                    
+
                         <thead></thead>
                         <tbody>
                             <tr>
@@ -671,12 +671,12 @@ class AuditScanner extends ScancoordDispatch
                                 <td class="btn-keypad" id="key4">4</td>
                                  <td class="btn-keypad" id="key5">5</td>
                                   <td class="btn-keypad" id="key6">6</td>
-                                   
+
                             </tr><tr>
                                 <td class="btn-keypad" id="key1">1</td>
                                  <td class="btn-keypad" id="key2">2</td>
                                   <td class="btn-keypad" id="key3">3</td>
-                                    
+
                             </tr><tr>
                                 <td ></td>
                                  <td class="btn-keypad" id="key0">0</td>
@@ -684,22 +684,22 @@ class AuditScanner extends ScancoordDispatch
                             </tr><tr>
                                 <td class="btn-keypad btn-info" id="keyCL">CL</td>
                                  <td></td>
-                                  <td><button type="button" class="btn-keypad" data-dismiss="modal" aria-label="Close"><span style="color: white; font-weight: bold">X</span></button></td>   
+                                  <td><button type="button" class="btn-keypad" data-dismiss="modal" aria-label="Close"><span style="color: white; font-weight: bold">X</span></button></td>
                             </tr>
                         </tbody>
                     </form></table>
-                    
+
                   </div>
-                  
+
                 </div><!-- /.modal-content -->
               </div><!-- /.modal-dialog -->
             </div><!-- /.modal -->
         ';
-        
+
         return $ret;
 
     }
-    
+
     public function javascript_content()
     {
         ob_start();
@@ -722,8 +722,8 @@ function queue(store_id)
         url: 'AuditUpdate.php',
         data: 'upc='+upcB+'&store_id='+store_id,
 		error: function(xhr, status, error)
-		{ 
-			alert('error:' + status + ':' + error + ':' + xhr.responseText) 
+		{
+			alert('error:' + status + ':' + error + ':' + xhr.responseText)
 		},
         success: function(response)
         {
@@ -731,7 +731,7 @@ function queue(store_id)
         }
     })
 	.done(function(data){
-        
+
 	})
 }
 </script>
@@ -806,13 +806,13 @@ function get_auto_par()
     $('#par_val').text(par);
 }
 $(document).ready( function() {
-   get_auto_par(); 
+   get_auto_par();
 });
 
 </script>
         <?php
         return ob_get_clean();
     }
-    
+
 }
 ScancoordDispatch::conditionalExec();
