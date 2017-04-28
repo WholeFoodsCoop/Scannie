@@ -157,6 +157,7 @@ class AuditScanner extends ScancoordDispatch
                 p.brand,
                 p.default_vendor_id,
                 p.inUse,
+                p.auto_par,
                 v.vendorName,
                 vi.vendorDept,
                 p.department,
@@ -202,6 +203,7 @@ class AuditScanner extends ScancoordDispatch
             $narrow = $row['narrow'];
             $markup = $row['shippingMarkup'];
             $discount = $row['discountRate'];
+            $ret .= '<input type="hidden" id="auto_par_value" value="'.$row['auto_par'].'"/>';
             
             $adjcost = $cost;
             if ($markup > 0) $adjcost += $cost * $markup;
@@ -463,6 +465,7 @@ class AuditScanner extends ScancoordDispatch
                     <input class="form-control input-sm info" name="upc" id="upc" value="'.$upc.'"
                         style="text-align: center; width: 140px; border: none;">
                     <input type="hidden" name="success" value="empty"/>
+                    <span id="auto_par" class="sm-label"></span><span id="par_val" class="norm-text"></span>
                     <button type="submit" class="btn btn-xs"><span class="go-icon"></span></button>
                 </form>
             </div>
@@ -590,6 +593,10 @@ class AuditScanner extends ScancoordDispatch
             }
             .btn-msg {
                 width: 150px;
+            }
+            .norm-text {
+                font-size: 12px;
+                color: black;
             }
         ';
     }
@@ -789,6 +796,19 @@ $(document).ready(function(){
         upc = $('#upc').val();
     });
 });
+
+function get_auto_par()
+{
+    var par = $('#auto_par_value').val();
+    par = parseFloat(par);
+    par = par.toPrecision(3);
+    $('#auto_par').text('PAR: ');
+    $('#par_val').text(par);
+}
+$(document).ready( function() {
+   get_auto_par(); 
+});
+
 </script>
         <?php
         return ob_get_clean();
