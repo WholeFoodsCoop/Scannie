@@ -139,6 +139,13 @@ class AuditScannerReport extends ScancoordDispatch
         
     }
     
+    private function list_upcs_handler($dbc,$storeID,$username)
+    {
+        $ret = '';
+        $ret .= '';
+        return $ret;
+    }
+    
     public function body_content()
     {           
     
@@ -152,21 +159,17 @@ class AuditScannerReport extends ScancoordDispatch
         $storeID = scanLib::getStoreID(); 
         $username = scanLib::getUser();
         
-        if ($_POST['cleardata']) {
-            $ret .= $this->clear_scandata_hander($dbc,$storeID,$username);
-        }
-        
-        if ($_POST['update']) {
-            $ret .= $this->update_scandata_handler($dbc,$storeID,$username);
-        }
-        
-        if ($_POST['clearNotes']) {
-            $ret .= $this->clear_notes_handler($dbc,$storeID,$username);
-        }
-        
-        if($_GET['upc']) {
-            $_GET['upc'] = trim($_GET['upc']);
-            $upc = str_pad($_GET['upc'], 13, 0, STR_PAD_LEFT);
+        $routes = array(
+            'cleardata' => 'clear_scandata_hander',
+            'update' => 'update_scandata_handler',
+            'clearNotes' => 'clear_notes_handler',
+            'listUPCS' => 'list_upcs_handler'
+        );
+          
+        foreach ($routes as $post => $function) {
+            if ($_POST[$post]) {
+                $ret .= $this->$function($dbc,$storeID,$username);
+            }
         }
         
         $ret .= $this->form_content();
@@ -365,6 +368,7 @@ class AuditScannerReport extends ScancoordDispatch
         $msgClear = 'Pressing OK will delete all data from this queue.';
         $msgUpdate = 'Pressing OK will update product data from Fannie.';
         $msgClearNotes = 'Pressing OK will clear all notes from this queue.';
+        $msgTest = 'This is a test. Okay?';
         
         return '
             <div style="float: right;">
@@ -381,6 +385,11 @@ class AuditScannerReport extends ScancoordDispatch
                     <button type="submit" class="btn btn-default btn-xs" onclick="return confirm(\''.$msgClearNotes.'\');">
                         &nbsp;Clear&nbsp;</button> notes
                     <input type="hidden" name="clearNotes" value="1">
+                </form>
+                <form method="post">
+                    <button type="submit" class="btn btn-default btn-xs" onclick="return confirm(\''.$msgTest.'\');">
+                        &nbsp;Test&nbsp;</button> notes
+                    <input type="hidden" name="listUPCS" value="1">
                 </form>
                 <a class="text-info" style="width: 132px" href="AuditScanner.php ">Goto Scanner</a><br />
             </div>
