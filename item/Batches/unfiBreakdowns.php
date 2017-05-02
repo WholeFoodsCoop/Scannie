@@ -35,7 +35,7 @@ class unfiBreakdowns extends ScancoordDispatch
         
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', 'woodshed_no_replicate', $SCANUSER, $SCANPASS);
         $prep = $dbc->prepare("
-            SELECT upcUp, upcDn, size
+            SELECT parent, child, size
             FROM UnfiBreakdowns AS u 
         ");
         $res = $dbc->execute($prep);
@@ -43,9 +43,9 @@ class unfiBreakdowns extends ScancoordDispatch
         $children = array();
         $size = array();
         while ($row = $dbc->fetchRow($res)) {
-            $parents[] = $row['upcUp'];
-            $children[] = $row['upcDn'];
-            $size[$row['upcUp']] = $row['size']; //size is saved only to parent UPCs
+            $parents[] = $row['parent'];
+            $children[] = $row['child'];
+            $size[$row['parent']] = $row['size']; //size is saved only to parent UPCs
         }
         if ($dbc->error()) $ret .=  $dbc->error() . '<br>';
         
