@@ -203,7 +203,7 @@ class AuditScanner extends ScancoordDispatch
             $narrow = $row['narrow'];
             $markup = $row['shippingMarkup'];
             $discount = $row['discountRate'];
-            $ret .= '<input type="hidden" id="auto_par_value" value="'.$row['auto_par'].'"/>';
+            $ret .= '<input type="hidden" id="auto_par_value" value="'.($row['auto_par']*7).'"/>';
 
             $adjcost = $cost;
             if ($markup > 0) $adjcost += $cost * $markup;
