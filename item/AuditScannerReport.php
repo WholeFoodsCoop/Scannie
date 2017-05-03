@@ -142,12 +142,156 @@ class AuditScannerReport extends ScancoordDispatch
     private function list_upcs_handler($dbc,$storeID,$username)
     {
         $ret = '';
-        $ret .= '';
+        $ret .= 'list_upcs_handler() was called';
+        
+        if ($_POST['upcs']) {
+            $upcs = $_POST['upcs'];
+            $plus = array();
+            $chunks = explode("\r\n", $upcs);
+            foreach ($chunks as $key => $str) {
+                $plus[] = $str;
+            }
+        }
+        
+        include('../config.php');
+        foreach ($plus as $upc) {
+            $upc = str_pad($upc, 13, 0, STR_PAD_LEFT);
+            $args = array($storeID,$upc);
+            $query = $dbc->prepare("
+                SELECT
+                    p.cost,
+                    p.normal_price,
+                    p.description,
+                    p.brand,
+                    p.default_vendor_id,
+                    p.inUse,
+                    p.auto_par,
+                    v.vendorName,
+                    vi.vendorDept,
+                    p.department,
+                    d.dept_name,
+                    p.price_rule_id,
+                    vd.margin AS unfiMarg,
+                    d.margin AS deptMarg,
+                    pu.description AS signdesc,
+                    pu.brand AS signbrand,
+                    v.shippingMarkup,
+                    v.discountRate
+                FROM products AS p
+                    LEFT JOIN productUser AS pu ON p.upc = pu.upc
+                    LEFT JOIN departments AS d ON p.department=d.dept_no
+                    LEFT JOIN vendors AS v ON p.default_vendor_id=v.vendorID
+                    LEFT JOIN vendorItems AS vi
+                        ON p.upc = vi.upc
+                            AND p.default_vendor_id = vi.vendorID
+                    LEFT JOIN vendorDepartments AS vd
+                        ON vd.vendorID = p.default_vendor_id
+                            AND vd.deptID = vi.vendorDept
+                    LEFT JOIN NarrowTags AS n ON p.upc=n.upc
+                WHERE p.store_id = ?
+                    AND p.upc = ?
+                LIMIT 1
+            ");
+            $result = $dbc->execute($query,$args);
+            while ($row = $dbc->fetchRow($result)) {
+                $cost = $row['cost'];
+                $price = $row['normal_price'];
+                $desc = $row['description'];
+                $brand = $row['brand'];
+                $vendor = '<span class="vid">id['.$row['default_vendor_id'].'] </span>'.$row['vendorName'];
+                $vd = $row['default_vendor_id'].' '.$row['vendorName'];
+                $dept = $row['department'].' '.$row['dept_name'];
+                $pid = $row['price_rule_id'];
+                $unfiMarg = $row['unfiMarg'];
+                $deptMarg = $row['deptMarg'];
+                $signDesc = $row['signdesc'];
+                $signBrand = $row['signbrand'];
+                $inUse = $row['inUse'];
+                $narrow = $row['narrow'];
+                $markup = $row['shippingMarkup'];
+                $discount = $row['discountRate'];
+
+                $adjcost = $cost;
+                if ($markup > 0) $adjcost += $cost * $markup;
+                if ($discount > 0) $adjcost -= $cost * $discount;
+
+                if ($row['default_vendor_id'] == 1) {
+                    $dMargin = $row['unfiMarg'];
+                } else {
+                    $dMargin = $row['deptMarg'];
+                }
+            }
+            if ($dbc->error()) echo $dbc->error();
+
+            $margin = ($price - $adjcost) / $price;
+            $rSrp = $adjcost / (1 - $dMargin);
+            $rounder = new PriceRounder();
+            $srp = $rounder->round($rSrp);
+            $sMargin = ($srp - $adjcost ) / $srp;
+
+            $sWarn = 'default';
+            if ($srp != $price) {
+                if ($srp > $price) {
+
+                } else { //$srp < $price
+                    $peroff = $srp / $price;
+                    if ($peroff < .05) {
+                        $sWarn = '';
+                    } elseif ($peroff > .15 && $peroff < .30) {
+                        $sWarn = 'warning';
+                    } else {
+                        $sWarn = 'danger';
+                    }
+                }
+            }
+            $passcost = $cost;
+            if ($cost != $adjcost) $passcost = $adjcost;
+            
+            $argsA = array($upc,$username,$storeID);
+            $prepA = $dbc->prepare("SELECT * FROM woodshed_no_replicate.AuditScanner WHERE upc = ? AND username = ? AND store_id = ? LIMIT 1");
+            $resA = $dbc->execute($prepA,$argsA);
+            if ($dbc->numRows($resA) == 0) {
+                $args = array(
+                    $upc,
+                    $brand,
+                    $description,
+                    $price,
+                    $margin,
+                    $deptMarg,
+                    $dept,
+                    $vendor,
+                    $rSrp,
+                    $srp,
+                    $pid,
+                    $sWarn,
+                    $cost,
+                    $storeID,
+                    $username
+                );
+                $prep = $dbc->prepare("
+                    INSERT INTO woodshed_no_replicate.AuditScanner
+                    (
+                        upc, brand, description, price, curMarg, desMarg, dept,
+                            vendor, rsrp, srp, prid, flag, cost, store_id,
+                            username
+                    ) VALUES (
+                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                    );
+                ");
+                $dbc->execute($prep,$args);
+                if ($dbc->error()) {
+                    $ret .= '<div class="alert alert-danger">' . $dbc->error() . '</div>';
+                } else {
+                    
+                }
+            }
+        }
+        
         return $ret;
     }
     
     public function body_content()
-    {           
+    {
     
         $ret = '';
         
@@ -163,7 +307,7 @@ class AuditScannerReport extends ScancoordDispatch
             'cleardata' => 'clear_scandata_hander',
             'update' => 'update_scandata_handler',
             'clearNotes' => 'clear_notes_handler',
-            'listUPCS' => 'list_upcs_handler'
+            'list_upcs' => 'list_upcs_handler'
         );
           
         foreach ($routes as $post => $function) {
@@ -370,7 +514,8 @@ class AuditScannerReport extends ScancoordDispatch
         $msgClearNotes = 'Pressing OK will clear all notes from this queue.';
         $msgTest = 'This is a test. Okay?';
         
-        return '
+        $ret = '';
+        $ret .= '
             <div style="float: right;">
                 <form method="post" id="myform">
                     <button type="submit" name="cleardata" id="cleardata" value="1" class="btn btn-danger btn-xs" 
@@ -386,14 +531,40 @@ class AuditScannerReport extends ScancoordDispatch
                         &nbsp;Clear&nbsp;</button> notes
                     <input type="hidden" name="clearNotes" value="1">
                 </form>
-                <form method="post">
-                    <button type="submit" class="btn btn-default btn-xs" onclick="return confirm(\''.$msgTest.'\');">
-                        &nbsp;Test&nbsp;</button> notes
-                    <input type="hidden" name="listUPCS" value="1">
-                </form>
+                
+                <button type="submit" class="btn btn-default btn-xs" data-toggle="modal" data-target="#upcs_modal">
+                    &nbsp;Upload&nbsp;</button> upcs <br />
+                
                 <a class="text-info" style="width: 132px" href="AuditScanner.php ">Goto Scanner</a><br />
             </div>
         ';
+        
+        $ret .= '
+            <div id="upcs_modal" class="modal fade">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h3 class="modal-title" style="color: #8c7b70">Upload a list of UPCs to scan</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                            style="position: absolute; top:20; right: 20">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <div align="center">
+                            <form method="post" class="form-inline">
+                                <input type="hidden" name="list_upcs" value="1">
+                                <textarea class="form-control" name="upcs" rows="10" cols="50"></textarea>
+                                <button type="submit" class="btn btn-default btn-xs">Submit</button>
+                            </form>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        ';
+        
+        return $ret;
     }
     
     public function javascript_content($e)

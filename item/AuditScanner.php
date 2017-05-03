@@ -78,10 +78,14 @@ class AuditScanner extends ScancoordDispatch
         return $error;
 
     }
+    
+    public function get_scan()
+    {
+        return 'hi, this is get_scan()';
+    }
 
     public function body_content()
     {
-
 
         $ret = '';
         $username = scanLib::getUser();
