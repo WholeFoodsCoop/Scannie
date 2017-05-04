@@ -7,6 +7,7 @@ if (session_status() == PHP_SESSION_NONE) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../common/bootstrap/bootstrap.min.css">
+  <!-- <link rel="stylesheet" href="../common/css/Scannie_css.css"> -->
   <script src="../common/bootstrap/jquery.min.js"></script>
   <script src="../common/bootstrap/bootstrap.min.js"></script>
 <style media="screen">
@@ -23,10 +24,7 @@ body {
  }
 .login-form {
     display:block;
-    width:30vw;
-    height:85vh;
-    //min-width: 400px;
-    min-height: 420px;
+    width: 400px;
     border-radius: 5px;
     margin:auto;
     box-shadow:0.7vw 0.7vw 0.7vw #272822;
@@ -36,7 +34,7 @@ body {
     color: black;
 }
 .login-resp {
-    width:80vw;
+    width:400px;
 }
 .btn-login {
     border: 2px solid lightblue;
