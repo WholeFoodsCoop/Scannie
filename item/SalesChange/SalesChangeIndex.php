@@ -54,7 +54,7 @@ class SalesChangeIndex extends ScancoordDispatch
                     <tr><td class="highlight"><a class="btn" href="SCScanner.php"> Scanner </a></td></tr>                               
                     <tr><td class="highlight"><a class="btn" href="../SignInfoHelper.php"> Sale Item Report <i>info in POS</i></a></td></tr>                                
                     <tr><td class="highlight"><a class="btn" href="http://192.168.1.2/git/fannie/item/CoopDealsLookupPage.php"> Coop Deals Check <i>by item</i> </a></td></tr>                                
-                    <tr><td class="highlight"><a class="btn" href="http://192.168.1.2/scancoord/testing/CoopDealsSearchPage.php"> Coop Deals Check <i>complete list</i> </a></td></tr>                                
+                    <tr><td class="highlight"><a class="btn" href="http://192.168.1.2/scancoord/item/Batches/CoopDealsSearchPage.php"> Coop Deals Check <i>complete list</i> </a></td></tr>                                
                 </table></div></div></div>
         ';
         
