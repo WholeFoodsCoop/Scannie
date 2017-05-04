@@ -509,33 +509,31 @@ class AuditScannerReport extends ScancoordDispatch
     private function form_content()
     {
         
-        $msgClear = 'Pressing OK will delete all data from this queue.';
-        $msgUpdate = 'Pressing OK will update product data from Fannie.';
-        $msgClearNotes = 'Pressing OK will clear all notes from this queue.';
-        $msgTest = 'This is a test. Okay?';
-        
         $ret = '';
         $ret .= '
             <div style="float: right;">
-                <form method="post" id="myform">
-                    <button type="submit" name="cleardata" id="cleardata" value="1" class="btn btn-danger btn-xs" 
-                        onclick="return confirm(\''.$msgClear.'\')"  ">&nbsp;Clear&nbsp;</button> data
-                </form>
-                <form method="post">
-                    <button type="submit" class="btn btn-default btn-xs" onclick="return confirm(\''.$msgUpdate.'\');">
-                        update</button> data
-                    <input type="hidden" name="update" value="1">
-                </form>
-                <form method="post">
-                    <button type="submit" class="btn btn-default btn-xs" onclick="return confirm(\''.$msgClearNotes.'\');">
-                        &nbsp;Clear&nbsp;</button> notes
-                    <input type="hidden" name="clearNotes" value="1">
-                </form>
+                <table class="buttonbox key">
+                    <thead></thead>
+                    <tbody>
+                        <tr class="buttonbox key">
+                            <form method="post" id="clearNotesForm">
+                                <td id="clearNotesInput" class="buttonbox key">Clear Notes</td>
+                                <input type="hidden" name="clearNotes" value="1" />
+                            </form>
+                            <form method="post" id="clearAllForm">
+                                <td id="clearAllInput" class="buttonbox">Clear ALL</td>
+                                <input type="hidden" name="cleardata" value="1" />
+                            </form>
+                        
+                            <form method="post" id="updateForm">
+                                <td id="updateInput" class="buttonbox">Update from POS</td>
+                                <input type="hidden" name="update" value="1">
+                            </form>
+                            <td class="buttonbox" data-toggle="modal" data-target="#upcs_modal">Upload a List</td>
+                    </tbody>
+                </table>
                 
-                <button type="submit" class="btn btn-default btn-xs" data-toggle="modal" data-target="#upcs_modal">
-                    &nbsp;Upload&nbsp;</button> upcs <br />
-                
-                <a class="text-info" style="width: 132px" href="AuditScanner.php ">Goto Scanner</a><br />
+                <a class="text-info" style="width: 132px;" href="AuditScanner.php ">Goto Scanner</a><br />
             </div>
         ';
         
@@ -603,6 +601,35 @@ $("#notes").change( function() {
         });
     });
 });
+</script>
+
+<script type="text/javascript">
+    $(document).ready( function() {
+       fancyButtons();
+    });
+    
+    function fancyButtons()
+    {
+        $("#clearNotesInput").click( function () {
+            var r = confirm("Pressing OK will clear all notes from this queue.");
+            if (r == true) {
+                $("#clearNotesForm").submit();
+            }
+        });
+        $("#clearAllInput").click( function () {
+            var r = confirm("Pressing OK will delete all data from this queue.");
+            if (r == true) {
+                $("#clearAllForm").submit();
+            }
+        });
+        $("#updateInput").click( function () {
+            var r = confirm("Pressing OK will update product data from Fannie.");
+            if (r == true) {
+                $("#updateForm").submit();
+            }
+        });
+        
+    }
 </script>
 
 <script type="text/javascript">    

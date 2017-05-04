@@ -1,3 +1,6 @@
+/*
+    Globally Used Style
+*/
 body {
     background: linear-gradient(white, #edf7fc);
     background-size: 100% 100%;
@@ -101,7 +104,9 @@ thead.float {
     background-color: white;
 }
 
-/* Pre-loaded Images */
+/*
+    Pre-loaded Images
+*/
 span.go-icon {
     background-image: url("../src/img/go.png");
     background-size: 15px 15px;
@@ -115,7 +120,9 @@ span.go-icon {
     font-size: 10px;
 }
 
-/* Global Classes*/
+/*
+    Quick Div Widths
+*/
 .lg-w {
     width: 800px;
 }
@@ -126,34 +133,46 @@ span.go-icon {
     width: 250px;
 }
 
-
-
-/*  Cmder Themed
-body, table, th, tr, td {
-    background-color: #272822;
-    color: #cacaca;
-    font-family: consolas;
+/*
+    Vertical Alignment Helper
+*/
+.vertical-alignment-helper {
+    display:table;
+    height: 100%;
+    width: 100%;
+    pointer-events:none; /* This makes sure that we can still click outside of the modal to close it */
 }
-.success {
-  color: #74aa04;
+.vertical-align-center {
+    /* To center vertically */
+    display: table-cell;
+    vertical-align: middle;
+    pointer-events:none;
 }
-.danger {
-  color: #a70334;
+.modal-content {
+    /* Bootstrap sets the size of the modal in the modal-dialog class, we need to inherit it */
+    width:inherit;
+    height:inherit;
+    /* To center horizontally */
+    margin: 0 auto;
+    pointer-events: all;
 }
-.warning {
-  color: #b6b649;
-  background-color: #272822;
+/*
+    Fancy Button Boxes
+*/
+.buttonbox {
+    border: 1px solid lightgrey;
 }
-.info {
-  color: #58c2e5;
+td.buttonbox {
+    font-size: 10px;
+    padding: 15px;
+    text-align: center;
+    height: 50px;
+    width: 50px;
+    background: linear-gradient(#e3e3e3,#ededed);
 }
-.purple {
-  color: #89569c;
+td.buttonbox:hover {
+    cursor: pointer;
 }
-.primary {
-  color: #1a83a6;
-}
-.panel {
-    background-color: #272822;
-    color: #cacaca;
+table.buttonbox {
+    border: 2px solid lightgrey;
 }
