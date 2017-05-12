@@ -116,6 +116,15 @@ span.go-icon {
     width: 40px;
     height: 30px;
 }
+span.delete-icon {
+    background-image: url("../src/img/deleteicon.png");
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+}
 .text-tiny {
     font-size: 10px;
 }
@@ -161,6 +170,7 @@ span.go-icon {
 */
 .buttonbox {
     border: 1px solid lightgrey;
+    font-weight: bold;
 }
 td.buttonbox {
     font-size: 10px;
@@ -169,6 +179,8 @@ td.buttonbox {
     height: 50px;
     width: 50px;
     background: linear-gradient(#e3e3e3,#ededed);
+    opacity: 0.9
+    border: 1px solid lightgrey;
 }
 td.buttonbox:hover {
     cursor: pointer;

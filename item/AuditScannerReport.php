@@ -142,7 +142,6 @@ class AuditScannerReport extends ScancoordDispatch
     private function list_upcs_handler($dbc,$storeID,$username)
     {
         $ret = '';
-        $ret .= 'list_upcs_handler() was called';
         
         if ($_POST['upcs']) {
             $upcs = $_POST['upcs'];
@@ -309,7 +308,6 @@ class AuditScannerReport extends ScancoordDispatch
             'clearNotes' => 'clear_notes_handler',
             'list_upcs' => 'list_upcs_handler'
         );
-          
         foreach ($routes as $post => $function) {
             if ($_POST[$post]) {
                 $ret .= $this->$function($dbc,$storeID,$username);
@@ -317,6 +315,9 @@ class AuditScannerReport extends ScancoordDispatch
         }
         
         $ret .= $this->form_content();
+        
+        //delete me later
+        $ret .= '<div id="resp"></div>';
         
         $options = $this->get_notes_options($dbc,$storeID);
         $noteStr = '';
@@ -340,7 +341,7 @@ class AuditScannerReport extends ScancoordDispatch
         //$ret .= $btnUpdate;
         $args = array($username,$storeID);
         $query = $dbc->prepare("
-        	SELECT upc, brand, description, cost, price, curMarg, desMarg, rsrp, srp, prid, flag, dept, vendor, notes, store_id
+        	SELECT upc, brand, description, cost, price, curMarg, desMarg, rsrp, srp, prid, flag, dept, vendor, notes, store_id, username
 			FROM woodshed_no_replicate.AuditScanner 
             WHERE username = ? 
                 AND store_id = ?
@@ -411,11 +412,12 @@ class AuditScannerReport extends ScancoordDispatch
                 $ret .=  '<th class="key">' . $v . '</th>';
             }
         }
-        $ret .=  '</tr></thead>';
+        $ret .=  '<th></th></tr></thead>';
         $prevKey = '1';
         $ret .= '<tbody id="mytable">';
-        $ret .=  '<tr class="key" class="highlight">';
+        $ret .=  '<tr class="key" id="firstTr" class="highlight">';
         $upcs = array();
+        
         foreach ($data as $k => $array) { 
             foreach ($array as $column_name  => $v) {
                 if ($column_name == 'store_id') {
@@ -426,14 +428,42 @@ class AuditScannerReport extends ScancoordDispatch
                     }
                     $ret .=  '<td class="notescell">' . $v . '</td>'; 
                 } elseif ($column_name == 'price' || $column_name == 'srp') {
-                    $ret .=  '<td class="price">' . $v . '</td>'; 
+                    $ret .=  '<td class="price">$' . $v . '</td>'; 
+                } elseif ($column_name == 'upc') {
+                    $upclink = '<a class="upc" href="http://192.168.1.2/git/fannie/item/ItemEditorPage.php?searchupc='.$v.
+                        '&ntype=UPC&searchBtn=" target="_blank">'.$v.'</a>';
+                    $ret .=  '<td>' . $upclink . '</td>'; 
+                    $curUpc = $v;
+                } elseif ($column_name == 'curMarg' || $column_name == 'desMarg') {
+                    $ret .=  '<td>' . 100*$v . '<span class="smSymb">%</span></td>';
+                } elseif ($column_name == 'username') {
+                    $ret .= '<td class="username">'.$v.'</td>';
                 } else {
                     $ret .=  '<td>' . $v . '</td>'; 
                 }
             }
+            $ret .= '<td  id="upc'.$curUpc.'"><span class="delete-icon"></span></td>';
             $ret .= '</tr>';
             
-            $ret .= '
+            if($prevKey != $k) {
+                if ($data[$k+1]['cost'] == 0) {
+                    $ret .=  '</tr><tr id="tr'.$curUpc.'" class="highlight grey" style="background-color:lightgrey">';
+                } elseif (in_array(($k+1),$flags['danger']) && $data[$k+1]['prid'] == 0) {
+                    $ret .=  '</tr><tr id="tr'.$curUpc.'"  class="highlight red" style="background-color:tomato; color:#700404">';
+	            } elseif (in_array(($k+1),$flags['warning']) && $data[$k+1]['prid'] == 0) {
+                    $ret .=  '</tr><tr id="tr'.$curUpc.'"  class="highlight yellow" style="background-color:#FFF457; color: #635d00">';
+                } elseif (in_array(($k+1),$flags['info']) && $data[$k+1]['prid'] == 0) {
+                    $ret .=  '</tr><tr id="tr'.$curUpc.'"  class="highlight blue" style="background-color:lightblue; color: #344c57">';
+                } else {
+                    $ret .=  '</tr><tr id="tr'.$curUpc.'"  class="highlight normal">';
+                }
+            } 
+            $prevKey = $k;
+        }
+        $ret .=  '</tbody></table></div>';
+        if ($dbc->error()) $ret .=  $dbc->error();
+        
+        $ret .= '
                 <style>
                     .grey {
                         background-color:lightgrey;
@@ -462,26 +492,11 @@ class AuditScannerReport extends ScancoordDispatch
                     #blue-toggle:hover {
                         cursor: pointer;
                     }
+                    .smSymb {
+                        font-size: 12px;
+                    }
                 </style>
             ';
-            
-            if($prevKey != $k) {
-                if ($data[$k+1]['cost'] == 0) {
-                    $ret .=  '</tr><tr class="highlight grey" style="background-color:lightgrey">';
-                } elseif (in_array(($k+1),$flags['danger']) && $data[$k+1]['prid'] == 0) {
-                    $ret .=  '</tr><tr class="highlight red" style="background-color:tomato; color:#700404">';
-	            } elseif (in_array(($k+1),$flags['warning']) && $data[$k+1]['prid'] == 0) {
-                    $ret .=  '</tr><tr class="highlight yellow" style="background-color:#FFF457; color: #635d00">';
-                } elseif (in_array(($k+1),$flags['info']) && $data[$k+1]['prid'] == 0) {
-                    $ret .=  '</tr><tr class="highlight blue" style="background-color:lightblue; color: #344c57">';
-                } else {
-                    $ret .=  '</tr><tr class="highlight normal">';
-                }
-            } 
-            $prevKey = $k;
-        }
-        $ret .=  '</tbody></table></div>';
-        if ($dbc->error()) $ret .=  $dbc->error();
         
         if ($storeID == 1) {
             $OppoID = 2;
@@ -605,7 +620,9 @@ $("#notes").change( function() {
 
 <script type="text/javascript">
     $(document).ready( function() {
-       fancyButtons();
+        fancyButtons();
+        //linksToText();
+        deleteRow();
     });
     
     function fancyButtons()
@@ -629,6 +646,38 @@ $("#notes").change( function() {
             }
         });
         
+    }
+
+    function linksToText() {
+        $('.upc').each( function() {
+            $(this).removeAttr('href');
+        });
+    }
+    
+    function deleteRow() {
+        $('.delete-icon').click( function() {
+            var upc = $(this).closest('td').attr('id');
+            var store_id = $(this).closest('tr').find('.store_id').text();
+            var username = $(this).closest('tr').find('.username').text();
+            var rowclicked = $(this).closest('tr').attr('id')   ;
+            var r = confirm('Remove '+upc+' from Queue?');
+            if (r == true) {
+                $.ajax({        
+                    url: 'AuditScannerReportAjax.php',
+                    type: 'post',
+                    data: 'store_id='+store_id+'&upc='+upc+'&username='+username+'&deleteRow=true',
+                    success: function(response)
+                    {
+                        if($('#'+rowclicked).length == 0) {
+                            $('#firstTr').hide();
+                        } else {
+                            $('#'+rowclicked).hide();
+                        }
+                        $('#resp').html(response);
+                    }
+                });
+            }
+        });
     }
 </script>
 
