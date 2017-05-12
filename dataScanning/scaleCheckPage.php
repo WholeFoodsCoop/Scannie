@@ -82,7 +82,9 @@ class scaleCheckPage extends ScancoordDispatch
             983,
             984,
             985,
-            917
+            917,
+            154,
+            155
         );
 
         $dontCheck[] = '189'; //  Marlenes bulk inventory debacle.
