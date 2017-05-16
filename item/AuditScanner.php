@@ -108,7 +108,11 @@ class AuditScanner extends ScancoordDispatch
         $rounder = new PriceRounder();
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         $storeID = scanLib::getStoreID();
-        $upc = str_pad($_POST['upc'], 13, 0, STR_PAD_LEFT);
+        /*$upc = str_pad($_POST['upc'], 13, 0, STR_PAD_LEFT);
+        if (substr($upc,2,1) == '2') {
+            $upc = '002' . substr($upc,3,4) . '000000';
+        }*/
+        $upc = scanLib::upcPreparse($_POST['upc']);
 
         $ret .= $this->mobile_menu($upc);
         $ret .= '<div align="center"><h4 id="heading">AUDIE: THE AUDIT SCANNER</h4></div>';
@@ -519,6 +523,7 @@ class AuditScanner extends ScancoordDispatch
         $argsA = array($data['upc'],$username,$storeID);
         $prepA = $dbc->prepare("SELECT * FROM AuditScanner WHERE upc = ? AND username = ? AND store_id = ? LIMIT 1");
         $resA = $dbc->execute($prepA,$argsA);
+        
         if ($dbc->numRows($resA) == 0) {
             $args = array(
                 $data['upc'],

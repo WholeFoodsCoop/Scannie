@@ -148,13 +148,19 @@ class AuditScannerReport extends ScancoordDispatch
             $plus = array();
             $chunks = explode("\r\n", $upcs);
             foreach ($chunks as $key => $str) {
+                /*
+                if (substr($str,2,1) == '2') {
+                    $str = '002' . substr($str,3,4) . '000000';
+                }
+                */
+                $str = scanLib::upcPreparse($str);
                 $plus[] = $str;
             }
         }
         
         include('../config.php');
         foreach ($plus as $upc) {
-            $upc = str_pad($upc, 13, 0, STR_PAD_LEFT);
+            //$upc = str_pad($upc, 13, 0, STR_PAD_LEFT);
             $args = array($storeID,$upc);
             $query = $dbc->prepare("
                 SELECT
@@ -319,7 +325,7 @@ class AuditScannerReport extends ScancoordDispatch
         //delete me later
         $ret .= '<div id="resp"></div>';
         
-        $options = $this->get_notes_options($dbc,$storeID);
+        $options = $this->get_notes_options($dbc,$storeID,$username);
         $noteStr = '';
         $noteStr .= '<select id="notes" class="" style="font-size: 10px; font-weight: normal; margin-left: 5px; width: 100px;">';
         $noteStr .= '<option value="viewall">View All</option>';
@@ -399,7 +405,7 @@ class AuditScannerReport extends ScancoordDispatch
         
         $ret .=  '<div class="panel panel-default">
             <table class="table table-condensed" id="dataTable">';
-        $ret .=  '<thead class="float key" id="dataTableThead">
+        $ret .=  '<thead class="key" id="dataTableThead">
             <tr class="key">';
         foreach ($headers as $v) {
             if ($v == 'notes') {
@@ -508,14 +514,16 @@ class AuditScannerReport extends ScancoordDispatch
         return $ret;
     }
     
-    private function get_notes_options($dbc,$storeID)
+    private function get_notes_options($dbc,$storeID,$username)
     {
-        $args = array($storeID);
-        $query = $dbc->prepare("SELECT notes FROM woodshed_no_replicate.AuditScanner WHERE store_id = ? GROUP BY notes;");    
+        $args = array($storeID,$username);
+        $query = $dbc->prepare("SELECT notes FROM woodshed_no_replicate.AuditScanner WHERE store_id = ? AND username = ? GROUP BY notes;");    
         $result = $dbc->execute($query,$args);
         $options = array();
         while ($row = $dbc->fetch_row($result)) {
-            $options[] = $row['notes'];
+            if ($row['notes'] != '') {
+                $options[] = $row['notes'];
+            }
         }
         echo $dbc->error();
         return $options;
@@ -632,18 +640,21 @@ $("#notes").change( function() {
             if (r == true) {
                 $("#clearNotesForm").submit();
             }
+            event.stopPropagation();
         });
         $("#clearAllInput").click( function () {
             var r = confirm("Pressing OK will delete all data from this queue.");
             if (r == true) {
                 $("#clearAllForm").submit();
             }
+            event.stopPropagation();
         });
         $("#updateInput").click( function () {
             var r = confirm("Pressing OK will update product data from Fannie.");
             if (r == true) {
                 $("#updateForm").submit();
             }
+            event.stopPropagation();
         });
         
     }
@@ -677,6 +688,7 @@ $("#notes").change( function() {
                     }
                 });
             }
+            event.stopPropagation();
         });
     }
 </script>

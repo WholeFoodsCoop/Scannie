@@ -23,7 +23,7 @@
 
 /**
 *   @class scanLib
-*
+*   common methods included in all Scannie pages.
 */
 
 class scanLib 
@@ -201,9 +201,25 @@ class scanLib
         return false;
     }
     
+    /**
+     *  @class upcPreparse
+     *  @param str STRING upc to preparse. 
+     *  @return str STRING
+     */
+    
+    public function upcPreparse($str)
+    {
+        $str = str_pad($str, 13, 0, STR_PAD_LEFT);
+        if (substr($str,2,1) == '2') {
+            /* UPC is for a re-pack scale item. */
+            $str = '002' . substr($str,3,4) . '000000';
+        } elseif (1) {
+            
+        }
+        return $str;
+    }
+    
 }
-
-
 
 
 
