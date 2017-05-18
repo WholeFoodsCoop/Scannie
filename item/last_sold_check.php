@@ -241,8 +241,8 @@ class last_sold_check extends scancoordDispatch
                 if ($sku) {
                     $ret .= '
                         <span class="alert-success">
-                            Below is the most recent purchase order for this 
-                            item.
+                            Highlighted below is the sku associated with the 
+                            most recent purchase order for this product.
                         </span><br><br>
                     ';
                 }
