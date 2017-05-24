@@ -28,8 +28,8 @@ class AuditScanner extends ScancoordDispatch
 {
 
     protected $title = "Audit Scanner";
-    protected $description = "[Audit Scanner] Scan page designed solely for shelf
-        tag auditing.";
+    protected $description = "[Audit Scanner] is a light-weight, all around product
+        scanner for use with iUnfi iPod Touch scanners.";
     protected $ui = FALSE;
     protected $add_css_content = TRUE;
     protected $add_javascript_content = TRUE;
@@ -504,7 +504,7 @@ class AuditScanner extends ScancoordDispatch
                         style="text-align: center; width: 140px; border: none;">
                     <input type="hidden" name="success" value="empty"/>
                     <span id="auto_par" class="sm-label"></span><span id="par_val" class="norm-text"></span>
-                    <button type="submit" class="btn btn-xs"><span class="go-icon"></span></button>
+                    <!-- <button type="submit" class="btn btn-xs"><span class="go-icon"></span></button> -->
                 </form>
             </div>
         ';
@@ -723,7 +723,9 @@ class AuditScanner extends ScancoordDispatch
                             </tr><tr>
                                 <td class="btn-keypad btn-info" id="keyCL">CL</td>
                                  <td></td>
-                                  <td><button type="button" class="btn-keypad" data-dismiss="modal" aria-label="Close"><span style="color: white; font-weight: bold">X</span></button></td>
+                                  <!-- <td><button type="button" class="btn-keypad" data-dismiss="modal" aria-label="Close"><span style="color: white; font-weight: bold">X</span></button></td> -->
+                                  <!-- <td><button type="submit" onClick="formSubmitter(); return false;" class="btn-keypad btn-success">GO</button></td> -->
+                                  <td onClick="formSubmitter(); return false;" class="btn-keypad btn-success">GO</td>
                             </tr>
                         </tbody>
                     </form></table>
@@ -847,6 +849,11 @@ function get_auto_par()
 $(document).ready( function() {
    get_auto_par();
 });
+
+function formSubmitter()
+{
+    $('#my-form').submit();
+}
 
 </script>
         <?php

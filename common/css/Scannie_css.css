@@ -116,6 +116,15 @@ span.go-icon {
     width: 40px;
     height: 30px;
 }
+span.green-goicon {
+    background-image: url("../src/img/greenGo.png");
+    background-size: 15px 15px;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: inline-block;
+    width: 40px;
+    height: 30px;
+}
 span.delete-icon {
     background-image: url("../src/img/deleteicon.png");
     background-size: 20px 20px;
