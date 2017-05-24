@@ -142,17 +142,21 @@ function draw_table($dbc)
                 CASE WHEN u.description IS NULL OR u.description='' THEN p.description ELSE u.description END as description,
                 u.upc, p.size, p.normal_price, ba.batchName,
                 p.special_price as price, ba.batchID, q.notes,
-                p.last_sold
+                p.last_sold,
+                f.floorSectionID,
+                fs.name
                 FROM SaleChangeQueues as q
                     LEFT JOIN is4c_op.products as p on p.upc=q.upc AND p.store_id=q.store_id
                     LEFT JOIN is4c_op.productUser as u on u.upc=p.upc
                     LEFT JOIN is4c_op.batchList as bl on bl.upc=p.upc
                     LEFT JOIN is4c_op.batches as ba on ba.batchID=bl.batchID
+                    LEFT JOIN is4c_op.FloorSectionProductMap as f on f.upc=p.upc
+                    LEFT JOIN is4c_op.FloorSections as fs on fs.floorSectionID=f.floorSectionID
                 WHERE q.queue= ?
                     AND q.store_id= ?
                     AND q.session= ?
                 GROUP BY upc
-                ORDER BY brand ASC
+                ORDER BY f.floorSectionID, brand ASC
     ");
     $res = $dbc->execute($prep,$args);
     while ($row = $dbc->fetch_row($res)) {
@@ -169,6 +173,8 @@ function draw_table($dbc)
                     . $row['upc'] 
                     . "&ntype=UPC&searchBtn=' class='blue' target='_blank'>{$row['upc']}
                     </a>";
+        $floorSection[$upc] = $row['floorSectionID'];
+        $floorSectionName[$upc] = $row['name'];
     }
     if ($dbc->error()) {
         echo $dbc->error(). "<br>";
