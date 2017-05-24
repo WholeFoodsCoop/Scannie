@@ -54,7 +54,13 @@ class menu
                 border-radius: 2px;
             }
             
-            
+            .tinyInput {
+                height: 20px;
+                width: 125px;
+                font-size: 10px;
+                border: 1px solid lightgrey;
+                border-radius: 2px;
+            }
             
             
             .tooltip1 { position: relative; }
@@ -64,11 +70,19 @@ class menu
             </style>
         ';
         
-        $ret .=  '
+        $ret .= '
+            <div align="center">
+                <a class="hidden-md hidden-lg hidden-sm" href="http://192.168.1.2/scancoord/testing/SiteMap.php">
+                    Site Map
+                </a>
+            </div>
+        ';
+        
+        $ret .=  '        
 <div class="container-fluid"  align="center" style="height:80px;width:1000px; ">   
+    
     <div class="navbar navbar-default collapse in hidden-xs hidden-print" style="background-color:white;border:none">
         <ul class="nav navbar-nav">
-        
             <li class="dropdown"><a  class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Item<span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                     <li><a class="menu-opt" href="http://192.168.1.2/scancoord/item/last_sold_check.php">Last Sold</a></li>
@@ -115,15 +129,16 @@ class menu
             <li class="dropdown"><a class="menuNav"  href=""
                 data-toggle="modal" data-target="#help">Help<span class=""></span></a>
             
-            <li class="dropdown"><a class="menuNav"  href="http://192.168.1.2/git/fannie/item/ItemEditorPage.php">CORE-POS<span class=""></span></a>
+           <!-- <li><a class="menuNav"  href="" data-toggle="modal" data-target="#quick_lookups">QLU<span class=""></span></a></li> -->
             
-            <li><a class="menuNav"  href=""
-                data-toggle="modal" data-target="#quick_lookups">QLU<span class=""></span></a></li>
+            <li class="dropdown" style="margin-top: 15px;"><input class="tinyInput menuNav" id="searchbar" name="search" placeholder="search"/></a></li>
             
             <li></li>
     </div>
 </div>
         ';
+        
+        $ret .= '<div id="search-resp"></div>';
         
         return $ret;
     }
@@ -138,6 +153,36 @@ function popitup(url) {
 	newwindow=window.open(url,'name','height=300,width=300');
 	if (window.focus) {newwindow.focus()}
 	return false;
+}
+
+$(document).ready( function () {
+        $('#searchbar').keypress( function () {
+            var text = $("#searchbar").val();
+            if (text.length) {
+                //alert(text);
+                getSearchResults(text);
+            } else {
+                $('#search-resp').html('')
+            }
+        });
+});
+
+
+
+function getSearchResults(search)
+{
+    $.ajax({
+        url: '../common/ui/searchbar.php',
+        //dataType: 'POST',
+        data: 'search='+search,
+        success: function(response)
+        {
+            $('#search-resp').html(response);
+        }
+    });
+    
+
+
 }
 </script>
 

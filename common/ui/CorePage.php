@@ -64,7 +64,8 @@ class ScancoordDispatch
                 <div class="container" style="width:95%; ">
                     <div style="font-size:28px;margin-bottom:5px;" class="primaryColor">
                         <img src="/scancoord/common/src/img/scanner.png" style="width:75px;heigh:75px;float:left">
-                        <a href="/scancoord">Scannie</a>
+                        <a href="/scancoord">Scannie</a> | an extension of 
+                        <a href="http://192.168.1.2/git/fannie">CORE-POS</a>
                         <!-- this span is for detecting bootstrap screensize -->
                             <span class="device-xs visible-xs"></span>
                             <div style="font-size:20px;" class="secondaryColor" data-toggle="collapse" data-target=".navbar-default" onclick="smartToggle();">
