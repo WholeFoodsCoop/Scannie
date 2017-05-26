@@ -32,7 +32,7 @@ class ScancoordDispatch
     protected $add_javascript_content = false;
     
     public function help_content() { 
-        return 'No notes have been entered for this page.'; 
+        return 'No help content has been created for this page.'; 
     } 
     
     function __construct() {
@@ -87,6 +87,13 @@ class ScancoordDispatch
         print $this->quick_lookups();
         print '</div></div></div>';
         print $this->footer();
+        $this->recordPath();
+    }
+    
+    private function recordPath()
+    {
+        if ($_SESSION['prevUrl'] = $_SESSION['curUrl']) {}  
+        $_SESSION['curUrl'] = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
     }
     
     private function get_help_content()
@@ -328,15 +335,17 @@ window.addEventListener('keydown', KeyDown);
         if (empty($user)) {
             $user = 'Generic User';
             $logVerb = 'Login';
+            $link = '<a href="http://192.168.1.2/scancoord/admin/login.php">['.$logVerb.']</a><br />';
         } else {
             $logVerb = 'Logout';
+            $link = '<a href="http://192.168.1.2/scancoord/admin/logout.php">['.$logVerb.']</a><br />';
         }
         $ret .= '
 <div class="container" id="" style="width:96%;">
         ';
         $ret .= '
             You are logged in as <strong>'.$user.'</strong>. 
-            <a href="../admin/logout.php">['.$logVerb.']</a><br />
+            '.$link.'
             Current version: 0.0.1-dev<br />
             <a href="http://192.168.1.2/scancoord/testing/SiteMap.php">Site Map</a><br />
             <br />
@@ -346,13 +355,5 @@ window.addEventListener('keydown', KeyDown);
         ';
         return $ret;
     }
-    
-    
-    /*
-    private function css_content()
-    {
-        return '';
-    }
-    */
     
 }

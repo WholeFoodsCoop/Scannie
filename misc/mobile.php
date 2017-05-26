@@ -56,7 +56,7 @@ class mobile extends ScancoordDispatch
                 <a class="btn btn-default btn-mobile-menu" href="mobile.php">&nbsp;</a><br /><br />
                 <a class="btn btn-default btn-mobile-menu" href="mobile.php">&nbsp;</a><br /><br />
                 <a class="btn btn-default btn-mobile-menu" href="mobile.php">&nbsp;</a><br /><br />
-                <a class="btn btn-default btn-mobile-menu" href="mobile.php">return</a>
+                <a class="btn btn-default btn-mobile-menu" href="..">return</a>
             </div><br /><br />
         ';
         return $ret;

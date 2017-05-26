@@ -18,7 +18,8 @@ class logout
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
-        session_unset();
+        unset($_SESSION['user_type']);
+        unset($_SESSION['user_name']);
         
         return header('location: http://192.168.1.2/scancoord/admin/login.php');
     }
