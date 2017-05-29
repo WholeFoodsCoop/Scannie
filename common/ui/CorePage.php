@@ -99,19 +99,21 @@ class ScancoordDispatch
     private function get_help_content()
     {
         return '
-            <div id="help" class="modal fade">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h3 class="modal-title" style="color: #8c7b70">'.$this->title.'</h3>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                            style="position: absolute; top:20; right: 20">
-                          <span aria-hidden="true">&times;</span>
-                        </button>
-                      </div>
-                      <div class="modal-body">
-                        '.$this->help_content().'
-                      </div>
+            <div id="help" class="modal">
+                <div class="vertical-alignment-helper">
+                    <div class="modal-dialog vertical-align-center" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h3 class="modal-title" style="color: #8c7b70">'.$this->title.'</h3>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                style="position: absolute; top:20; right: 20">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            '.$this->help_content().'
+                          </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -121,19 +123,21 @@ class ScancoordDispatch
     private function quick_lookups()
     {
         return '
-            <div id="quick_lookups" class="modal fade" >
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h3 class="modal-title" style="color: #8c7b70">Quick Lookups</h3>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                            style="position: absolute; top:20; right: 20">
-                          <span aria-hidden="true">&times;</span>
-                        </button>
-                      </div>
-                      <div class="modal-body">
-                        '.$this->quick_lookups_content().'
-                      </div>
+            <div id="quick_lookups" class="modal" >
+                <div class="vertical-alignment-helper">
+                    <div class="modal-dialog vertical-align-center" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h3 class="modal-title" style="color: #8c7b70">Quick Lookups</h3>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                style="position: absolute; top:20; right: 20">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            '.$this->quick_lookups_content().'
+                          </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -289,9 +293,23 @@ window.addEventListener('keydown', KeyDown);
         if ($this->must_authenticate == TRUE) {
             $userPrivilege = $_SESSION['user_type'];
             if ($userPrivilege != 1) {
-                header('Location: http://192.168.1.2/scancoord/admin/login.php');
+                //header('Location: http://192.168.1.2/scancoord/admin/login.php');
+                echo $this->jsRedirect();
             }
         }
+    }
+    
+    private function jsRedirect()
+    {
+        $prevUrl = $_SESSION['prevUrl'];
+        return '
+<script type="text/javascript">
+$(document).ready( function () {
+    window.location.replace( "'.$prevUrl.'" );
+});
+</script>
+        ';
+        
     }
     
     private function header($class)
