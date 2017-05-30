@@ -47,14 +47,14 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
         $ret .= '<h4>Exception Sale Items</h4>';
         $ret .= $this->form_content();
         
-        if (strlen($_POST['addItem']) == 13) {
-            $addItem = $_POST['addItem'];
-            $prep = $dbc->prepare("insert into woodshed_no_replicate.exceptionItems (upc) values (?)");
-            $dbc->execute($prep,$addItem);
+        if ($addItem = str_pad($_POST['addItem'], 13, 0, STR_PAD_LEFT)) {
+            $note = $_POST['note'];
+            $args = array($addItem,$note);
+            $prep = $dbc->prepare("insert into woodshed_no_replicate.exceptionItems (upc,note) values (?,?)");
+            $dbc->execute($prep,$args);
             unset($_POST['addItem']);
         }
-        if ($_POST['rmItem']) {
-            $rmItem = $_POST['rmItem'];
+        if ($rmItem = str_pad($_POST['rmItem'], 13, 0, STR_PAD_LEFT)) {
             $prep = $dbc->prepare("delete from woodshed_no_replicate.exceptionItems where upc = ?");
             $dbc->execute($prep,$rmItem);
             unset($_POST['rmItem']);
@@ -125,6 +125,10 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
                 <div class="input-group">
                     <span class="input-group-addon">Remove Item:</span>
                     <input type="text" class="form-control" id="rmItem" style="width: 175px" name="rmItem" >&nbsp;&nbsp;
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon">Add a Note</span>
+                    <input type="text" class="form-control" id="note" style="width: 175px" name="note" >&nbsp;&nbsp;
                 </div>
                 <button type="submit" class="btn btn-default">Add/Remove Item</button>
             </form>
