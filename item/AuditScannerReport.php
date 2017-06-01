@@ -192,7 +192,6 @@ class AuditScannerReport extends ScancoordDispatch
                     LEFT JOIN vendorDepartments AS vd
                         ON vd.vendorID = p.default_vendor_id
                             AND vd.deptID = vi.vendorDept
-                    LEFT JOIN NarrowTags AS n ON p.upc=n.upc
                 WHERE p.store_id = ?
                     AND p.upc = ?
                 LIMIT 1
@@ -561,7 +560,7 @@ class AuditScannerReport extends ScancoordDispatch
         ';
         
         $ret .= '
-            <div id="upcs_modal" class="modal fade">
+            <div id="upcs_modal" class="modal">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                       <div class="modal-header">

@@ -177,7 +177,7 @@ class AuditScanner extends ScancoordDispatch
                 pu.brand AS signbrand,
                 v.shippingMarkup,
                 v.discountRate,
-                case when n.upc is not null then '<span class=\'alert-warning\'>Flagged Narrow</span>' else NULL end as narrow
+                case when pu.narrow=1 then '<span class=\'alert-warning\'>Flagged Narrow</span>' else NULL end as narrow
             FROM products AS p
                 LEFT JOIN productUser AS pu ON p.upc = pu.upc
                 LEFT JOIN departments AS d ON p.department=d.dept_no
@@ -188,7 +188,6 @@ class AuditScanner extends ScancoordDispatch
                 LEFT JOIN vendorDepartments AS vd
                     ON vd.vendorID = p.default_vendor_id
                         AND vd.deptID = vi.vendorDept
-                LEFT JOIN NarrowTags AS n ON p.upc=n.upc
             WHERE p.store_id = ?
                 AND p.upc = ?
             LIMIT 1
