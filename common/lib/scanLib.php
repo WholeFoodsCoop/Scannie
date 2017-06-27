@@ -2,9 +2,9 @@
 /*******************************************************************************
 
     Copyright 2013 Whole Foods Community Co-op.
-    
+
     This file is a part of CORE-POS.
-    
+
     CORE-POS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -18,7 +18,7 @@
     You should have received a copy of the GNU General Public License
     in the file LICENSE along with CORE-POS; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-    
+
 *********************************************************************************/
 
 /**
@@ -26,25 +26,25 @@
 *   common methods included in all Scannie pages.
 */
 
-class scanLib 
+class scanLib
 {
-    
-    public function readStdin() 
+
+    public function readStdin()
     {
         $this->read_stdin();
         return false;
     }
-    
+
     public function stdin($msg)
     {
         self::read_stdin($msg);
         return false;
     }
-    
+
     public function read_stdin($msg)
     {
-        /**	
-        *	@read_stdin() 		
+        /**
+        *	@read_stdin()
         *	Read input from command line.
         */
         echo $msg . ': ';
@@ -53,26 +53,26 @@ class scanLib
         $input = rtrim($input);
         fclose($fr);
         return $input;
-        
+
     }
-    
+
     public function check_date_downwards($year,$month,$day)
     {
-        
+
         /**
-        *   @function: check_date_downwards 
-            @purpose: In a table, take a datetime and return 
-            stylized table data with warning colors. 
+        *   @function: check_date_downwards
+            @purpose: In a table, take a datetime and return
+            stylized table data with warning colors.
                 dates < 1 month return with normal <td> color
-                dates > 1 > 2 month return yellow 
+                dates > 1 > 2 month return yellow
                 dates > 2 > 3 months return orange,
                 dates > 3 months return red
-            @params: The year, month and date to compare 
+            @params: The year, month and date to compare
             against the current datetime.
             @returns: Table data contents
             e.g. '<td>'.[DATETIME].'</td>';
         */
-        
+
         $ret = '';
         $date = $year . '-' . $month . '-' . $day;
         $curY = date('Y');
@@ -86,30 +86,30 @@ class scanLib
             $ret .= "<td style='color:red'>" . $date . "</td>";
         } else {
             $ret .= "<td style='color:green'>" . $date . "</td>";
-        }   
-        
+        }
+
         return $ret;
     }
-    
+
     public function check_date_downwards_alert($year,$month,$day)
     {
-        
+
         /**
         *   @function: check_date_downwards_alert
-            @purpose: In a table, take a datetime and return 
-            stylized table data with warning colors. 
+            @purpose: In a table, take a datetime and return
+            stylized table data with warning colors.
                 dates < 1 month return with normal <td> color
-                dates > 1 > 2 month return yellow 
+                dates > 1 > 2 month return yellow
                 dates > 2 > 3 months return orange,
                 dates > 3 months return red
-            @params: The year, month and date to compare 
+            @params: The year, month and date to compare
             against the current datetime.
             @returns: <td> contents and alert level as array.
-            e.g. 
+            e.g.
                 'td' = '<td>'.[DATETIME].'</td>';
                 'alert' = 0
         */
-        
+
         $ret = '';
         $date = $year . '-' . $month . '-' . $day;
         $curY = date('Y');
@@ -127,29 +127,29 @@ class scanLib
         } else {
             $ret .= "<td style='color:green'>" . $date . "</td>";
             $data['alert'] = 0;
-        }   
-        
+        }
+
         $data['td'] = $ret;
-        
+
         return $data;
     }
-    
+
     public function dateAdjust($adjDay,$adjMonth,$adjYear)
     {
         /**
         *   Takes the current date and reduce (d,m,y) by values in argument.
         *   Returns the desired date in DATETIME format.
         */
-        
+
         $curY = date('Y') - $adjYear;
         $curM = date('m') - $adjMonth;
         $curD = date('d') - $adjDay;
-        
+
         $date = $curY . '-' . $curM . '-' . $curD;
-        
+
         return $date;
     }
-    
+
     public function getStoreID()
     {
         $remote_addr = $_SERVER['REMOTE_ADDR'];
@@ -158,10 +158,22 @@ class scanLib
         } else {
             $store_id = 1;
         }
-        
+
         return $store_id;
     }
-    
+
+    public function getStoreName($storeID)
+    {
+        switch ($storeID) {
+            case 1:
+                return 'Hillside';
+            case 2:
+                return 'Denfeld';
+            case 999:
+                return 'UNKNOWN';
+        }
+    }
+
     public function convert_unix_time($secs) {
         $bit = array(
             'y' => $secs / 31556926 % 12,
@@ -171,7 +183,7 @@ class scanLib
             'm' => $secs / 60 % 60,
             's' => $secs % 60
             );
-           
+
         foreach($bit as $k => $v)
             if($k == 's') {
                 $ret[] = $v;
@@ -179,10 +191,10 @@ class scanLib
                 $ret[] = $v . ':';
             }
             if ($v == 0) $ret[] = '0';
-               
+
         return join('', $ret);
     }
-    
+
     public function getUser()
     {
         if (!empty($_SESSION['user_name'])) {
@@ -191,7 +203,7 @@ class scanLib
             return false;
         }
     }
-    
+
     public function isDeviceIpod()
     {
         $device = $_SERVER['HTTP_USER_AGENT'];
@@ -200,13 +212,13 @@ class scanLib
         }
         return false;
     }
-    
+
     /**
      *  @class upcPreparse
-     *  @param str STRING upc to preparse. 
+     *  @param str STRING upc to preparse.
      *  @return str STRING
      */
-    
+
     public function upcPreparse($str)
     {
         $str = str_pad($str, 13, 0, STR_PAD_LEFT);
@@ -214,11 +226,11 @@ class scanLib
             /* UPC is for a re-pack scale item. */
             $str = '002' . substr($str,3,4) . '000000';
         } elseif (1) {
-            
+
         }
         return $str;
     }
-    
+
 }
 
 
