@@ -72,12 +72,21 @@ class unfiBreakdowns extends ScancoordDispatch
            $batchIDs[$row['upc']] = $row['batchID'];
            $batchDesc[$row['upc']] = $row['description'];
         }
+        if ($er = $dbc->error()) {
+            $ret .= '<div class="alert alert-danger">'.$er.'</div>';
+        }
         
         $ret .=  "<p style='width:350px'>If there are UPCs listed below, they should be added to the following batches. 
             You may want to double check the prices suggested by this page.</p>";
         
         $ret .=  '<table class="table table-striped table-condensed small" style="width:250px;border:2px solid lightgrey">
                     <th></ht><th>upc</th><th>batchID</th><th>saleprice</th>';
+        /*
+        foreach ($batchList as $upc => $salePrice) {
+            echo $upc . ' ' . $salePrice . ' <span style="color: purple">' . $size[$upc] . '</span><br />';
+        }
+        */
+                    
         foreach ($batchList as $upc => $salePrice) {
             //  GET Child
             if (in_array($upc,$parents) && !in_array($upc,$child)) {
@@ -85,9 +94,11 @@ class unfiBreakdowns extends ScancoordDispatch
                 $price = ($salePrice / $curSize);
                 $price = $rounder->round($price);
                 $batch = '<a href="http://192.168.1.2/git/fannie/batches/newbatch/EditBatchPage.php?id=' . $batchIDs[$upc] . '" target="_blank">' . $batchIDs[$upc] . '</a>';
-                while ($price*$curSize < $salePrice) {
-                    $price++;
-                }
+                if ($curSize > 0.01) {
+                    while ($price*$curSize < $salePrice) {
+                        $price++;
+                    }
+                }                
                 $childKey = array_keys($parents,$upc);
                 foreach ($childKey as $value) $child = $children[$value];
                 $child = str_pad($child, 13, 0, STR_PAD_LEFT);
@@ -112,6 +123,9 @@ class unfiBreakdowns extends ScancoordDispatch
                     $ret .=  sprintf('<tr><td>parent</td><td>%s</td><td>%s</td><td>%0.2f</td></tr>',$parent,$batch,$price);
                 }
             }
+            
+            //return "hi!";
+            
         }
         $ret .=  '</table>';
         $ret .= '</div>';
