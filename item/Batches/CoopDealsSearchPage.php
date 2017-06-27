@@ -61,10 +61,11 @@ class CoopDealsSearchPage extends ScancoordDispatch
         if (isset($_GET['brand'])) {
             $brand = str_replace("'","\'",$_GET['brand']);
         }
+        /*
         if (isset($_GET['description'])) {
             $description = $_GET['description'];
         }
-
+        */
         if ($month = $_GET['month']) {
             $ret .= 'Month Selected: <strong>' . $month . '</strong>';
 
@@ -96,7 +97,7 @@ class CoopDealsSearchPage extends ScancoordDispatch
                     department,
                     sku,
                     brand,
-                    description,
+                    description AS posDesc,
                     packSize,
                     srp,
                     lineNotes,
@@ -189,8 +190,8 @@ class CoopDealsSearchPage extends ScancoordDispatch
                     <option value="Mar">March</option>
                     <option value="Apr">April</option>
                     <option value="May">May</option>
-                    <option value="June">June</option>
-                    <option value="July">July</option>
+                    <option value="Jun">June</option>
+                    <option value="Jul">July</option>
                     <option value="Aug">August</option>
                     <option value="Sep">September</option>
                     <option value="Oct">October</option>
