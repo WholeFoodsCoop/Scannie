@@ -156,7 +156,7 @@ function draw_table($dbc)
                     AND q.store_id= ?
                     AND q.session= ?
                 GROUP BY upc
-                ORDER BY f.floorSectionID, brand ASC
+                ORDER BY fs.name, brand ASC
     ");
     $res = $dbc->execute($prep,$args);
     while ($row = $dbc->fetch_row($res)) {
