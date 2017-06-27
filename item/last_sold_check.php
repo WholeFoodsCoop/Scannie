@@ -166,8 +166,9 @@ class last_sold_check extends scancoordDispatch
             $ret .= '
                 
                     <div class="row">
-                        <div class="col-md-4 panel panel-default">
-                        <label>Product Last Sold On</label><br><br>
+                        <div class="panel panel-info" style="max-width: 390px;">
+                            <div class="panel-heading"><label style="color:darkslategrey;">This Product Last Sold On</label></div>
+                            <br />
             ';
             $i = 0;
             while ($row = mysql_fetch_assoc($result)) {
@@ -217,7 +218,7 @@ class last_sold_check extends scancoordDispatch
                 ";
                 $result = mysql_query($query, $dbc);
                 $sku = 0;
-                $ret .= '<div class="panel panel-default" style="width: 390px;">';
+                $ret .= '<div class="panel panel-info" style="width: 390px;">';
                 $ret .= '
                     <div class="panel-heading">
                         <label style="color:darkslategrey;">Purchase Order Items</label>
@@ -237,15 +238,6 @@ class last_sold_check extends scancoordDispatch
                 } 
                 $ret .= '</table>';
                 $ret .='</div>';
-                
-                if ($sku) {
-                    $ret .= '
-                        <span class="alert-success">
-                            Highlighted below is the sku associated with the 
-                            most recent purchase order for this product.
-                        </span><br><br>
-                    ';
-                }
                 
                 $query = "
                     SELECT upc
@@ -275,11 +267,10 @@ class last_sold_check extends scancoordDispatch
                         AND vendorID = 1
                 ";
                 $result = mysql_query($query, $dbc);
-                $ret .= '<div class="panel panel-default">';
+                $ret .= '<div class="panel panel-info">';
                 $ret .= '
                     <div class="panel-heading">
                         <label style="color:darkslategrey;">Vendor Items</label>
-                        <br><i>Latest cost on file for listed sku</i>
                     </div>';
                 $ret .= '<table class="table">';
                 $ret .= '<th>UPC</th>';
@@ -312,52 +303,15 @@ class last_sold_check extends scancoordDispatch
                 $ret .= '</table>';
                 $ret .= '</div>';
                 
-                
-                /*
-                $query = "
-                    SELECT
-                        upc,
-                        sku, 
-                        size, 
-                        cost, 
-                        srp
-                    FROM woodshed_no_replicate.unfipf_july
-                    WHERE upc = {$_GET['upc']}
-                ";
-                $ret .= '
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <label style="color:darkslategrey;">UNFI Price File</label>
-                            <br><i>Info from CMW final commitment for this UPC<br>I.T. - month => July. This must be changed manually.</i>
-                        </div>
-                ';
-                $ret .= '<table class="table">';
-                $ret .= '<th>UPC</th>';
-                $ret .= '<th>SKU</th>';
-                $ret .= '<th>Size</th>';
-                $ret .= '<th>Cost</th>';
-                $ret .= '<th>SRP</th>';
-                $result = mysql_query($query, $dbc);
-                while ($row = mysql_fetch_assoc($result)) {
-                    if ($row['sku'] == $sku) {
-                        $ret .= '<tr class="success">';
-                    } else {
-                        $ret .= '<tr>';
-                    }
-                    $ret .= '<td>' . $row['upc'] . '</td>';
-                    $ret .= '<td>' . $row['sku'] . '</td>';
-                    $ret .= '<td>' . $row['size'] . '</td>';
-                    $ret .= '<td>' . $row['cost'] . '</td>';
-                    $ret .= '<td>' . $row['srp'] . '</tr>';
-
-                    
+                if ($sku) {
+                    $ret .= '
+                        <span class="alert-success">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            Highlighted row related to sku associated with the 
+                            most recent purchase order for this product.
+                        <br><br>
+                    ';
                 }
-                */
-                               
-                $ret .='<br>** if you are using this page while working on UNFI price change files -> if you cannot 
-                figure out why the Batch Page is suggesting an incorrect price AND there is more than one row in 
-                the <b>Vendor Items</b> panel, Batch Page is probably using the incorrect cost for this item. You
-                should correct the cost of the item in the Item Editor Page.';
+                
             } else {
                 $ret .= 'This UPC is not recoginzed by Office.';
             }
