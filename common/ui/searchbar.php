@@ -38,7 +38,11 @@ class search
         $ret .= '<u style="color:#c7bda3">Search Results</u><br />';
         foreach ($this->data as $name => $path) {
             if ( (strstr($name,$s) || strstr($name,ucwords($s))) && strlen($s) > 2) {
-                $ret .= '<a href="'.$path.$name.'">'.$name.'</a><br />';
+                $ret .= '<a href="'.$path.$name.'">';
+                $replace = '<b>'.$s.'</b>';
+                $newstring = str_replace($s,$replace,$name);
+                $ret .= $newstring;
+                $ret .= '</a><br />';
             }
         }
         return $ret;
@@ -101,6 +105,7 @@ class search
         $exceptions[] = "DenfeldDeptMap.php";
         $exceptions[] = "DenfeldDeptMap2.php";
         $exceptions[] = "BatchReviewPage.html";
+        $exceptions[] = "getProcesslist.php";
 
         $dir = opendir($dirname);
 
