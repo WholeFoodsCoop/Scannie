@@ -14,14 +14,27 @@ class logout
 {
     public function run()
     {
-        
+
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
         unset($_SESSION['user_type']);
         unset($_SESSION['user_name']);
-        
+
         return header('location: http://192.168.1.2/scancoord/admin/login.php');
+    }
+
+    private function jsRedirect()
+    {
+        $prevUrl = $_SESSION['prevUrl'];
+        return '
+<script type="text/javascript">
+$(document).ready( function () {
+    window.location.replace( "'.$prevUrl.'" );
+});
+</script>
+        ';
+
     }
 }
 

@@ -1,4 +1,4 @@
-<?php 
+<?php
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
@@ -8,23 +8,23 @@ if (session_status() == PHP_SESSION_NONE) {
 <?php
 if (!class_exists('SQLManager')) {
     include('../common/sqlconnect/SQLManager.php');
-} 
+}
 
 class admin
 {
-    
+
     public function run()
     {
         echo $this->header();
         echo $this->view();
     }
-    
+
     private function view()
     {
-        
+
         include('../config.php');
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANALTDB, $SCANUSER, $SCANPASS);
-        
+
         $cur_from_page = basename($_SERVER['HTTP_REFERER']);
         if ($cur_from_page != 'login.php') {
             $_SESSION['from_page'] = basename($_SERVER['HTTP_REFERER']);
@@ -32,8 +32,8 @@ class admin
         }
         $from_page = $_SESSION['from_page'];
         $from_path = $_SESSION['from_path'];
-        
-        
+
+
         if(!function_exists('hash_equals')) {
             function hash_equals($str1, $str2) {
                 if(strlen($str1) != strlen($str2)) {
@@ -47,11 +47,11 @@ class admin
             }
         }
         $curUser = $_SESSION['user_name'];
-        
+
         $ret = '';
         $ret .= $this->form_content();
         echo $ret;
-        
+
         $user = array();
 
         if (isset($_SESSION['notadmin'])) echo 'You must be logged in as admin to access the previous page.';
@@ -94,12 +94,20 @@ class admin
         }
 
     }
-    
+
     private function form_content()
     {
         include('../config.php');
         include('../common/lib/scanLib.php');
         $ret = '';
+
+        /*  for testing only
+        $ret .= '
+            <b style="color: tomato;">$prev = '.$_SESSION["prevUrl"].'<br />
+            $cur = '.$_SESSION["curUrl"].'</b>
+        ';
+        */
+
         if ($ipod = scanLib::isDeviceIpod()) {
             $width = 'width: 90vw;';
         } else {
@@ -120,16 +128,16 @@ class admin
                         <input type="text" name="username" class="form-control" style="max-width: 200px;" autofocus><br><br>
                     <label style="width:120px">Password:</label>
                         <input type="password" name="pw" class="form-control" style="max-width: 200px;"><br><br><br><br>
-                        <input type="submit" value="LOG IN" class="btn btn-default btn-login" style="width: 150px; "><br /><br /><br /> 
+                        <input type="submit" value="LOG IN" class="btn btn-default btn-login" style="width: 150px; "><br /><br /><br />
                     <a class="" href="'.$SCANWEBPATH.'/misc/mobile.php" style="background: rgba(155,155,155,.9); border: 1px solid grey; padding: 5px;">Mobile Menu</a><br />
                 </form>
-                
+
             </div>
         ';
-        
+
         return $ret;
     }
-    
+
     private function header()
     {
         ob_start()?>
@@ -178,10 +186,10 @@ body {
         <?php
         return ob_get_clean();
     }
-    
+
     private function jsRedirect()
     {
-        $prevUrl = $_SESSION['prevUrl'];
+        $prevUrl = $_SESSION['curUrl'];
         return '
 <script type="text/javascript">
 $(document).ready( function () {
@@ -189,9 +197,9 @@ $(document).ready( function () {
 });
 </script>
         ';
-        
+
     }
-    
+
 }
 
 $obj = new admin();
