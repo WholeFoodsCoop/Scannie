@@ -19,7 +19,9 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *********************************************************************************/-->
-<?php session_start(); ?>
+<?php 
+//session_start(); 
+?>
 <html>
 <head>
   <title> Coop Basics Sign Scan </title>
@@ -38,7 +40,7 @@ if (!class_exists('FannieAPI')) {
     include('../../../../../var/www/html/git/fannie/classlib2.0/FannieAPI.php');
 }
 /**
-*   @class coopBasicsScanPage  - Hillside
+*   @class coopBasicsScanPage  - All Stores.
 *
 *   coopBasicsScanPage checks for Coop Basics
 *   missing signs for Hillside, using the woodshed.AuditScanner data.
@@ -53,7 +55,7 @@ if (!class_exists('FannieAPI')) {
 *   3. Clear the Audit Scanner Queue.
 *	4. Pull up the audit scanner on a handheld device and scan each coop-basics
 *	   item. No buttons pushing is necessary, just scan those items, the scanner will
-*	   save a list of everything that is scanned.
+*	   save a list of everything that is scanned. Use the 'admin' account.
 */
 class coopBasicsScanPage
 {
@@ -68,13 +70,9 @@ class coopBasicsScanPage
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
 
         $store_id = scanLib::getStoreID();
-        if($store_id == 2) {
-            $shelftagid = 26;
-            echo '<h4>Coop Basics Review for <strong>Denfeld</strong></h4>';
-        } else {
-            $shelftagid = 13;
-            echo '<h4>Coop Basics Review for <strong>Hillside</strong></h4>';
-        }
+        
+        $storeName = scanLib::getStoreName($store_id);
+        echo '<h4>Coop Basics Review for <strong>'.$storeName.'</strong></h4>';
 
         echo "don't forget to upload Coop Basics checklist to <strong>Generic Upload</strong>.<br>";
 
@@ -109,8 +107,9 @@ class coopBasicsScanPage
         }
 		*/
 
+        $storeID = scanLib::getStoreID();
 		$scanned = array();
-        $queryB = ('SELECT upc FROM woodshed_no_replicate.AuditScanner WHERE username = "admin"');
+        $queryB = ('SELECT upc FROM woodshed_no_replicate.AuditScanner WHERE username = "admin" and store_id = '.$storeID);
         $resB = $dbc->query($queryB);
         while ($row = $dbc->fetchRow($resB))  {
             $scanned[] = $row['upc'];
@@ -186,7 +185,7 @@ class coopBasicsScanPage
         foreach ($missing as $upc) echo $upc . '<br>';
         echo '<br>These signs are on the sales floor and should be taken down<br>---------------------------------------------------------------------<br>';
         foreach ($remove as $upc) echo $upc . '<br>';
-        echo '<br>These items should be marked as not in use for this store
+        echo '<br><span style="text-decoration: line-through;">These items should be marked as not in use for this store</span>
             <br>---------------------------------------------------------<br>';
         foreach ($notInUse as $upc) echo $upc . '<br>';
 
