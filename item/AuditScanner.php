@@ -678,7 +678,7 @@ class AuditScanner extends ScancoordDispatch
             </style>
         ';
         $ret .= '
-            <button class="btn-mobile" data-toggle="modal" data-target="#keypad">
+            <button class="btn-mobile" data-toggle="modal" data-target="#keypad" id="btn-modal">
                 <div class="btn-mobile-lines">&nbsp;</div>
                 <div class="btn-mobile-sp">&nbsp;</div>
                 <div class="btn-mobile-lines">&nbsp;</div>
@@ -688,7 +688,7 @@ class AuditScanner extends ScancoordDispatch
             </button>';
 
         $ret .= '
-            <div class="modal fade" tabindex="-1" role="dialog" id="keypad">
+            <div class="modal" tabindex="-1" role="dialog" id="keypad">
             <br /><br /><br /><br /><br />
               <div class="" role="document">
                 <div class="" >
@@ -698,7 +698,7 @@ class AuditScanner extends ScancoordDispatch
                     <table><form type="hidden" method="get">
                         <input type="hidden" name="upc" id="keypadupc" value="0" />
                         <input type="hidden" name="success" value="empty"/>
-
+                        <div id="modal-text" style="background-color: white; width: 170px; padding: 5px; border-radius: 5px;">&nbsp;</div><br />
                         <thead></thead>
                         <tbody>
                             <tr>
@@ -794,46 +794,57 @@ $(document).ready(function(){
         $('#upc').val('0');
         upc = 0;
        //alert( $('#upc').val() );
+       updateModalText();
     });
     $( "#key1" ).click(function() {
         $('#upc').val(upc+'1');
         upc = $('#upc').val();
+        updateModalText();
     });
     $( "#key2" ).click(function() {
         $('#upc').val(upc+'2');
         upc = $('#upc').val();
+        updateModalText();
     });
     $( "#key3" ).click(function() {
         $('#upc').val(upc+'3');
         upc = $('#upc').val();
+        updateModalText();
     });
     $( "#key4" ).click(function() {
         $('#upc').val(upc+'4');
         upc = $('#upc').val();
+        updateModalText();
     });
     $( "#key5" ).click(function() {
         $('#upc').val(upc+'5');
         upc = $('#upc').val();
+        updateModalText();
     });
     $( "#key6" ).click(function() {
         $('#upc').val(upc+'6');
         upc = $('#upc').val();
+        updateModalText();
     });
     $( "#key7" ).click(function() {
         $('#upc').val(upc+'7');
         upc = $('#upc').val();
+        updateModalText();
     });
     $( "#key8" ).click(function() {
         $('#upc').val(upc+'8');
         upc = $('#upc').val();
+        updateModalText();
     });
     $( "#key9" ).click(function() {
         $('#upc').val(upc+'9');
         upc = $('#upc').val();
+        updateModalText();
     });
     $( "#key0" ).click(function() {
         $('#upc').val(upc+'0');
         upc = $('#upc').val();
+        updateModalText();
     });
 });
 
@@ -847,11 +858,25 @@ function get_auto_par()
 }
 $(document).ready( function() {
    get_auto_par();
+   updateModalOnload();
 });
 
 function formSubmitter()
 {
     $('#my-form').submit();
+}
+
+function updateModalOnload()
+{
+    $('#btn-modal').click( function () {
+        updateModalText();
+    });
+}
+
+function updateModalText()
+{
+    $text = $('#upc').val();
+    $('#modal-text').text($text);
 }
 
 </script>
