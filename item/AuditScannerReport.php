@@ -403,7 +403,7 @@ class AuditScannerReport extends ScancoordDispatch
         ';
         
         $ret .=  '<div class="panel panel-default">
-            <table class="table table-condensed" id="dataTable">';
+            <table class="table table-condensed small" id="dataTable">';
         $ret .=  '<thead class="key" id="dataTableThead">
             <tr class="key">';
         foreach ($headers as $v) {
