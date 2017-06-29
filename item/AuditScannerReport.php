@@ -77,14 +77,15 @@ class AuditScannerReport extends ScancoordDispatch
         foreach ($upcs as $upc) {
             //$args = array($upc);
 
-            $args = array($upc,$upc,$upc,$upc,$upc,$upc);
+            $args = array($upc,$upc,$upc,$upc,$upc,$upc,$upc);
             $prep = $dbc->prepare("
                 UPDATE woodshed_no_replicate.AuditScanner 
                 SET price = (select normal_price from is4c_op.products where upc = ? group by upc),
                     prid = (select price_rule_id from is4c_op.products where upc = ? group by upc),
                     cost= (select cost from is4c_op.products where upc = ? group by upc),
                     description = (select description from is4c_op.products where upc = ? group by upc),
-                    brand = (select brand from is4c_op.products where upc = ? group by upc)
+                    brand = (select brand from is4c_op.products where upc = ? group by upc),
+                    dept = (select concat(department,' ',dept_name) from is4c_op.products as p left join is4c_op.departments as d on department=d.dept_no where p.upc = ? group by upc)
                 WHERE upc = ?;
             ");
             $dbc->execute($prep,$args);
