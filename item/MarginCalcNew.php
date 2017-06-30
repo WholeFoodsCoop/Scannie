@@ -108,6 +108,7 @@ class MarginCalcNew extends ScancoordDispatch
 
 
         $ret .= "</div>";
+        $ret .= '<div style="height: 250px;"></div>';
 
         
         return $ret;

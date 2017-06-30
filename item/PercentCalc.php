@@ -35,6 +35,7 @@ class PercentCalc extends ScancoordDispatch
     protected $title = "none";
     protected $description = "[none] blank.";
     protected $ui = FALSE;
+    protected $add_css_content = TRUE;
     
     public function body_content()
     {           
@@ -42,7 +43,6 @@ class PercentCalc extends ScancoordDispatch
         include('../config.php');
         include('../common/lib/PriceRounder.php');
         $rounder = new PriceRounder();
-        //$dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         
 		if ($_GET['price'] && $_GET['percent']) {
 			$price = $_GET['price'];
@@ -54,20 +54,28 @@ class PercentCalc extends ScancoordDispatch
 
 		$ret .= '
 <div align="center">
-<form method="get">
-<table>
+    <form method="get">
+    <div class="container-fluid">
+        <div class="input-group">
+            <span class="input-group-addon input-sm" autofocus>Price</span>
+            <input class="form-control" name="price" value="'.$price.'">
+        </div>
+        <div class="input-group">
+            <span class="input-group-addon input-sm">Precent Off</span>
+            <input class="form-control" name="percent" value="'.$percent.'">
+        </div>
+        <br />
+        <div align="right"><button class="btn btn-xs" type="submit">submit</button>&nbsp;&nbsp;</div>
+    </div>
+    </form>
 
-	<tr>
-	<td style="width:90px">Price </td><td><input type="text" name="price" style="width:90px" autofocus></td></tr>
-	<td>% </td><td><input type="text" name="percent" value="'.$percent.'" style="width:90px"></td></tr>
-	<td></td><td><button type="submit" class="btn btn-default btn-sm">submit</button></td>
-	<tr><td>.</td></tr>
-	<td>Raw Price</td><td>'.sprintf('%0.2f',$rawprice).'</td>
-	</tr><tr>
-	<td>New Price</td><td>'.$newprice.'</td>
-
-</table>
-</form>
+    <table>
+        <tr>
+        <td>Raw Price</td><td>'.sprintf('%0.2f',$rawprice).'</td>
+        </tr><tr>
+        <td>New Price</td><td>'.$newprice.'</td>
+    </table>
+    
 </div>
 		';        
 		$ret .= '<br><br><br>';
@@ -75,20 +83,81 @@ class PercentCalc extends ScancoordDispatch
         return $ret;
     }
     
-    private function form_content()
+public function css_content()
     {
         return '
-            <div class="text-center container">
-                <form class ="form-inline"  method="get" > 
-                    <br>
-                    <div class="form-group">    
-                        <input type="text" class="form-control" name="upc" placeholder="enter plu to track" autofocus>
-                    </div>
-                    <div class="form-group">
-                        <input type="submit" class="btn btn-default" value="submit">
-                    </div>
-                </form>
-            </div>
+body {
+    overflow: -moz-scrollbars-horizontal;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+input {
+    //background-color: black;
+}
+.form-control {
+    border: 2px solid white;;
+    background: linear-gradient(#fffcf7,#fff5e8);
+}
+.input-group-addon {
+    border: 2px solid white;;
+    width: 50px;
+    background: linear-gradient(#fcf0cc,#ffe9ab);
+}
+.btn {
+    background: linear-gradient(#fcf0cc,#ffe9ab);
+}
+table td,th {                   
+  border-top: none !important;
+  padding: 15px;
+}                               
+body {
+  //color: #cacaca;
+  font-family: consolas;
+}
+.success {
+  color: #74aa04;
+}
+.danger {
+  color: #a70334;
+}
+.warning {
+  color: #b6b649;
+}
+.info {
+  color: #58c2e5;
+}
+.purple {
+  color: #89569c;
+}
+.primary {
+  color: #1a83a6;
+}
+.invisInput {
+  //background-color: #555f6b;
+  background-color: rgbs (0, 0, 0, 0);
+  border: none;
+  width: 150px;
+  color: #cacaca;
+  font-family: consolas;
+  font-size: 16px;
+  opacity: 0.9
+}
+input:focus, button:focus, a:focus {
+  //border: 1px solid blue;
+  background: rgbs (0, 0, 0, 0);
+  border: none;
+}
+textarea {
+  width: 100%;
+  height: 100%;
+  
+}
+fieldset {
+    border: 1px dotted grey;
+}
+.input-group-addon {
+    width: 100px;
+}
         ';
     }
     
