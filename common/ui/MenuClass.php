@@ -61,12 +61,15 @@ class menu
                 border: 1px solid lightgrey;
                 border-radius: 2px;
             }
-            
-            
+                        
             .tooltip1 { position: relative; }
             .tooltip1 a span { display: none; color: #FFFFFF; }
             .tooltip1 a:hover span { display: block; position: absolute; width: 200px; background: #aaa url(images/horses200x50.jpg); height: 50px; left: 100px; top: -10px; color: #FFFFFF; padding: 0 5px; }
 
+            iframe.menu {
+                opacity: 0.95;
+            }
+            
             </style>
         ';
         
@@ -131,8 +134,19 @@ class menu
             
            <!-- <li><a class="menuNav"  href="" data-toggle="modal" data-target="#quick_lookups">QLU<span class=""></span></a></li> -->
             
-            <li class="dropdown" style="margin-top: 15px;"><input class="tinyInput menuNav" id="searchbar" name="search" placeholder="search"/></a></li>
+            <li class="dropdown" style="margin-top: 15px;"><input class="tinyInput menuNav" id="searchbar" name="search" placeholder="search scannie"/></a></li>
             
+            <li style="padding: 10px;"></li>
+            
+            <li><span><img class="menuIcon" 
+                src="http://192.168.1.2/scancoord/common/src/img/calc.png" 
+                onClick="calcView(\'marginCalc\');"></span>
+                
+                <span ><img class="menuIcon" 
+                src="http://192.168.1.2/scancoord/common/src/img/percentCalc.png" 
+                onClick="calcView(\'percentCalc\');" ></span>
+            </li>
+                
             <li></li>
     </div>
 </div>
@@ -140,12 +154,23 @@ class menu
         
         $ret .= '<div id="search-resp"></div>';
         
+        $ret .= self::calciframes();
+        
         return $ret;
     }
     
+    private function calciframes()
+    {
+        $ret = '';
+        $ret .= '<iframe class="fixedCalc menu collapse" id="marginCalc" frameBorder="0"
+            src="http://192.168.1.2/scancoord/item/MarginCalcNew.php?iframe=true"></iframe>';
+        $ret .= '<iframe class="fixedCalc menu collapse" id="percentCalc" frameBorder="0"
+            src="http://192.168.1.2/scancoord/item/PercentCalc.php?iframe=true"></iframe>';
+        $ret .= '<img class="backToTop collapse" id="backToTop" src="http://192.168.1.2/scancoord/common/src/img/upArrow.png" />';
+        return $ret;
+    }
     
 }
-
 ?>
 
 <script language="javascript" type="text/javascript">
@@ -165,9 +190,8 @@ $(document).ready( function () {
                 $('#search-resp').html('')
             }
         });
+        backToTop();
 });
-
-
 
 function getSearchResults(search)
 {
@@ -180,9 +204,44 @@ function getSearchResults(search)
             $('#search-resp').html(response);
         }
     });
-    
+}
 
+function calcView(name)
+{
+    if ( $('#'+name).is(":visible") ) {
+        $('#'+name).hide();
+    } else {
+        $('#'+name).show();
+    }
+}
 
+function backToTop()
+{
+    $(window).scroll(function () {
+        var scrollTop = $(this).scrollTop();
+        //alert(scrollTop);
+        if (scrollTop != 0) {
+            $('#backToTop').show();
+        } else {
+            $('#backToTop').hide();
+        }
+        
+        $('.background1, .background2').each(function() {
+            var topDistance = $(this).offset().top;
+
+            if ( (topDistance+100) < scrollTop ) {
+                alert( $(this).text() + ' was scrolled to the top' );
+            }
+        });
+
+        if ($(window).scrollTop() > $('body').height() / 2) {
+            $('#backToTop').show();
+        } 
+    });
+
+    $('#backToTop').click(function(){
+        $("html, body").animate({ scrollTop: 0 }, "fast");
+    });   
 }
 </script>
 
