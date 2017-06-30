@@ -2,9 +2,9 @@
 /*******************************************************************************
 
     Copyright 2013 Whole Foods Community Co-op.
-    
+
     This file is a part of CORE-POS.
-    
+
     CORE-POS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -18,7 +18,7 @@
     You should have received a copy of the GNU General Public License
     in the file LICENSE along with CORE-POS; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-    
+
 *********************************************************************************/
 class menu
 {
@@ -26,7 +26,7 @@ class menu
     {
         include('../../config.php');
         $ret = '';
-        
+
         $ret .= '
             <style>
             span.hd.grey {
@@ -35,11 +35,11 @@ class menu
             span.hd.green {
                 background-color: green;
                 color: white;
-                font-size: 12px; 
+                font-size: 12px;
                 padding: 2px;
                 font-family: consolas;
                 border-radius: 2px;
-                
+
             }
             span.hd.blue {
                 background-color: lightblue;
@@ -53,7 +53,7 @@ class menu
                 border: 1px solid white;
                 border-radius: 2px;
             }
-            
+
             .tinyInput {
                 height: 20px;
                 width: 125px;
@@ -61,7 +61,7 @@ class menu
                 border: 1px solid lightgrey;
                 border-radius: 2px;
             }
-                        
+
             .tooltip1 { position: relative; }
             .tooltip1 a span { display: none; color: #FFFFFF; }
             .tooltip1 a:hover span { display: block; position: absolute; width: 200px; background: #aaa url(images/horses200x50.jpg); height: 50px; left: 100px; top: -10px; color: #FFFFFF; padding: 0 5px; }
@@ -69,10 +69,10 @@ class menu
             iframe.menu {
                 opacity: 0.95;
             }
-            
+
             </style>
         ';
-        
+
         $ret .= '
             <div align="center">
                 <a class="hidden-md hidden-lg hidden-sm" href="http://192.168.1.2/scancoord/testing/SiteMap.php">
@@ -80,10 +80,10 @@ class menu
                 </a>
             </div>
         ';
-        
-        $ret .=  '        
-<div class="container-fluid"  align="center" style="height:80px;width:1000px; ">   
-    
+
+        $ret .=  '
+<div class="container-fluid"  align="center" style="height:80px;width:1000px; ">
+
     <div class="navbar navbar-default collapse in hidden-xs hidden-print" style="background-color:white;border:none">
         <ul class="nav navbar-nav">
             <li class="dropdown"><a  class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Item<span class="caret"></span></a>
@@ -97,7 +97,7 @@ class menu
                     <li><a class="menu-opt" href="http://192.168.1.2/scancoord/item/AuditScanner.php">Audit Scanner</a></li>
                     <li><a class="menu-opt" href="http://192.168.1.2/scancoord/item/AuditScannerReport.php">Audit Scan Report</a></li>
             </ul></li>
-            
+
             <li class="dropdown"><a  class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Batches<span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                 <li class="dropdown-header">Basics</li>
@@ -116,49 +116,49 @@ class menu
                     <li><a class="menu-opt" href="http://192.168.1.2/scancoord/item/Batches/BatchReview/">Batch Review</a></li>
                     <li><a class="menu-opt" href="http://192.168.1.2/scancoord/item/Batches/CheckBatchPercent.php">Sales Batch %</a></li>
             </ul>
-            </li>    
-            
+            </li>
+
             <li class="dropdown"><a  class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Data<span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                 <li class="dropdown-header">Discrepancy Tasks</li>
                     <li><a class="menu-opt" href="http://192.168.1.2/scancoord/dataScanning/zeroPriceCheck.php">Bad Price Scan</a></li>
                     <li><a class="menu-opt" href="http://192.168.1.2/scancoord/dataScanning/ExceptionSaleItemTracker.php">Exception Sale Items</a></li>
-                    <li><a class="menu-opt" href="http://192.168.1.2/scancoord/dataScanning/MultiStoreDiscrepTable.php">Multi-Store Prod Discrep</a></li> 
+                    <li><a class="menu-opt" href="http://192.168.1.2/scancoord/dataScanning/MultiStoreDiscrepTable.php">Multi-Store Prod Discrep</a></li>
                     <li><a class="menu-opt" href="http://192.168.1.2/scancoord/dataScanning/CashlessCheckPage.php">Cashess Trans. Check</a></li>
                     <li><a class="menu-opt" href="http://192.168.1.2/scancoord/misc/ProdUserChangeReport.php">Prod User Change</a></li>
                 </ul>
             </li>
-            
+
             <li class="dropdown"><a class="menuNav"  href=""
                 data-toggle="modal" data-target="#help">Help<span class=""></span></a>
-            
+
            <!-- <li><a class="menuNav"  href="" data-toggle="modal" data-target="#quick_lookups">QLU<span class=""></span></a></li> -->
-            
+
             <li class="dropdown" style="margin-top: 15px;"><input class="tinyInput menuNav" id="searchbar" name="search" placeholder="search scannie"/></a></li>
-            
+
             <li style="padding: 10px;"></li>
-            
-            <li><span><img class="menuIcon" 
-                src="http://192.168.1.2/scancoord/common/src/img/calc.png" 
+
+            <li><span><img class="menuIcon"
+                src="http://192.168.1.2/scancoord/common/src/img/calc.png"
                 onClick="calcView(\'marginCalc\');"></span>
-                
-                <span ><img class="menuIcon" 
-                src="http://192.168.1.2/scancoord/common/src/img/percentCalc.png" 
+
+                <span ><img class="menuIcon"
+                src="http://192.168.1.2/scancoord/common/src/img/percentCalc.png"
                 onClick="calcView(\'percentCalc\');" ></span>
             </li>
-                
+
             <li></li>
     </div>
 </div>
         ';
-        
+
         $ret .= '<div id="search-resp"></div>';
-        
+
         $ret .= self::calciframes();
-        
+
         return $ret;
     }
-    
+
     private function calciframes()
     {
         $ret = '';
@@ -169,7 +169,7 @@ class menu
         $ret .= '<img class="backToTop collapse" id="backToTop" src="http://192.168.1.2/scancoord/common/src/img/upArrow.png" />';
         return $ret;
     }
-    
+
 }
 ?>
 
@@ -225,7 +225,7 @@ function backToTop()
         } else {
             $('#backToTop').hide();
         }
-        
+
         $('.background1, .background2').each(function() {
             var topDistance = $(this).offset().top;
 
@@ -236,12 +236,12 @@ function backToTop()
 
         if ($(window).scrollTop() > $('body').height() / 2) {
             $('#backToTop').show();
-        } 
+        }
     });
 
     $('#backToTop').click(function(){
         $("html, body").animate({ scrollTop: 0 }, "fast");
-    });   
+    });
 }
 </script>
 
