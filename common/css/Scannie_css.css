@@ -152,7 +152,10 @@ span.delete-icon {
     Menu Styles
 */
 .menuIcon {
-    padding: 14px;
+    padding-top: 14px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
     cursor: pointer;
 }
 .fixedCalc {
