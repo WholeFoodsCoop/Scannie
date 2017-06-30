@@ -2,9 +2,9 @@
 /*******************************************************************************
 
     Copyright 2013 Whole Foods Community Co-op.
-    
+
     This file is a part of CORE-POS.
-    
+
     CORE-POS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -18,29 +18,29 @@
     You should have received a copy of the GNU General Public License
     in the file LICENSE along with CORE-POS; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-    
+
 *********************************************************************************/
 
-class ScancoordDispatch 
+class ScancoordDispatch
 {
-    
+
     protected $start_timestamp = NULL;
     protected $must_authenticate = false;
     protected $current_user = false;
     protected $auth_classes = array();
     protected $add_css_content = false;
     protected $add_javascript_content = false;
-    
-    public function help_content() { 
-        return 'No help content has been created for this page.'; 
-    } 
-    
+
+    public function help_content() {
+        return 'No help content has been created for this page.';
+    }
+
     function __construct() {
         $this->start_timestamp = microtime(true);
         $auth_default = NULL;
         $css_content = FALSE;
     }
-    
+
     private function runPage($class)
     {
         if(!class_exists('scanLib')) {
@@ -49,7 +49,7 @@ class ScancoordDispatch
         $obj = new $class();
         $obj->draw_page($class);
     }
-    
+
     private function draw_page($class)
     {
         $this->preflight();
@@ -58,44 +58,48 @@ class ScancoordDispatch
             include(dirname(__FILE__).'/MenuClass.php');
         }
         print "<br />";
-        
+
         if ($this->ui === TRUE) {
             print '
-                <div class="container" style="width:95%; ">
-                    <div style="font-size:28px;margin-bottom:5px;" class="primaryColor">
+                <div class="container" style="width:95%;">
+                    <div style="font-size:28px;margin-bottom:5px;" class="primaryColor"; >
                         <img src="/scancoord/common/src/img/scanner.png" style="width:75px;heigh:75px;float:left">
-                        <a href="/scancoord">Scannie</a> | an extension of 
+                        <a href="/scancoord">Scannie</a> | an extension of
                         <a href="http://192.168.1.2/git/fannie">CORE-POS</a>
                         <!-- this span is for detecting bootstrap screensize -->
                             <span class="device-xs visible-xs"></span>
                             <div style="font-size:20px;" class="secondaryColor" data-toggle="collapse" data-target=".navbar-default" onclick="smartToggle();">
                                 IT COREY maintenance &amp; reporting <span style="color: grey;">|</span>  <span style="color: #8c7b70;">'.$this->title.'</span>
                             </div>
+                        <!-- for testing only
+                            $prev = '.$_SESSION["prevUrl"].'<br />
+                            $cur = '.$_SESSION["curUrl"].'
+                        -->
                     </div>
                 </div>
             ';
             //print '<div class="container" id="border" style="width:95%;padding:5px">';
-            print '<div class="container" id="" style="min-height: 850px;width:95%;border:1px solid #f5ebd0; padding:5px; background-color: white">';
-            print menu::nav_menu();    
+            print '<div class="container" id="" style="min-height: 850px;width:95%;border:1px solid #f5ebd0; padding:5px; background-color: white; border-radius: 5px;">';
+            print menu::nav_menu();
         }
         /*
         print '<a class="menuNav" style="width:160px;" href=""
                 data-toggle="modal" data-target="#quick_lookups">Quick Lookups<span class=""></span></a>';
         */
-        print $this->body_content();   
+        print $this->body_content();
         print $this->get_help_content();
         print $this->quick_lookups();
         print '</div></div></div>';
         print $this->footer();
         $this->recordPath();
     }
-    
+
     private function recordPath()
     {
-        if ($_SESSION['prevUrl'] = $_SESSION['curUrl']) {}  
+        if ($_SESSION['prevUrl'] = $_SESSION['curUrl']) {}
         $_SESSION['curUrl'] = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
     }
-    
+
     private function get_help_content()
     {
         return '
@@ -119,7 +123,7 @@ class ScancoordDispatch
             </div>
         ';
     }
-    
+
     private function quick_lookups()
     {
         return '
@@ -143,13 +147,13 @@ class ScancoordDispatch
             </div>
         ';
     }
-    
+
     private function quick_lookups_content()
     {
-        
+
         $ret = '';
         $ret .= '
-            
+
         ';
         $subBtn = '&nbsp;<button type="submit" class="btn btn-info btn-xs" href=""><span class="go-icon">&nbsp;</span></a>';
         $TrackChange = 'http://192.168.1.2/scancoord/item/TrackChangeNew.php';
@@ -158,11 +162,11 @@ class ScancoordDispatch
         $LastSold = 'http://192.168.1.2/scancoord/item/last_sold_check.php';
         $ItemBatchHistory = 'http://192.168.1.2/scancoord/item/Batches/prodBatchHistory.php';
         $SalesBatchPercent = 'http://192.168.1.2/scancoord/item/Batches/CheckBatchPercent.php';
-        
-        
+
+
         //$ret .= '<h4 align="center">Quick Lookups</h4>';
         $ret .= '<div align="center">';
-        
+
         $ret .= '
             <form class="form-inline" method="get"   action="'.$TrackChange.'">
                 <div class="input-group">
@@ -170,9 +174,9 @@ class ScancoordDispatch
                     <input type="text" class="form-control" id="trackchange" name="upc" placeholder="enter upc" style="width: 200px; " autofocus>
                     '.$subBtn.'
                 </div>
-            </form>     
+            </form>
         ';
-        
+
         $ret .= '
             <form class="form-inline" method="get"   action="'.$LastSold.'">
                 <div class="input-group">
@@ -183,7 +187,7 @@ class ScancoordDispatch
                 <input type="hidden" name="id" value="1">
             </form>
         ';
-        
+
         $ret .= '
             <form class="form-inline" method="get"   action="'.$ItemEditor.'">
                 <div class="input-group">
@@ -193,9 +197,9 @@ class ScancoordDispatch
                 </div>
                 <input type="hidden" name="ntype" value="UPC">
                 <input type="hidden" name="searchBtn" value="">
-            </form>     
+            </form>
         ';
-        
+
         $ret .= '
             <form class="form-inline" method="get"   action="'.$batch.'">
                 <div class="input-group">
@@ -205,9 +209,9 @@ class ScancoordDispatch
                 </div>
                 <input type="hidden" name="ntype" value="UPC">
                 <input type="hidden" name="searchBtn" value="">
-            </form>     
+            </form>
         ';
-        
+
         $ret .= '
             <form class="form-inline" method="get"   action="'.$ItemBatchHistory.'">
                 <div class="input-group">
@@ -216,10 +220,10 @@ class ScancoordDispatch
                     '.$subBtn.'
                 </div>
                 <input type="hidden" name="id" value="1">
-            </form>     
+            </form>
         ';
-        
-        
+
+
         $ret .= '
             <form class="form-inline" method="get"   action="'.$SalesBatchPercent.'">
                 <div class="input-group">
@@ -227,14 +231,14 @@ class ScancoordDispatch
                     <input type="text" class="form-control" id="salesbatchpercent" name="batchID" placeholder="enter batch id" style="width: 200px; ">
                     '.$subBtn.'
                 </div>
-            </form>     
-        '; 
-        
+            </form>
+        ';
+
         $ret .= '</div>';
-        
+
         return $ret;
     }
-    
+
     public function keypress_js()
     {
         ob_start();
@@ -253,7 +257,7 @@ function KeyDown(evt){
 
         case 38:  /* Up Arrow */
             break;
-            
+
         case 192:  /* Tilde */
             $('#quick_lookups').modal('toggle');
             //$('#quick_lookups').focus();
@@ -266,7 +270,7 @@ window.addEventListener('keydown', KeyDown);
 <?php
         return ob_get_clean();
     }
-    
+
     static public function conditionalExec($custom_errors=true)
     {
         $frames = debug_backtrace();
@@ -280,25 +284,26 @@ window.addEventListener('keydown', KeyDown);
             } else {
                 trigger_error('Missing class '.$class, E_USER_NOTICE);
             }
-            
+
         }
     }
-    
-    private function preflight($class) 
+
+    private function preflight($class)
     {
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
-        
+
         if ($this->must_authenticate == TRUE) {
             $userPrivilege = $_SESSION['user_type'];
             if ($userPrivilege != 1) {
-                //header('Location: http://192.168.1.2/scancoord/admin/login.php');
-                echo $this->jsRedirect();
+                //$_SESSION['prevUrl'] = full_path_to_page_whos_class_was_loaded;
+                header('Location: http://192.168.1.2/scancoord/admin/login.php');
+
             }
         }
     }
-    
+
     private function jsRedirect()
     {
         $prevUrl = $_SESSION['prevUrl'];
@@ -309,11 +314,11 @@ $(document).ready( function () {
 });
 </script>
         ';
-        
+
     }
-    
+
     private function header($class)
-    {   
+    {
         $ret = '';
         if ($this->use_preprocess == TRUE) {
             $this->preprocess();
@@ -342,10 +347,10 @@ $(document).ready( function () {
 </head>
 <body>
         ';
-        
+
         return $ret;
     }
-    
+
     private function footer()
     {
         $ret ='';
@@ -362,7 +367,7 @@ $(document).ready( function () {
 <div class="container" id="" style="width:96%;">
         ';
         $ret .= '
-            You are logged in as <strong>'.$user.'</strong>. 
+            You are logged in as <strong>'.$user.'</strong>.
             '.$link.'
             Current version: 0.0.1-dev<br />
             <a href="http://192.168.1.2/scancoord/testing/SiteMap.php">Site Map</a><br />
@@ -373,5 +378,5 @@ $(document).ready( function () {
         ';
         return $ret;
     }
-    
+
 }
