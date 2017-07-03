@@ -150,11 +150,8 @@ class AuditScannerReport extends ScancoordDispatch
             $plus = array();
             $chunks = explode("\r\n", $upcs);
             foreach ($chunks as $key => $str) {
-                /*
-                if (substr($str,2,1) == '2') {
-                    $str = '002' . substr($str,3,4) . '000000';
-                }
-                */
+                $str = str_replace(" ","",$str);
+                $str = scanLib::upcParse($str);
                 $str = scanLib::upcPreparse($str);
                 $plus[] = $str;
             }
@@ -260,7 +257,7 @@ class AuditScannerReport extends ScancoordDispatch
                 $args = array(
                     $upc,
                     $brand,
-                    $description,
+                    $desc,
                     $price,
                     $margin,
                     $deptMarg,
