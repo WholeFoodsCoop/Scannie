@@ -233,14 +233,19 @@ class scanLib
     
     public function upcParse($str)
     {
-        $rstr = $str;
+        $rstr = str_replace(" ","",$str);
         
         if (strstr($str,"-")) {
             $split = array();
             $split = preg_split("/[-]+/",$str);
         }
+        $count = count($split);
         foreach ($split as $v) {
-            $rstr = $split[0].$split[1].$split[2];
+            if ($count == 4) {
+                $rstr = $split[0].$split[1].$split[2];
+            } elseif ($count == 2) {
+                $rstr = $split[0].substr($split[1],0,5);
+            }
         }
         
         if (strlen($rstr) != 13) {
