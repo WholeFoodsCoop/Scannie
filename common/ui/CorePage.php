@@ -97,7 +97,14 @@ class ScancoordDispatch
     private function recordPath()
     {
         if ($_SESSION['prevUrl'] = $_SESSION['curUrl']) {}
-        $_SESSION['curUrl'] = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+        $noRecord = array(
+            '/scancoord/item/PercentCalc.php?iframe=true',
+            '/scancoord/item/MarginCalcNew.php?iframe=true'
+        );
+        echo $_SERVER[REQUEST_URI];
+        if (!in_array($_SERVER[REQUEST_URI] ,$noRecord)) {
+            $_SESSION['curUrl'] = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+        }
     }
 
     private function get_help_content()
@@ -162,15 +169,13 @@ class ScancoordDispatch
         $LastSold = 'http://192.168.1.2/scancoord/item/last_sold_check.php';
         $ItemBatchHistory = 'http://192.168.1.2/scancoord/item/Batches/prodBatchHistory.php';
         $SalesBatchPercent = 'http://192.168.1.2/scancoord/item/Batches/CheckBatchPercent.php';
-
-
-        //$ret .= '<h4 align="center">Quick Lookups</h4>';
+        
         $ret .= '<div align="center">';
 
         $ret .= '
             <form class="form-inline" method="get"   action="'.$TrackChange.'">
                 <div class="input-group">
-                    <span class="input-group-addon alert-info" style="width: 100px; ">Track Change</span>
+                    <span class="input-group-addon alert-info" style="width: 100px; "><a href="'.$TrackChange.'">Track Change</a></span>
                     <input type="text" class="form-control" id="trackchange" name="upc" placeholder="enter upc" style="width: 200px; " autofocus>
                     '.$subBtn.'
                 </div>
@@ -180,7 +185,7 @@ class ScancoordDispatch
         $ret .= '
             <form class="form-inline" method="get"   action="'.$LastSold.'">
                 <div class="input-group">
-                    <span class="input-group-addon alert-info" style="width: 100px; ">Last Sold</span>
+                    <span class="input-group-addon alert-info" style="width: 100px; "><a href="'.$LastSold.'">Last Sold</a></span>
                     <input type="text" class="form-control" id="lastsold" name="upc" placeholder="enter upc" style="width: 200px; ">
                     '.$subBtn.'
                 </div>
@@ -191,7 +196,7 @@ class ScancoordDispatch
         $ret .= '
             <form class="form-inline" method="get"   action="'.$ItemEditor.'">
                 <div class="input-group">
-                    <span class="input-group-addon alert-warning" style="width: 100px; ">Item Editor</span>
+                    <span class="input-group-addon alert-warning" style="width: 100px; "><a href="'.$ItemEditor.'">Item Editor</a></span>
                     <input type="text" class="form-control" id="itemeditor" name="searchupc" placeholder="enter upc" style="width: 200px; ">
                     '.$subBtn.'
                 </div>
@@ -203,7 +208,7 @@ class ScancoordDispatch
         $ret .= '
             <form class="form-inline" method="get"   action="'.$batch.'">
                 <div class="input-group">
-                    <span class="input-group-addon alert-warning" style="width: 100px; ">Sales Batches</span>
+                    <span class="input-group-addon alert-warning" style="width: 100px; "><a href="'.$batch.'">Sales Batches</a></span>
                     <input type="text" class="form-control" id="itemeditor" name="id" placeholder="enter batch ID" style="width: 200px; ">
                     '.$subBtn.'
                 </div>
@@ -215,7 +220,7 @@ class ScancoordDispatch
         $ret .= '
             <form class="form-inline" method="get"   action="'.$ItemBatchHistory.'">
                 <div class="input-group">
-                    <span class="input-group-addon alert-info" style="width: 100px; ">Item Batch H</span>
+                    <span class="input-group-addon alert-info" style="width: 100px; "><a href="'.$ItemBatchHistory.'">Item Batch H</a></span>
                     <input type="text" class="form-control" id="itembatchhistory" name="upc" placeholder="enter upc" style="width: 200px; ">
                     '.$subBtn.'
                 </div>
@@ -227,7 +232,7 @@ class ScancoordDispatch
         $ret .= '
             <form class="form-inline" method="get"   action="'.$SalesBatchPercent.'">
                 <div class="input-group">
-                    <span class="input-group-addon alert-info" style="width: 100px; ">Sales Batch %</span>
+                    <span class="input-group-addon alert-info" style="width: 100px; "><a href="'.$SalesBatchPercent.'">Sales Batch %</a></span>
                     <input type="text" class="form-control" id="salesbatchpercent" name="batchID" placeholder="enter batch id" style="width: 200px; ">
                     '.$subBtn.'
                 </div>
