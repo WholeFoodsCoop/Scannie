@@ -57,10 +57,8 @@ class TrackChangeNew extends ScancoordDispatch
         $ret .= '<div class="container-fluid">';
         $ret .=  self::form_content();
 
-        if($_GET['upc']) {
-            $_GET['upc'] = trim($_GET['upc']);
-            $upc = str_pad($_GET['upc'], 13, 0, STR_PAD_LEFT);
-            
+        $upc = $_GET['upc'];
+        if($upc = scanLib::upcParse($upc)) {
             //* Create the table if it doesn't exist */
             $query = "SELECT pu.description,
                         pu.salePrice,
