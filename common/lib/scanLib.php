@@ -230,6 +230,25 @@ class scanLib
         }
         return $str;
     }
+    
+    public function upcParse($str)
+    {
+        $rstr = $str;
+        
+        if (strstr($str,"-")) {
+            $split = array();
+            $split = preg_split("/[-]+/",$str);
+        }
+        foreach ($split as $v) {
+            $rstr = $split[0].$split[1].$split[2];
+        }
+        
+        if (strlen($rstr) != 13) {
+            $rstr = str_pad($rstr, 13, 0, STR_PAD_LEFT);
+        }
+        
+        return $rstr;
+    }
 
 }
 
