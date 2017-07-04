@@ -43,7 +43,7 @@ class CashlessCheckPage extends ScancoordDispatch
             $_SESSION['store_id'] = $_GET['store_id'];
         } else {
             if (empty($_SESSION['store_id'])) {
-                $ret .= '<div align="center"><div class="alert alert-danger md-w">You must select a store ID to check Cashless Transactions.</div></div>';
+                $ret .= '<div align="center"><div class="alert alert-danger md-w">You must select a store ID to view Cashless Transactions.</div></div>';
             }
         }
         $view_by = $_GET['view_by'];
@@ -284,9 +284,14 @@ class CashlessCheckPage extends ScancoordDispatch
                 if ($LU) {
                     $lane = $regNo;
                 }
+                $transNo = $row['empNo'].'-'.$lane.'-'.$row['transNo'];
+                $transDate = $row['requestDatetime'];
+                $tCheckPath = '<a href="http:\\' . $CORE_POS_DIR .
+                    '/admin/LookupReceipt/RenderReceiptPage.php?date='.$transDate.'&receipt='.$transNo.
+                    '" target="_BLANK">' . $transNo . '</a>';
                 $ret .= '<tr>';
                 $ret .= '<td>' . $row['issuer'] . '</td>';
-                $ret .= '<td>' . $row['empNo'] . '-' . $lane . '-' . $row['transNo'] . '</td>';
+                $ret .= '<td>' . $tCheckPath . '</td>';
                 //$ret .= '<td>' . $row['empNo'] . '</td>';
                 $ret .= '<td>' . $row['processor'] . '</td>';
                 
@@ -405,10 +410,10 @@ class CashlessCheckPage extends ScancoordDispatch
                         //do nothing
                         //do nothing
                     } else {
-                        $ret .= '
+                        echo '
                             <div align="center">
-                                <div class="alert alert-danger" style="text-align: center; width: 800px">
-                                    POSSIBLE INCOMPLETE TRANS ('.$xRes.') '.$curEmpNo.'-'.$registerNo.'-'.$transNo.' on '.$date.' <br />
+                                <div class="alert alert-danger md-w" >
+                                    POSSIBLE INCOMPLETE TRANS <br />('.$xRes.') '.$curEmpNo.'-'.$registerNo.'-'.$transNo.' on '.$date.' <br />
                                 </div>
                             </div>
                         ';
