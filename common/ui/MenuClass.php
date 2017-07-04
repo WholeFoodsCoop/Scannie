@@ -22,6 +22,7 @@
 *********************************************************************************/
 class menu
 {
+    
     public function nav_menu()
     {
         include('../../config.php');
@@ -71,14 +72,6 @@ class menu
             }
 
             </style>
-        ';
-
-        $ret .= '
-            <div align="center">
-                <a class="hidden-md hidden-lg hidden-sm" href="http://192.168.1.2/scancoord/testing/SiteMap.php">
-                    Site Map
-                </a>
-            </div>
         ';
 
         $ret .=  '
@@ -153,8 +146,12 @@ class menu
         ';
 
         $ret .= '<div id="search-resp"></div>';
+        
+        $ret .= '<img class="backToTop collapse" id="backToTop" src="http://192.168.1.2/scancoord/common/src/img/upArrow.png" />';
 
         $ret .= self::calciframes();
+        
+        $ret .= self::mobileMenu();
 
         return $ret;
     }
@@ -166,7 +163,60 @@ class menu
             src="http://192.168.1.2/scancoord/item/MarginCalcNew.php?iframe=true"></iframe>';
         $ret .= '<iframe class="fixedCalc menu collapse" id="percentCalc" frameBorder="0"
             src="http://192.168.1.2/scancoord/item/PercentCalc.php?iframe=true"></iframe>';
-        $ret .= '<img class="backToTop collapse" id="backToTop" src="http://192.168.1.2/scancoord/common/src/img/upArrow.png" />';
+        return $ret;
+    }
+    
+    private function mobileMenu()
+    {
+        include('../config.php');
+        $menuOptions = array(
+            'Item' => array(
+                'Last Sold' => 'http://192.168.1.2/scancoord/item/last_sold_check.php',
+                'Track Change' => 'http://192.168.1.2/scancoord/item/TrackChangeNew.php',
+                'Audit Scanner' => 'http://192.168.1.2/scancoord/item/AuditScanner.php',
+                'Audit Report'  => 'http://192.168.1.2/scancoord/item/AuditScannerReport.php'
+            ),
+            'Batches' => array(
+                'BatchCheck' => 'http://192.168.1.2/scancoord/item/SalesChange/SalesChangeIndex.php',
+                'ItemBatchHistory' => 'http://192.168.1.2/scancoord/item/Batches/prodBatchHistory.php',
+                'CoopDealsFile' => 'http://192.168.1.2/scancoord/item/Batches/CoopDealsSearchPage.php',
+                'BatchForceCheck' => 'http://192.168.1.2/scancoord/item/Batches/batchForceCheck.php'
+            ),
+            'Data' => array(
+                'BadPriceScan' => 'http://192.168.1.2/scancoord/dataScanning/zeroPriceCheck.php',
+                'ExceptionSaleItems' => 'http://192.168.1.2/scancoord/dataScanning/ExceptionSaleItemTracker.php',
+                'Multi-StoreDiscreps' => 'http://192.168.1.2/scancoord/dataScanning/MultiStoreDiscrepTable.php'
+            )
+        );
+        $ret = '';
+        $ret = '<img src="http://192.168.1.2/scancoord/common/src/img/menuIcon.png" 
+            id="mobileMenuBtn" class="mobileMenuIcon hidden-lg hidden-md hidden-sm" />';
+            
+        $ret .= '
+            <div id="mobileMenu" class="mobileMenu collapse">
+                <ul>';
+        foreach ($menuOptions as $k => $v) {
+            if (is_array($v)) {
+                $ret .= '<li class="mobileHeader" data-toggle="collapse" data-target="#li'.$k.'">'.$k.'</li>';
+                $ret .= '<ul class="collapse" id="li'.$k.'">';
+                foreach ($v as $vk => $vv) {
+                    $ret .=  '<li><a href="'.$vv.'">'.$vk.'</a></li>';
+                }
+                $ret .= '</ul>';
+            } else {
+                $ret .=  '<li class="mobileHeader">'.$v.'</li>';
+            }
+        }
+        $ret .= '
+        <ul class="mobileHeader"  href="" data-toggle="modal" data-target="#help">Help</ul>
+                </ul>
+                
+                <div align="center"><span style="cursor: pointer; font-size: 18px;" 
+                    id="closeMenu"><br />x<br /><br /></span></div>
+            </div>
+        ';
+        
+            
         return $ret;
     }
 
@@ -191,6 +241,8 @@ $(document).ready( function () {
             }
         });
         backToTop();
+        getMobileMenu();
+        closeMenu();
 });
 
 function getSearchResults(search)
@@ -241,6 +293,20 @@ function backToTop()
 
     $('#backToTop').click(function(){
         $("html, body").animate({ scrollTop: 0 }, "fast");
+    });
+}
+
+function getMobileMenu()
+{
+    $('#mobileMenuBtn').click( function () {
+        $('#mobileMenu').show();
+    });
+}
+
+function closeMenu()
+{
+    $('#closeMenu').click( function () {
+        $('#mobileMenu').hide();
     });
 }
 </script>

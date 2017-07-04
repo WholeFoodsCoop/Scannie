@@ -53,7 +53,7 @@ class mobile extends ScancoordDispatch
                 <a class="btn btn-default btn-mobile-menu" href="http://192.168.1.2/scancoord/item/AuditScanner.php">Audie: Scanner</a><br /><br />
                 <a class="btn btn-default btn-mobile-menu" href="http://192.168.1.2/git/fannie/modules/plugins2.0/ShelfAudit/SaMenuPage.php">CORE-POS Fannie</a><br /><br />
                 <a class="btn btn-default btn-mobile-menu" href="http://192.168.1.2/git/fannie/item/CoopDealsLookupPage.php">Coop Deals Lookup Page</a><br /><br />
-                <a class="btn btn-default btn-mobile-menu" href="mobile.php">&nbsp;</a><br /><br />
+                <a class="btn btn-default btn-mobile-menu" href="http://192.168.1.2/scancoord/item/TrackChangeNew.php">Track Change</a><br /><br />
                 <a class="btn btn-default btn-mobile-menu" href="mobile.php">&nbsp;</a><br /><br />
                 <a class="btn btn-default btn-mobile-menu" href="mobile.php">&nbsp;</a><br /><br />
                 <a class="btn btn-default btn-mobile-menu" href="..">return</a>

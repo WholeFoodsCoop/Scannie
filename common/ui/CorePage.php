@@ -62,7 +62,7 @@ class ScancoordDispatch
         if ($this->ui === TRUE) {
             print '
                 <div class="container" style="width:95%;">
-                    <div style="font-size:28px;margin-bottom:5px;" class="primaryColor"; >
+                    <div style="font-size:28px;margin-bottom:5px;" class="primaryColor hidden-sm hidden-xs">
                         <img src="/scancoord/common/src/img/scanner.png" style="width:75px;heigh:75px;float:left">
                         <a href="/scancoord">Scannie</a> | an extension of
                         <a href="http://192.168.1.2/git/fannie">CORE-POS</a>
@@ -70,6 +70,23 @@ class ScancoordDispatch
                             <span class="device-xs visible-xs"></span>
                             <div style="font-size:20px;" class="secondaryColor" data-toggle="collapse" data-target=".navbar-default" onclick="smartToggle();">
                                 IT COREY maintenance &amp; reporting <span style="color: grey;">|</span>  <span style="color: #8c7b70;">'.$this->title.'</span>
+                            </div>
+                        <!-- for testing only
+                            $prev = '.$_SESSION["prevUrl"].'<br />
+                            $cur = '.$_SESSION["curUrl"].'
+                        -->
+                    </div>
+                </div>
+            ';
+            print '
+                <div class="container" style="width:95%;">
+                    <div style="font-size:14px;margin-bottom:5px;" class="primaryColor hidden-lg hidden-md">
+                        <a href="/scancoord">Scannie</a> | an extension of
+                        <a href="http://192.168.1.2/git/fannie">CORE-POS</a>
+                        <!-- this span is for detecting bootstrap screensize -->
+                            <span class="device-xs visible-xs"></span>
+                            <div style="font-size:14px;" class="secondaryColor" data-toggle="collapse" data-target=".navbar-default" onclick="smartToggle();">
+                                ITCM&amp;R <span style="color: grey;">|</span>  <span style="color: #8c7b70;">'.$this->title.'</span>
                             </div>
                         <!-- for testing only
                             $prev = '.$_SESSION["prevUrl"].'<br />
@@ -101,7 +118,6 @@ class ScancoordDispatch
             '/scancoord/item/PercentCalc.php?iframe=true',
             '/scancoord/item/MarginCalcNew.php?iframe=true'
         );
-        echo $_SERVER[REQUEST_URI];
         if (!in_array($_SERVER[REQUEST_URI] ,$noRecord)) {
             $_SESSION['curUrl'] = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
         }
