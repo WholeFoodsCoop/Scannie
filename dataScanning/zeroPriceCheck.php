@@ -94,7 +94,7 @@ class zeroPriceCheck extends ScancoordDispatch
             echo '<div class="alert alert-success" align="center">
                 No badly priced items discovered.</div>';
         } else {
-            echo  '<div class="well" align="center">
+            echo  '<div class="alert alert-danger" align="center">
                 '.$count.' products with bad prices discovered.<br></div>';
                 
             $ret .=  '<table class="table table-condensed table-striped">';
