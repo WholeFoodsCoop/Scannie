@@ -24,6 +24,8 @@
 class ScancoordDispatch
 {
 
+    protected $onload_commands = array();
+    protected $scripts = array();
     protected $start_timestamp = NULL;
     protected $must_authenticate = false;
     protected $current_user = false;
@@ -108,6 +110,15 @@ class ScancoordDispatch
         print $this->quick_lookups();
         print '</div></div></div>';
         print $this->footer();
+        print $this->writeJS();
+        
+        $page_css = $this->css_content();
+        if (!empty($page_css)) {
+            echo '<style type="text/css">';
+            echo $page_css;
+            echo '</style>';
+        }
+        
         $this->recordPath();
     }
 
@@ -260,38 +271,6 @@ class ScancoordDispatch
         return $ret;
     }
 
-    public function keypress_js()
-    {
-        ob_start();
-?>
-<script type="text/javascript">
-function KeyDown(evt){
-    switch (evt.keyCode) {
-        case 39:  /* Right Arrow */
-            break;
-
-        case 37:  /* Left Arrow */
-            break;
-
-        case 40:  /* Down Arrow */
-            break;
-
-        case 38:  /* Up Arrow */
-            break;
-
-        case 192:  /* Tilde */
-            $('#quick_lookups').modal('toggle');
-            //$('#quick_lookups').focus();
-            //$('#trackchange').focus();
-            break;
-    }
-}
-window.addEventListener('keydown', KeyDown);
-</script>
-<?php
-        return ob_get_clean();
-    }
-
     static public function conditionalExec($custom_errors=true)
     {
         $frames = debug_backtrace();
@@ -327,15 +306,10 @@ window.addEventListener('keydown', KeyDown);
 
     private function jsRedirect()
     {
-        $prevUrl = $_SESSION['prevUrl'];
-        return '
-<script type="text/javascript">
-$(document).ready( function () {
-    window.location.replace( "'.$prevUrl.'" );
-});
-</script>
-        ';
-
+        $prevUrl = $_SESSION['prevUrl'];        
+        $onloadCommand = 'window.location.replace( "'.$prevUrl.'" );';
+        
+        return $this->addOnloadCommand($onloadCommand);
     }
 
     private function header($class)
@@ -360,7 +334,7 @@ $(document).ready( function () {
         }
         $ret .= '
 </style>';
-        $ret .= $this->keypress_js();
+        $this->addScript('http://192.168.1.2/scancoord/common/javascript/scannie.js');
         if ($this->add_javascript_content == TRUE) {
             $ret .= $class::javascript_content();
         }
@@ -385,7 +359,7 @@ $(document).ready( function () {
             $link = '<a href="http://192.168.1.2/scancoord/admin/logout.php">['.$logVerb.']</a><br />';
         }
         $ret .= '
-<div class="container" id="" style="width:96%;">
+            <div class="container" id="" style="width:96%;">
         ';
         $ret .= '
             You are logged in as <strong>'.$user.'</strong>.
@@ -395,9 +369,70 @@ $(document).ready( function () {
             <br />
        ';
         $ret .= '
-</div></body></html>
+            </div></body></html>
         ';
         return $ret;
+    }
+    
+    protected function add_script($file_url,$type="text/javascript")
+    {
+        $this->addScript($file_url, $type);
+    }
+    
+    protected function addScript($file_url, $type='text/javascript')
+    {
+        $this->scripts[$file_url] = $type;
+    }
+    
+    protected function add_onload_command($str)
+    {
+        $this->onload_commands[] = $str;    
+    }
+
+    protected function addOnloadCommand($str)
+    {
+        $this->add_onload_command($str);
+    }
+    
+    protected function writeJS()
+    {
+        foreach($this->scripts as $s_url => $s_type) {
+            printf('<script type="%s" src="%s"></script>',
+                $s_type, $s_url);
+            echo "\n";
+        }
+
+        $js_content = $this->javascriptContent();
+        if (!empty($js_content) || !empty($this->onload_commands)) {
+            echo '<script type="text/javascript">';
+            echo $js_content;
+            echo "\n\$(document).ready(function(){\n";
+            echo array_reduce($this->onload_commands, function($carry, $oc) { return $carry . $oc . "\n"; }, '');
+            echo "});\n";
+            echo '</script>';
+        }
+    }
+    
+    protected function javascript_content()
+    {
+    }
+
+    protected function javascriptContent()
+    {
+        return $this->javascript_content();
+    }
+    
+    /**
+      Define any CSS needed
+      @return A CSS string
+    */
+    protected function css_content()
+    {
+    }
+
+    protected function cssContent()
+    {
+        return $this->css_content();
     }
 
 }
