@@ -247,3 +247,16 @@ td.buttonbox:hover {
 table.buttonbox {
     border: 2px solid lightgrey;
 }
+
+/*
+    Override Bootstrap
+*/
+//boostrap 2: stop collapse animation
+.collapse {
+    transition: height 0.01s;
+}
+//boostrap 3: stop collapse animation
+.collapsing {
+    -webkit-transition: none;
+    transition: none;
+}
