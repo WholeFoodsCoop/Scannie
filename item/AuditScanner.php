@@ -31,8 +31,6 @@ class AuditScanner extends ScancoordDispatch
     protected $description = "[Audit Scanner] is a light-weight, all around product
         scanner for use with iUnfi iPod Touch scanners.";
     protected $ui = FALSE;
-    protected $add_css_content = TRUE;
-    protected $add_javascript_content = TRUE;
     protected $use_preprocess = TRUE;
     protected $must_authenticate = TRUE;
 
@@ -78,7 +76,7 @@ class AuditScanner extends ScancoordDispatch
         return $error;
 
     }
-    
+
     public function get_scan()
     {
         return 'hi, this is get_scan()';
@@ -414,7 +412,7 @@ class AuditScanner extends ScancoordDispatch
 
             <div id="ajax-resp"></div>
         ';
-        
+
         //  Get easy re-use notes for this session
         $args = array($username,$storeID);
         $prep = $dbc->prepare("SELECT notes FROM woodshed_no_replicate.AuditScanner WHERE username = ? AND store_id = ?");
@@ -437,7 +435,7 @@ class AuditScanner extends ScancoordDispatch
                 $notes[] = $row['notes'];
             }
         }
-        
+
         //  Commonly used NOTES.
         $ret .= '
             <div id="notepad" class="collapse" >
@@ -458,12 +456,12 @@ class AuditScanner extends ScancoordDispatch
                                 <b>Change Price</b></span><br /><br />
                             <span onClick="qm(\'Print Tag \'); return false; ">
                                 <b>Print Tag</b></span><br /><br />';
-                                
+
         foreach ($notes as $note) {
             $ret .= '<span onClick="qm(\''.$note.'\'); return false; ">
                          <b>'.$note.'</b></span><br /><br />';
         }
-        
+
         $ret .= '
                         </div>
                     <!-- Green Buttons -->
@@ -484,9 +482,13 @@ class AuditScanner extends ScancoordDispatch
         </div>
         ';
 
-
-
         $ret .= '<br /><br /><br /><br /><br /><br />';
+
+        $this->addScript('/git/fannie/src/javascript/jquery.js');
+        $this->addScript('/git/fannie/src/javascript/linea/cordova-2.2.0.js');
+        $this->addScript('/git/fannie/src/javascript/linea/ScannerLib-Linea-2.0.0.js');
+        $this->addScript('../item/SalesChange/scanner.js');
+        $this->addScript('AuditScanner.js');
 
         return $ret;
     }
@@ -522,7 +524,7 @@ class AuditScanner extends ScancoordDispatch
         $argsA = array($data['upc'],$username,$storeID);
         $prepA = $dbc->prepare("SELECT * FROM AuditScanner WHERE upc = ? AND username = ? AND store_id = ? LIMIT 1");
         $resA = $dbc->execute($prepA,$argsA);
-        
+
         if ($dbc->numRows($resA) == 0) {
             $args = array(
                 $data['upc'],
@@ -738,150 +740,6 @@ class AuditScanner extends ScancoordDispatch
 
         return $ret;
 
-    }
-
-    public function javascript_content()
-    {
-        ob_start();
-        ?>
-<script type="text/javascript" src="/git/fannie/src/javascript/jquery.js"></script>
-<script type="text/javascript" src="/git/fannie/src/javascript/linea/cordova-2.2.0.js"></script>
-<script type="text/javascript" src="/git/fannie/src/javascript/linea/ScannerLib-Linea-2.0.0.js"></script>
-<script type="text/javascript" src="../item/SalesChange/scanner.js"></script>
-<script type="text/javascript">
-$(document).ready(function(){
-    enableLinea('#upc', function(){$('#my-form').submit();});
-});
-</script>
-<script type="text/javascript">
-function queue(store_id)
-{
-    var upcB = document.getElementById("upc").value;
-    $.ajax({
-		type: 'post',
-        url: 'AuditUpdate.php',
-        data: 'upc='+upcB+'&store_id='+store_id,
-		error: function(xhr, status, error)
-		{
-			alert('error:' + status + ':' + error + ':' + xhr.responseText)
-		},
-        success: function(response)
-        {
-            $('#ajax-resp').html(response);
-        }
-    })
-	.done(function(data){
-
-	})
-}
-</script>
-<script>
-$( "button" ).click(function() {
-  var text = $( this ).text();
-  $( "note" ).val( text );
-});
-</script>
-<script>
-function qm(msg)
-{
-    document.getElementById("note").value = msg;
-}
-</script>
-<script type="text/javascript">
-$(document).ready(function(){
-    var upc = $('#upc').val() + '';
-    $( "#keyCL" ).click(function() {
-        $('#upc').val('0');
-        upc = 0;
-       //alert( $('#upc').val() );
-       updateModalText();
-    });
-    $( "#key1" ).click(function() {
-        $('#upc').val(upc+'1');
-        upc = $('#upc').val();
-        updateModalText();
-    });
-    $( "#key2" ).click(function() {
-        $('#upc').val(upc+'2');
-        upc = $('#upc').val();
-        updateModalText();
-    });
-    $( "#key3" ).click(function() {
-        $('#upc').val(upc+'3');
-        upc = $('#upc').val();
-        updateModalText();
-    });
-    $( "#key4" ).click(function() {
-        $('#upc').val(upc+'4');
-        upc = $('#upc').val();
-        updateModalText();
-    });
-    $( "#key5" ).click(function() {
-        $('#upc').val(upc+'5');
-        upc = $('#upc').val();
-        updateModalText();
-    });
-    $( "#key6" ).click(function() {
-        $('#upc').val(upc+'6');
-        upc = $('#upc').val();
-        updateModalText();
-    });
-    $( "#key7" ).click(function() {
-        $('#upc').val(upc+'7');
-        upc = $('#upc').val();
-        updateModalText();
-    });
-    $( "#key8" ).click(function() {
-        $('#upc').val(upc+'8');
-        upc = $('#upc').val();
-        updateModalText();
-    });
-    $( "#key9" ).click(function() {
-        $('#upc').val(upc+'9');
-        upc = $('#upc').val();
-        updateModalText();
-    });
-    $( "#key0" ).click(function() {
-        $('#upc').val(upc+'0');
-        upc = $('#upc').val();
-        updateModalText();
-    });
-});
-
-function get_auto_par()
-{
-    var par = $('#auto_par_value').val();
-    par = parseFloat(par);
-    par = par.toPrecision(3);
-    $('#auto_par').text('PAR: ');
-    $('#par_val').text(par);
-}
-$(document).ready( function() {
-   get_auto_par();
-   updateModalOnload();
-});
-
-function formSubmitter()
-{
-    $('#my-form').submit();
-}
-
-function updateModalOnload()
-{
-    $('#btn-modal').click( function () {
-        updateModalText();
-    });
-}
-
-function updateModalText()
-{
-    $text = $('#upc').val();
-    $('#modal-text').text($text);
-}
-
-</script>
-        <?php
-        return ob_get_clean();
     }
 
 }
