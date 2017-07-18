@@ -30,7 +30,7 @@ class AuditScannerReport extends ScancoordDispatch
     protected $title = "Audit Scanner Report";
     protected $description = "[Audit Scanner Report] View data from recent scan job.";
     protected $ui = TRUE;
-    protected $add_javascript_content = TRUE;
+    //protected $add_javascript_content = TRUE;
     protected $must_authenticate = TRUE;
     
     private function clear_scandata_hander($dbc,$storeID,$username) 
@@ -91,32 +91,6 @@ class AuditScannerReport extends ScancoordDispatch
             ");
             $dbc->execute($prep,$args);
             
-            /*
-            $prep = $dbc->prepare("SELECT normal_price,cost,brand,description,price_rule_id FROM products WHERE upc = ? GROUP BY upc");
-            $res = $dbc->execute($prep,$upc);
-            while ($row = $dbc->fetchRow($res)) {
-                $description = $row['description'];
-                $price = $row['normal_price'];
-                $prid = $row['price_rule_id'];
-                $cost = $row['cost'];
-                $brand = $row['brand'];
-            }
-            
-            $updateA = array($description,$price,$prid,$cost,$brand,$upc,$username,$store_id);
-            $updateP = $dbc->prepare("
-                UPDATE woodshed_no_replicate.AuditScanner
-                SET description = ?, price = ?, prid = ?, cost = ?, brand = ?
-                WHERE upc = ?
-                    AND username = ?
-                    AND store_id = ?
-            ");
-            $dbc->execute($updateP,$updateA);
-            unset($description);
-            unset($price);
-            unset($prid);
-            unset($cost);
-            unset($brand);
-            */
         }
         
         if ($er = $dbc->error()) {
@@ -150,7 +124,6 @@ class AuditScannerReport extends ScancoordDispatch
             $plus = array();
             $chunks = explode("\r\n", $upcs);
             foreach ($chunks as $key => $str) {
-                $str = str_replace(" ","",$str);
                 $str = scanLib::upcParse($str);
                 $str = scanLib::upcPreparse($str);
                 $plus[] = $str;
@@ -401,7 +374,7 @@ class AuditScannerReport extends ScancoordDispatch
             </style>
         ';
         
-        $ret .=  '<div class="panel panel-default">
+        $ret .=  '<div class="panel panel-default table-responsive">
             <table class="table table-condensed small" id="dataTable">';
         $ret .=  '<thead class="key" id="dataTableThead">
             <tr class="key">';
@@ -438,6 +411,7 @@ class AuditScannerReport extends ScancoordDispatch
                         '&ntype=UPC&searchBtn=" target="_blank">'.$v.'</a>';
                     $ret .=  '<td>' . $upclink . '</td>'; 
                     $curUpc = $v;
+                    $upcs[] = $v;
                 } elseif ($column_name == 'curMarg' || $column_name == 'desMarg') {
                     $ret .=  '<td>' . 100*$v . '<span class="smSymb">%</span></td>';
                 } elseif ($column_name == 'username') {
@@ -451,15 +425,15 @@ class AuditScannerReport extends ScancoordDispatch
             
             if($prevKey != $k) {
                 if ($data[$k+1]['cost'] == 0) {
-                    $ret .=  '</tr><tr id="tr'.$curUpc.'" class="highlight grey" style="background-color:lightgrey">';
+                    $ret .=  '</tr><tr id="tr'.$curUpc.'" class="highlight grey rowz" style="background-color:lightgrey">';
                 } elseif (in_array(($k+1),$flags['danger']) && $data[$k+1]['prid'] == 0) {
-                    $ret .=  '</tr><tr id="tr'.$curUpc.'"  class="highlight red" style="background-color:tomato; color:#700404">';
+                    $ret .=  '</tr><tr id="tr'.$curUpc.'"  class="highlight red rowz" style="background-color:tomato; color:#700404">';
 	            } elseif (in_array(($k+1),$flags['warning']) && $data[$k+1]['prid'] == 0) {
-                    $ret .=  '</tr><tr id="tr'.$curUpc.'"  class="highlight yellow" style="background-color:#FFF457; color: #635d00">';
+                    $ret .=  '</tr><tr id="tr'.$curUpc.'"  class="highlight yellow rowz" style="background-color:#FFF457; color: #635d00">';
                 } elseif (in_array(($k+1),$flags['info']) && $data[$k+1]['prid'] == 0) {
-                    $ret .=  '</tr><tr id="tr'.$curUpc.'"  class="highlight blue" style="background-color:lightblue; color: #344c57">';
+                    $ret .=  '</tr><tr id="tr'.$curUpc.'"  class="highlight blue rowz" style="background-color:lightblue; color: #344c57">';
                 } else {
-                    $ret .=  '</tr><tr id="tr'.$curUpc.'"  class="highlight normal">';
+                    $ret .=  '</tr><tr id="tr'.$curUpc.'"  class="highlight normal rowz">';
                 }
             } 
             $prevKey = $k;
@@ -502,12 +476,15 @@ class AuditScannerReport extends ScancoordDispatch
                 </style>
             ';
         
+        // $OppoID tells AuditScannerReport.js which store's scans to igore.
         if ($storeID == 1) {
             $OppoID = 2;
         } else {
             $OppoID = 1;
         }
-        $ret .= $this->javascript_content($OppoID);
+        $ret .= '<input type="hidden" id="storeID" value="'.$OppoID.'" />';
+        
+        $this->addScript('AuditScannerReport.js');
         
         return $ret;
     }
@@ -585,169 +562,6 @@ class AuditScannerReport extends ScancoordDispatch
         
         return $ret;
     }
-    
-    public function javascript_content($e)
-    {
-        ob_start();
-        ?>
-<script type="text/javascript">
-    $("tr").each(function() { 
-        var op_store = '.$e.';
-        var id = $(this).find(\'td.store_id\').text();
-        if (id == op_store) {
-            $(this).closest(\'tr\').hide();
-        }
-    });
-</script>
-
-<script type="text/javascript">
-$("#notes").change( function() {
-    var noteKey = $("#notes").val();
-    var note = $("#notes").find(":selected").text();
-    $("#mytable").each(function() {
-        $(this).find("tr").each(function() {
-            $(this).show();
-        });
-    });
-    $("#mytable").each(function() {
-        $(this).find("tr").each(function() {
-        var notecell = $(this).find(".notescell").text();
-            if (note != notecell) {
-                $(this).closest("tr").hide();
-            }
-            if (noteKey == "viewall") {
-                $(this).show();
-            }
-            $(".blankrow").show();
-        });
-    });
-});
-</script>
-
-<script type="text/javascript">
-    $(document).ready( function() {
-        fancyButtons();
-        //linksToText();
-        deleteRow();
-    });
-    
-    function fancyButtons()
-    {
-        $("#clearNotesInput").click( function () {
-            var r = confirm("Pressing OK will clear all notes from this queue.");
-            if (r == true) {
-                $("#clearNotesForm").submit();
-            }
-            event.stopPropagation();
-        });
-        $("#clearAllInput").click( function () {
-            var r = confirm("Pressing OK will delete all data from this queue.");
-            if (r == true) {
-                $("#clearAllForm").submit();
-            }
-            event.stopPropagation();
-        });
-        $("#updateInput").click( function () {
-            var r = confirm("Pressing OK will update product data from Fannie.");
-            if (r == true) {
-                $("#updateForm").submit();
-            }
-            event.stopPropagation();
-        });
-        
-    }
-
-    function linksToText() {
-        $('.upc').each( function() {
-            $(this).removeAttr('href');
-        });
-    }
-    
-    function deleteRow() {
-        $('.delete-icon').click( function() {
-            var upc = $(this).closest('td').attr('id');
-            var store_id = $(this).closest('tr').find('.store_id').text();
-            var username = $(this).closest('tr').find('.username').text();
-            var rowclicked = $(this).closest('tr').attr('id')   ;
-            var r = confirm('Remove '+upc+' from Queue?');
-            if (r == true) {
-                $.ajax({        
-                    url: 'AuditScannerReportAjax.php',
-                    type: 'post',
-                    data: 'store_id='+store_id+'&upc='+upc+'&username='+username+'&deleteRow=true',
-                    success: function(response)
-                    {
-                        if($('#'+rowclicked).length == 0) {
-                            $('#firstTr').hide();
-                        } else {
-                            $('#'+rowclicked).hide();
-                        }
-                        $('#resp').html(response);
-                    }
-                });
-            }
-            event.stopPropagation();
-        });
-    }
-</script>
-
-<script type="text/javascript">    
-    function redrawDataTable()
-    {
-        $('#dataTable').each(function() {
-            $('tr').each(function () {
-                $(this).show();
-            });
-        });   
-    }
-
-    $(document).ready(function () {
-        $('#red-toggle').click(function () {
-            redrawDataTable();
-            $('#dataTable').each(function() {
-                $('tr').each(function () {
-                    if ( !$(this).hasClass('red') && !$(this).hasClass('key') ) {
-                        $(this).hide();
-                    }
-                });
-            });       
-        });
-        $('#yellow-toggle').click(function () {
-            redrawDataTable();
-            $('#dataTable').each(function() {
-                $('tr').each(function () {
-                    if ( !$(this).hasClass('yellow') && !$(this).hasClass('key') ) {
-                        $(this).hide();
-                    }
-                });
-            });       
-        });
-        $('#blue-toggle').click(function () {
-            redrawDataTable();
-            $('#dataTable').each(function() {
-                $('tr').each(function () {
-                    if ( !$(this).hasClass('blue') && !$(this).hasClass('key') ) {
-                        $(this).hide();
-                    }
-                });
-            });       
-        });
-        $('#grey-toggle').click(function () {
-            redrawDataTable();
-            $('#dataTable').each(function() {
-                $('tr').each(function () {
-                    if ( !$(this).hasClass('grey') && !$(this).hasClass('key') ) {
-                        $(this).hide();
-                    }
-                });
-            });       
-        });
-    });
-</script>
-        <?php
-        return ob_get_clean();
-    }
-    
     
 }
 ScancoordDispatch::conditionalExec();
