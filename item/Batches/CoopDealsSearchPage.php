@@ -143,7 +143,7 @@ class CoopDealsSearchPage extends ScancoordDispatch
                 $data[$upc]['price'] = $row['srp'];
                 $data[$upc]['normal_price'] = $row['normal_price'];
                 $data[$upc]['lineNotes'] = $row['lineNotes'];
-				$data[$upc]['promoDiscount'] = $row['promoDiscount'].'% OFF';
+				$data[$upc]['promoDiscount'] = ($row['promoDiscount']*100).'% OFF';
             }
             if ($dbc->error()) echo $dbc->error();
             $ret .= '<div class="panel panel-default">
