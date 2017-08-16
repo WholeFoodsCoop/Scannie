@@ -30,8 +30,8 @@ class ScancoordDispatch
     protected $must_authenticate = false;
     protected $current_user = false;
     protected $auth_classes = array();
-    protected $add_css_content = false;
-    protected $add_javascript_content = false;
+    //protected $add_css_content = false;
+    //protected $add_javascript_content = false;
 
     public function help_content() {
         return 'No help content has been created for this page.';
@@ -111,13 +111,6 @@ class ScancoordDispatch
         print '</div></div></div>';
         print $this->footer();
         print $this->writeJS();
-        
-        $page_css = $this->css_content();
-        if (!empty($page_css)) {
-            echo '<style type="text/css">';
-            echo $page_css;
-            echo '</style>';
-        }
         
         $this->recordPath();
     }
@@ -315,23 +308,18 @@ class ScancoordDispatch
     private function header($class)
     {
         $ret = '';
-        if ($this->use_preprocess == TRUE) {
-            $this->preprocess();
-        }
+        $ret .= $this->preprocess();
         $ret .= '
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/scancoord/common/bootstrap/bootstrap.min.css">
-    <link rel="stylesheet" href="/scancoord/common/css/Scannie_css.css?foo=bar">
+    <link rel="stylesheet" href="/scancoord/common/css/Scannie_css.css?load=true">
     <script src="/scancoord/common/bootstrap/jquery.min.js"></script>
     <script src="/scancoord/common/bootstrap/bootstrap.min.js"></script>
     <title>' . $this->title . '</title>
 <style>';
-        //$ret .= self::css_content();
-        if ($this->add_css_content == TRUE) {
-            $ret .= $class::css_content();
-        }
+        $ret .= $this->cssContent();
         $ret .= '
 </style>';
         $this->addScript('http://192.168.1.2/scancoord/common/javascript/scannie.js');
@@ -433,6 +421,10 @@ class ScancoordDispatch
     protected function cssContent()
     {
         return $this->css_content();
+    }
+    
+    protected function preprocess()
+    {
     }
 
 }
