@@ -47,8 +47,8 @@ class ipod extends ScancoordDispatch
         $ret .= '</div>';
         
         $ret .= '<form id="newurl">
-            <input type="text" name="changesrc" id="changesrc" 
-            placeholder="enter a new URL" ></form>';
+            <input type="text" name="changesrc" id="changesrc"
+            class="urlbar" placeholder="enter a new URL" ></form>';
         
         return $ret;
     }
@@ -92,13 +92,20 @@ class ipod extends ScancoordDispatch
                 border-radius: 100%;
                 height: 50px;
                 width: 50px;
-                position: absolute;
-                bottom: 20px;
+                position: relative;
+                bottom: 75px;
                 left: 120px;
             }
             input {
                 width: 100%;
                 border: 1px solid orange;
+                opacity: 0.9;
+                position: absolute;
+                bottom: 5px;
+                background-color: lightorange;
+            }
+            .urlbar {
+                
             }
         ';
     }
