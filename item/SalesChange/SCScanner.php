@@ -49,8 +49,6 @@ class SCScanner extends scancoordDispatch
     protected $title = "Sales Change Scanner";
     protected $description = "[] ";
     protected $ui = FALSE;
-    protected $add_css_content = true;
-    protected $add_javascript_content = true;
     
     public function body_content()
     {
@@ -126,7 +124,7 @@ class SCScanner extends scancoordDispatch
             
             $_GET['upc'] = str_pad($_GET['upc'], 13, '0', STR_PAD_LEFT);
             $ret .= "<table class='table'  align='center' width='100%'>";
-            
+
             //* Find UPCs and Queues in Woodshed */
             $query = "
                 SELECT 
@@ -244,15 +242,16 @@ class SCScanner extends scancoordDispatch
             $ret .= "</table>";
         }
 
-        $ret .= "<table class='table'>";
-        $ret .= "<tr><td><button class=\"btn btn-success\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 1, '{$_SESSION['session']}','NULL'); return false;\">Check Sign</button></tr>";
-        $ret .= "<tr><td><button class=\"btn btn-info\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 99, '{$_SESSION['session']}','NULL'); return false;\">Add Item to Queue</button></tr>";
-        $ret .= "<tr><td><button class=\"btn btn-warning\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 8, '{$_SESSION['session']}'); return false;\">Missing Sign</button></tr>";
-        $ret .= '<tr id="noteTr" class="collapse"><td><div id="ajax-form"></div></td></tr>';
-        $ret .= "<tr><td><button class=\"btn btn-danger\" id=\"errBtn\" type=\"button\" onclick=\"getErrNote('{$_GET['upc']}'); return false;\">Write Note</button></tr>";
-        $ret .= "<tr><td><button class=\"btn btn-surprise\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 7, '{$_SESSION['session']}','NULL'); return false;\">Shelf Tag Missing</button></tr>";
-        $ret .= "<tr><td><button class=\"btn btn-default btn-inverse\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 9, '{$_SESSION['session']}','NULL'); return false;\">Generic Sign Needed</button></tr>";
-        $ret .= "</table>";
+        $ret .= "<div align='center'>";
+        $ret .= "<div class='btn-container'><button class=\"btn btn-success\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 1, '{$_SESSION['session']}','NULL'); return false;\">Check Sign</button></div>";
+        $ret .= "<div class='btn-container'><button class=\"btn btn-info\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 99, '{$_SESSION['session']}','NULL'); return false;\">Add Item to Queue</button></div>";
+        $ret .= "<div class='btn-container'><button class=\"btn btn-warning\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 8, '{$_SESSION['session']}'); return false;\">Missing Sign</button></div>";
+        $ret .= '<tr id="noteTr" class="collapse"><div id="ajax-form"></div>';
+        $ret .= "<div class='btn-container'><button class=\"btn btn-danger\" id=\"errBtn\" type=\"button\" onclick=\"getErrNote('{$_GET['upc']}'); return false;\">Write Note</button></div>";
+        $ret .= "<div class='btn-container'><button class=\"btn btn-surprise\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 7, '{$_SESSION['session']}','NULL'); return false;\">Shelf Tag Missing</button></div>";
+        $ret .= "<div class='btn-container'><button class=\"btn btn-default btn-inverse\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 9, '{$_SESSION['session']}','NULL'); return false;\">Generic Sign Needed</button></div>";
+        $ret .= '<br />';
+        $ret .= "</div>";
 
         $query = "SELECT session 
                 FROM SaleChangeQueues
@@ -264,8 +263,9 @@ class SCScanner extends scancoordDispatch
             }
             $ret .=  ('
                 <div class="text-center container">
+                <div align="center">
                 <form method="post" class="form-inline">
-                    <select class="form-control" name="session">
+                    <select class="form-control" name="session" style="width: 80%">
                         <option value="">select a session</option>');
                         
             foreach ($session as $key => $sessID) {
@@ -274,19 +274,22 @@ class SCScanner extends scancoordDispatch
 
             $ret .=  ('    
                     </select>
+                </div>
                 </div>');
                 
             $ret .=  '
                 <div class="text-center container">
+                <div align="center">
                 <form method="post" class="form-inline">
-                    <select class="form-control" name="store_id">
+                    <select class="form-control" name="store_id" style="width: 80%;">
                         <option value="">select a store</option>
                         <option value="1">Hillside</option>
                         <option value="2">Denfeld</option>
                     </select>
                     <br>
-                    <input type="submit" class="btn btn-default" value="Update Session & Store ID">
+                    <input type="submit" class="btn btn-default btn-wide" value="Update Session & Store ID">
                 </form>
+                </div>
             ';
             
             $ret .= $this->EOP();
@@ -332,9 +335,9 @@ class SCScanner extends scancoordDispatch
     {
         return '<br><br>
 <span class="btn-group">
-    <a class="btn btn-default btn-sm iframe fancyboxLink" href="http://192.168.1.2/scancoord/item/SalesChange/SalesChangeIndex.php" title="Scanning Tools">Scanning<br>Tools</a>
-    <a class="btn btn-default btn-sm iframe fancyboxLink" href="http://192.168.1.2/git/fannie/item/handheld/ItemStatusPage.php" title="Status Check">Status<br>Check</a>
-    <a class="btn btn-default btn-sm iframe fancyboxLink" href="http://192.168.1.2/git/fannie/item/CoopDealsLookupPage.php" title="cd_check">Co-op Deals<br>File Check</a>
+    <a class="btn btn-default btn-sm fancyboxLink" href="http://192.168.1.2/scancoord/item/SalesChange/SalesChangeIndex.php" title="Scanning Tools">Scanning<br>Tools</a>
+    <a class="btn btn-default btn-sm fancyboxLink" href="http://192.168.1.2/git/fannie/item/handheld/ItemStatusPage.php" title="Status Check">Status<br>Check</a>
+    <a class="btn btn-default btn-sm fancyboxLink" href="http://192.168.1.2/git/fannie/item/CoopDealsLookupPage.php" title="cd_check">Co-op Deals<br>File Check</a>
 </span>
 
 
@@ -348,11 +351,21 @@ class SCScanner extends scancoordDispatch
     {
         return '
             button {
-                width:300px;
-                height: 75px;
+                width: 80%;
                 border-radius: 5px;
                 font-size: 18;
-                
+            }
+            .btn-wide {
+                width: 80%;
+            }
+            .btn-group {
+                width: 80%;
+            }
+            .btn-container {
+                padding: 10px;
+            }
+            .fancyboxLink {
+                width: 29vw;
             }
             .red {
                 color: tomato;
@@ -374,23 +387,20 @@ class SCScanner extends scancoordDispatch
     }
     
     
-    public function javascript_content() 
+    public function javascriptContent() 
     {
         
         ob_start();
         ?>
-<script language="javascript" type="text/javascript">
 $('#myTabs a').click(function (e) {
   e.preventDefault()
   $(this).tab('show')
 })
-</script>
-<script>
+
 function button(button, href) {
     window.open(href, '_blank');
 }
-</script>
-<script language="javascript" type="text/javascript">
+
 function getErrNote(upc)
 {
     $.ajax({
@@ -404,7 +414,6 @@ function getErrNote(upc)
         }
     });
 }
-</script>
         <?php
         return ob_get_clean();
         

@@ -24,24 +24,14 @@ session_start();
 <script type="text/javascript" src="scanner.js"></script>
 <script type="text/javascript">
 
-function sendToQueue(button, upc, queue_id, session)
+function sendToQueue(button, upc, queue_id, session, delQ)
 {
     $.ajax({
-
-        // Info will be sent to this URL
         url: 'salesChangeAjax2.php',
-
-        // The actual data to send
-        data: 'upc='+upc+'&queue='+queue_id+'&session='+session,
-
-        // callback to process the response
+        data: 'upc='+upc+'&queue='+queue_id+'&session='+session+'&delQ='+delQ,
         success: function(response)
         {
-            // display the response in element w/ id=ajax-resp
             $('#ajax-resp').html('AJAX call returned: ' + response);
-
-            // search DOM upword for a <tr> tag and hide that element
-            // as well as its children
             $(button).closest('tr').hide();
         }
     });
@@ -226,30 +216,7 @@ function draw_table($dbc)
             </form>
         ';
     }
-/*
-    if ($_POST['rmDisco']) {
-        $rmProduct = array();
-        $args = array($upc,$sess);
-        foreach ($batchName as $upc => $name) {
-            if (strpos($name,"Disco")
-                || strpos($name,'Disco') 
-                || strpos($name,'DISCO') 
-                || strpos($name,'overstock') 
-                || strpos($name,'OVERSTOCK') 
-                || strpos($name,'Overstock') 
-                || strpos($name,'LINE') 
-                || strpos($name,'Line') 
-                || strpos($name,'DC') 
-            ) {
-                $prep = $dbc->prepare("UPDATE SaleChangeQueues SET queue = 1 WHERE upc = ? AND session = ?");
-                $dbc->execute($prep,$args);
-                if ($dbc->error()) {
-                    echo $dbc->error(). "<br>";
-                }
-            }
-        }
-    }
-*/
+
     if (count($upcs) > 0) {
         echo '<a href="" onclick="$(\'#cparea\').show(); return false;">Copy/paste</a>';
         echo '<textarea id="cparea" class="collapse">';
@@ -283,7 +250,6 @@ function draw_table($dbc)
             echo "<td>" . $upcLink[$upc] . "</td>"; 
             echo "<td>" . $batch[$upc] . "</td>";
             if ($curQueue == 2) echo "<td><strong>" . $notes[$upc] . "</strong></td>";
-           // if ($curQueue == 0) echo "<td>".$last_sold[$upc]."</td>";
             if ($curQueue == 0) {
                 $year = substr($last_sold[$upc], 0, 4);
                 $month = substr($last_sold[$upc], 5, 2);
@@ -297,14 +263,15 @@ function draw_table($dbc)
             }        
             
             if ($curQueue == 7) {
-                echo "<td><a class=\"btn btn-default\" href=\"http://192.168.1.2/git/fannie/item/handheld/ItemStatusPage.php?id={$upc}\" target=\"_blank\">status check</a></tr>";  
+                echo "<td><a class=\"btn btn-default\" 
+                     href=\"http://192.168.1.2/git/fannie/item/handheld/ItemStatusPage.php?id={$upc}\" target=\"_blank\">status check</a></tr>";  
             } else {
-                echo "<td><button class=\"btn btn-default\" type=\"button\" onclick=\"sendToQueue(this, '{$upc}', 1, '{$_SESSION['session']}'); return false;\">Good</button></td>";    
-                echo "<td><button class=\"btn btn-default\" type=\"button\" onclick=\"sendToQueue(this, '{$upc}', 8, '{$_SESSION['session']}'); return false;\">Missing</button></td>";    
-                echo "<td><button class=\"btn btn-default\" type=\"button\" onclick=\"sendToQueue(this, '{$upc}', 98, '{$_SESSION['session']}'); return false;\">DNC</button></td>";    
-            }  
-            if ($curQueue == 99) {
-                echo "<td><button class=\"btn btn-default\" type=\"button\" onclick=\"sendToQueue(this, '{$upc}', 0, '{$_SESSION['session']}'); return false;\">Unchecked</button></td>";    
+                echo "<td><button class=\"btn btn-default\" type=\"button\" 
+                    onclick=\"sendToQueue(this, '{$upc}', 1, '{$_SESSION['session']}', '{$curQueue}'); return false;\">Good</button></td>";    
+                echo "<td><button class=\"btn btn-default\" type=\"button\" 
+                    onclick=\"sendToQueue(this, '{$upc}', 8, '{$_SESSION['session']}', '{$curQueue}'); return false;\">Missing</button></td>";  
+                echo "<td><button class=\"btn btn-default\" type=\"button\" 
+                    onclick=\"sendToQueue(this, '{$upc}', 98, '{$_SESSION['session']}', '{$curQueue}'); return false;\">DNC</button></td>";    
             }
         }
     }
