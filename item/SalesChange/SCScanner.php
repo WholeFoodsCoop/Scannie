@@ -47,7 +47,8 @@ class SCScanner extends scancoordDispatch
 {
     
     protected $title = "Sales Change Scanner";
-    protected $description = "[] ";
+    protected $description = "[Sales Change Scanner] is the portion of 
+        batch check tools used for scanning barcodes.";
     protected $ui = FALSE;
     
     public function body_content()
@@ -56,10 +57,13 @@ class SCScanner extends scancoordDispatch
         $ret = '';
         $ret .= $this->form_content();
         
-        if(isset($_POST['session'])) $_SESSION['session'] = $_POST['session'];
-        if(isset($_POST['store_id'])) $_SESSION['store_id'] = $_POST['store_id'];
+        if (isset($_POST['session'])) {
+            $_SESSION['session'] = $_POST['session'];
+        }
+        if (isset($_POST['store_id'])) {
+            $_SESSION['store_id'] = $_POST['store_id'];
+        }
         $item = array ( array() );
-
 
         if (isset($_GET['notes'])) {
             $note = $_GET['notes'];
@@ -69,15 +73,6 @@ class SCScanner extends scancoordDispatch
             ;
             unset($_GET['notes']);
         }
-
-        /*
-        foreach ($_SESSION as $key => $value) {
-            $ret .= $key . '<br>';
-            foreach ($value as $keyb => $valueb) {
-                $ret .= $keyb . ' :: ' . $valueb . '<br>';
-            }
-        }
-        */
 
         $ret .= "<div align=\"center\">";
         if ($_SESSION['store_id'] == 1) {
@@ -115,15 +110,32 @@ class SCScanner extends scancoordDispatch
         include('../../common/sqlconnect/SQLManager.php');
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANALTDB, $SCANUSER, $SCANPASS);
 
-        if ($_GET['upc']) {
+        if ($upc = $_GET['upc']) {
             
-            if ($_GET['upc'] < 99999 && $_GET['upc'] > 9999) {
-                $_GET['upc'] = ltrim($_GET['upc'], '0');
-                $_GET['upc'] = $this->skuToUpc($_GET['upc'], $dbc);
+            $sesh = $_SESSION['session'];
+            $sid = $_SESSION['store_id'];
+            
+            if ($upc < 99999 && $upc > 9999) {
+                $upc = ltrim($upc, '0');
+                $upc = $this->skuToUpc($upc, $dbc);
             }
             
-            $_GET['upc'] = str_pad($_GET['upc'], 13, '0', STR_PAD_LEFT);
+            $upc = str_pad($upc, 13, '0', STR_PAD_LEFT);
             $ret .= "<table class='table'  align='center' width='100%'>";
+            
+            /* find all queues for upc */
+            $args = array($upc,$sid,$sesh);
+            $prep = $dbc->prepare("SELECT s.queue, q.name FROM SaleChangeQueues AS s
+                LEFT JOIN queues AS q ON q.queue=s.queue
+                WHERE upc = ? AND store_id = ? AND session = ?");
+            $res = $dbc->execute($prep,$args);
+            $allQueues = array();
+            while ($row = $dbc->fetchRow($res)) {
+                $allQueues[$row['queue']] = $row['name'];
+            }
+            if ($er = $dbc->error()) {
+                echo '<div class="alert alert-danger">'.$er.'</div>';
+            }
 
             //* Find UPCs and Queues in Woodshed */
             $query = "
@@ -131,7 +143,7 @@ class SCScanner extends scancoordDispatch
                     q.queue AS queue_no, 
                     u.brand as ubrand, 
                     u.description as udesc,
-                    p.upc, 
+                    p.upc,
                     p.size as psize, 
                     p.normal_price, 
                     v.size as vsize,
@@ -143,14 +155,12 @@ class SCScanner extends scancoordDispatch
                     LEFT JOIN SaleChangeQueues as q ON (q.upc=p.upc)
                     LEFT JOIN is4c_op.vendorItems as v on v.upc=p.upc
                     LEFT JOIN queues AS qu ON q.queue=qu.queue
-                WHERE p.upc={$_GET['upc']}
-                    AND p.store_id={$_SESSION['store_id']}
-                    AND q.session='{$_SESSION['session']}'
-                GROUP BY p.upc
-                    ;";
+                WHERE p.upc={$upc}
+                    AND p.store_id={$sid}
+                    AND q.session='{$sesh}'
+                GROUP BY p.upc;";
             $result = $dbc->query($query);
             while ($row = $dbc->fetchRow($result)) {
-                //$ret .= "<tr><td><b>upc</td><td>" . $row['upc'] . "</tr>";
                 if ($row['ubrand'] != NULL) {
                     $ret .= "<tr><td><b>brand</td><td>" . $row['ubrand'] . "</tr>";
                 } else {
@@ -168,41 +178,15 @@ class SCScanner extends scancoordDispatch
                 } else {
                     $ret .= "<tr><td><b>size</td><td>" . $row['vsize'] . "</tr>";
                 }
-                
-                /*
-                if ($row['queue_no'] != NULL)  {
-                    if ($row['queue_no'] === "1") {
-                        $ret .= "<tr><td><b>queue</td><td><span class='code btn-success'>" . $row['queue_no'] . " - " . $row['name'] . "</span></tr>";
-                    }
-                    if($row['queue_no'] === "2") {
-                        $ret .= "<tr><td><b>queue</td><td><span class='code btn-danger'>" . $row['queue_no'] . " - " . $row['name'] . "</span></tr>";
-                    } 
-                    if($row['queue_no'] === "0") {
-                        $ret .= "<tr><td><b>queue</td><td><span class='code btn-inverse'>" . $row['queue_no'] . " - " . $row['name'] . "</span></tr>";
-                    }
-                    if($row['queue_no'] === "99") {
-                        $ret .= "<tr><td><b>queue</td><td><span class='code btn-info'>" . $row['queue_no'] . " - " . $row['name'] . "</span></tr>";
-                    } 
-                    if($row['queue_no'] === "8") {
-                        $ret .= "<tr><td><b>queue</td><td><span class='code btn-warning'>" . $row['queue_no'] . " - " . $row['name'] . "</span></tr>";
-                    } 
-                    if($row['queue_no'] === "7") {
-                        $ret .= "<tr><td><b>queue</td><td><span class='code btn-surprise'>" . $row['queue_no'] . " - " . $row['name'] . "</span></tr>";
-                    } 
-                    if($row['queue_no'] === "9") {
-                        $ret .= "<tr><td><b>queue</td><td><span class='code btn-inverse'>" . $row['queue_no'] . " - " . $row['name'] . "</span></tr>";
-                    }
-                } elseif ($row['queue'] == NULL) {
-                    $ret .= "<tr><td><b>queue</td><td><i class=\"red\">This items is queue-less</tr>";
-                }
-                $ret .= "<tr><td><b>Price</td><td>" . "$" . $row['normal_price'] . "</tr>";
-            */
             
             $queueCode = array(1=>'success',2=>'danger',0=>'default',99=>'info',8=>'warning',7=>'surprise',9=>'inverse');
-            if ($row['queue_no'] != NULL)  {
-                $ret .= "<tr><td><b>queue</td><td><span class='code btn-".$queueCode[$row['queue_no']]."'>" . $row['queue_no'] . " - " . $row['name'] . "</span></tr>";
+            if (count($allQueues) > 0)  {
+                foreach ($allQueues as $q => $name) {
+                    $ret .= "<tr><td></td><td><span class='alert-".$queueCode[$q]."'
+                        style='padding: 5px;'>" . $q . " - " . $name . "</span></tr>";
+                }
             } elseif ($row['queue'] == NULL) {
-                $ret .= "<tr><td><b>queue</td><td><i class=\"red\">This items is queue-less</tr>";
+                $ret .= "<tr><td></td><td><i class=\"red\">This items is queue-less</tr>";
             }
             $ret .= "<tr><td><b>Price</td><td>" . "$" . $row['normal_price'] . "</tr>";
                 
@@ -228,7 +212,7 @@ class SCScanner extends scancoordDispatch
                 FROM is4c_op.batches AS b 
                 LEFT JOIN is4c_op.batchList AS l ON l.batchID=b.batchID 
                 WHERE CURDATE() BETWEEN b.startDate AND b.endDate 
-                    AND l.upc={$_GET['upc']}
+                    AND l.upc={$upc}
                 ;";
             $result = $dbc->query($query);
             while ($row = $dbc->fetchRow($result)) {
@@ -243,13 +227,13 @@ class SCScanner extends scancoordDispatch
         }
 
         $ret .= "<div align='center'>";
-        $ret .= "<div class='btn-container'><button class=\"btn btn-success\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 1, '{$_SESSION['session']}','NULL'); return false;\">Check Sign</button></div>";
-        $ret .= "<div class='btn-container'><button class=\"btn btn-info\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 99, '{$_SESSION['session']}','NULL'); return false;\">Add Item to Queue</button></div>";
-        $ret .= "<div class='btn-container'><button class=\"btn btn-warning\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 8, '{$_SESSION['session']}'); return false;\">Missing Sign</button></div>";
+        $ret .= "<div class='btn-container'><button class=\"btn btn-success\" type=\"button\" onclick=\"sendToQueue(this, '{$upc}', 1, '{$_SESSION['session']}','NULL'); return false;\">Check Sign</button></div>";
+        $ret .= "<div class='btn-container'><button class=\"btn btn-info\" type=\"button\" onclick=\"sendToQueue(this, '{$upc}', 99, '{$_SESSION['session']}','NULL'); return false;\">Add Item to Queue</button></div>";
+        $ret .= "<div class='btn-container'><button class=\"btn btn-warning\" type=\"button\" onclick=\"sendToQueue(this, '{$upc}', 8, '{$_SESSION['session']}'); return false;\">Missing Sign</button></div>";
         $ret .= '<tr id="noteTr" class="collapse"><div id="ajax-form"></div>';
-        $ret .= "<div class='btn-container'><button class=\"btn btn-danger\" id=\"errBtn\" type=\"button\" onclick=\"getErrNote('{$_GET['upc']}'); return false;\">Write Note</button></div>";
-        $ret .= "<div class='btn-container'><button class=\"btn btn-surprise\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 7, '{$_SESSION['session']}','NULL'); return false;\">Shelf Tag Missing</button></div>";
-        $ret .= "<div class='btn-container'><button class=\"btn btn-default btn-inverse\" type=\"button\" onclick=\"sendToQueue(this, '{$_GET['upc']}', 9, '{$_SESSION['session']}','NULL'); return false;\">Generic Sign Needed</button></div>";
+        $ret .= "<div class='btn-container'><button class=\"btn btn-danger\" id=\"errBtn\" type=\"button\" onclick=\"getErrNote('{$upc}'); return false;\">Write Note</button></div>";
+        $ret .= "<div class='btn-container'><button class=\"btn btn-surprise\" type=\"button\" onclick=\"sendToQueue(this, '{$upc}', 7, '{$_SESSION['session']}','NULL'); return false;\">Shelf Tag Missing</button></div>";
+        $ret .= "<div class='btn-container'><button class=\"btn btn-default btn-inverse\" type=\"button\" onclick=\"sendToQueue(this, '{$upc}', 9, '{$_SESSION['session']}','NULL'); return false;\">Generic Sign Needed</button></div>";
         $ret .= '<br />';
         $ret .= "</div>";
 
