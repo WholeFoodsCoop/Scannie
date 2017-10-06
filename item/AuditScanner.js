@@ -122,3 +122,12 @@ function updateModalText()
     $text = $('#upc').val();
     $('#modal-text').text($text);
 }
+
+function startLoading()
+{
+    $('#progressBar').show();
+}
+function endLoading()
+{
+    $('#progressBar').hide();
+}

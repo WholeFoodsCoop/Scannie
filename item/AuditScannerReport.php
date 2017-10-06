@@ -1,3 +1,4 @@
+
 <?php
 /*******************************************************************************
     Copyright 2016 Whole Foods Community Co-op.
@@ -273,7 +274,9 @@ class AuditScannerReport extends ScancoordDispatch
         
         include('../config.php');
         include('../common/lib/PriceRounder.php');
-        
+        $this->addScript('../common/javascript/tablesorter/js/jquery.tablesorter.min.js');
+        $this->addScript('../common/javascript/tablesorter/js/jquery.metadata.js');
+
         $rounder = new PriceRounder();
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         $storeID = scanLib::getStoreID(); 
@@ -298,7 +301,7 @@ class AuditScannerReport extends ScancoordDispatch
         
         $options = $this->get_notes_options($dbc,$storeID,$username);
         $noteStr = '';
-        $noteStr .= '<select id="notes" class="" style="font-size: 10px; font-weight: normal; margin-left: 5px; width: 100px;">';
+        $noteStr .= '<select id="notes" style="font-size: 10px; font-weight: normal; margin-left: 5px; border: 1px solid lightgrey">';
         $noteStr .= '<option value="viewall">View All</option>';
         foreach ($options as $k => $option) {
             $noteStr .= '<option value="'.$k.'">'.$option.'</option>';
@@ -322,6 +325,7 @@ class AuditScannerReport extends ScancoordDispatch
 			FROM woodshed_no_replicate.AuditScanner 
             WHERE username = ? 
                 AND store_id = ?
+                AND upc != '0000000000000'
             ORDER BY vendor, dept, brand;
         ");    
         $result = $dbc->execute($query,$args);
@@ -374,15 +378,16 @@ class AuditScannerReport extends ScancoordDispatch
             </style>
         ';
         
+        $ret .= '<div style="font-size: 12px; padding-bottom: 10px;"><b>Filter by Notes</b>:'.$noteStr.'</div>';
         $ret .=  '<div class="panel panel-default table-responsive">
-            <table class="table table-condensed small" id="dataTable">';
+            <table class="table table-condensed small tablesorter" id="dataTable">';
         $ret .=  '<thead class="key" id="dataTableThead">
             <tr class="key">';
         foreach ($headers as $v) {
             if ($v == 'notes') {
-                $ret .=  '<th class="key">' . $v . $noteStr . '</th>';
+                $ret .=  '<th class="key tablesorter-header">' . $v . '</th>';
             } elseif($v == 'store_id') {
-                $ret .=  '<th class="key">' . 'store' . '</th>';
+                $ret .=  '<th class="key tablesorter-header">' . 'store' . '</th>';
             } elseif($v == NULL ) {
                 //do nothing
             } else {
@@ -515,19 +520,19 @@ class AuditScannerReport extends ScancoordDispatch
                     <tbody>
                         <tr class="buttonbox key">
                             <form method="post" id="clearNotesForm">
-                                <td id="clearNotesInput" class="buttonbox key">Clear Notes</td>
+                                <td id="clearNotesInput" class="buttonbox key bb-btn">Clear Notes</td>
                                 <input type="hidden" name="clearNotes" value="1" />
                             </form>
                             <form method="post" id="clearAllForm">
-                                <td id="clearAllInput" class="buttonbox">Clear ALL</td>
+                                <td id="clearAllInput" class="buttonbox bb-btn">Clear ALL</td>
                                 <input type="hidden" name="cleardata" value="1" />
                             </form>
                         
                             <form method="post" id="updateForm">
-                                <td id="updateInput" class="buttonbox">Update from POS</td>
+                                <td id="updateInput" class="buttonbox bb-btn">Update from POS</td>
                                 <input type="hidden" name="update" value="1">
                             </form>
-                            <td class="buttonbox" data-toggle="modal" data-target="#upcs_modal">Upload a List</td>
+                            <td class="buttonbox bb-btn" data-toggle="modal" data-target="#upcs_modal">Upload a List</td>
                     </tbody>
                 </table>
                 
@@ -561,6 +566,26 @@ class AuditScannerReport extends ScancoordDispatch
         ';
         
         return $ret;
+    }
+    
+    public function help_content()
+    {
+        return '
+            <ul>
+                <li>Use <label>Audit Scanner Report</label> to view data collected by 
+                    Audie Audit Scanner.</li>
+                <li><label>Clear Notes</label>: clear all notes taken with scanner.</li>
+                <li><label>Clear All</label>: remove all items from this report.</li>
+                <li><label>Update from POS</label>: update products with the current 
+                    data in POS. <i>SRP and Raw SRP will not update without being scanned.
+                    if you would like to re-calculate SRPs, select <b>Clear All</b>, then use 
+                    <b>Upload a List</b> to re-establish your list.</i></li>
+                <li><label>Upload a List</label>: Upload a list of UPCs to load products to 
+                    the report.</li>
+                <li>Click on a color in the <b>key</b> table to view items that are above/below the 
+                desired price-range & items that are missing cost.</li>   
+            </ul>
+        ';
     }
     
 }

@@ -52,6 +52,38 @@ class AuditScanner extends ScancoordDispatch
         }
 
     }
+    public function pBar($weekPar,$deptNo,$storeID,$dbc)    
+    {
+        if ($_SESSION['audieDept'] != $deptNo) {
+            $args = array($storeID,$deptNo);
+            $prep = $dbc->prepare("
+                SELECT auto_par, auto_par*7 as par, upc, brand, description 
+                FROM products 
+                WHERE store_id = ? 
+                    AND department = ? 
+                ORDER BY auto_par DESC 
+                LIMIT 1");
+            $res = $dbc->execute($prep,$args);
+            while ($row = $dbc->fetchRow($res)) {
+                $max = $row['par'];
+            }
+        } else {
+            $max = $_SESSION['maxPar'];
+        }
+        $_SESSION['audieDept'] = $deptNo;
+        $_SESSION['maxPar'] = $max;
+
+        $percent = 100*($weekPar/$max);
+        $oppo = $max-$percent;
+        return <<<HTML
+<div align="center" id="pBar" style="height: 1px;">
+    <div class="progress" style="width: 100px; height: 11px;">
+        <div class="progress-bar progress-bar-success" role="progressbar" style="width:{$percent}%;"></div>
+        <div class="progress-bar progress-bar-default" role="progressbar" style="width:{$oppo}%; "></div>
+    </div>
+</div>
+HTML;
+    }
 
     private function notedata_handler($dbc,$note,$username)
     {
@@ -86,6 +118,7 @@ class AuditScanner extends ScancoordDispatch
     {
 
         $ret = '';
+        $this->addOnloadCommand("$('#progressBar').show();");
         $username = scanLib::getUser();
         $response = $_GET['success'];
         $newscan = $_POST['success'];
@@ -112,7 +145,17 @@ class AuditScanner extends ScancoordDispatch
         }*/
         $upc = scanLib::upcPreparse($_POST['upc']);
 
+        $loading .= '
+            <div class="progress" id="progressBar">
+                <div class="progress-bar progress-bar-striped active" role="progressbar"
+                    aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
+                </div>
+            </div> 
+        ';
+
+        
         $ret .= $this->mobile_menu($upc);
+        $ret .= $loading;
         $ret .= '<div align="center"><h4 id="heading">AUDIE: THE AUDIT SCANNER</h4></div>';
         $ret .= $this->form_content();
 
@@ -199,6 +242,7 @@ class AuditScanner extends ScancoordDispatch
             $vendor = '<span class="vid">id['.$row['default_vendor_id'].'] </span>'.$row['vendorName'];
             $vd = $row['default_vendor_id'].' '.$row['vendorName'];
             $dept = $row['department'].' '.$row['dept_name'];
+            $deptNo = $row['department'];
             $pid = $row['price_rule_id'];
             $unfiMarg = $row['unfiMarg'];
             $deptMarg = $row['deptMarg'];
@@ -208,7 +252,9 @@ class AuditScanner extends ScancoordDispatch
             $narrow = $row['narrow'];
             $markup = $row['shippingMarkup'];
             $discount = $row['discountRate'];
-            $ret .= '<input type="hidden" id="auto_par_value" value="'.($row['auto_par']*7).'"/>';
+            $weekPar = $row['auto_par']*7;
+            $ret .= '<input type="hidden" id="auto_par_value" value="'.$weekPar.'"/>';
+            $ret .= $this->pBar($weekPar,$deptNo,$storeID,$dbc);
 
             $adjcost = $cost;
             if ($markup > 0) $adjcost += $cost * $markup;
@@ -427,7 +473,8 @@ class AuditScanner extends ScancoordDispatch
             'Queue Narrow Tag ',
             'Product Not In Use',
             'Remove This Item From Queue',
-            'n/a'
+            'n/a',
+            'Disco Item' 
         );
         while ($row = $dbc->fetchRow($res)) {
             //echo $row['notes'];
@@ -441,49 +488,46 @@ class AuditScanner extends ScancoordDispatch
             <div id="notepad" class="collapse" >
                 <div style="position: relative; top: 10%; opacity: 1;">
                     <form method="get" name="notepad" class="form-inline " >
-                        <input type="text" name="note" id="note" class="form-control" style="max-width: 90%; "><br /><br />
+                        <input type="text" name="note" id="note" class="form-control" style="max-width: 90%; "><br />
                         <input type="hidden" name="upc" value="'.$upc.'">
                         <button type="submit" class="btn btn-danger" onClick="$("#notepad").collapse("hide"); return false;">Submit Note</button>
                     </form>
-                    <!-- Purple Buttons -->
-                    <div align="left" style="padding: 10px; float: left; text-align:center; width: 45vw">
-                        <div>
-                            <span onClick="qm(\'Change Sign Text: \'); return false; ">
-                                <b>Change Sign Text</b></span><br /><br />
-                            <span onClick="qm(\'Line Price\'); return false; ">
-                                <b>Line Price</b></span><br /><br />
-                            <span onClick="qm(\'Change Price: \'); return false; ">
-                                <b>Change Price</b></span><br /><br />
-                            <span onClick="qm(\'Print Tag \'); return false; ">
-                                <b>Print Tag</b></span><br /><br />';
-
-        foreach ($notes as $note) {
-            $ret .= '<span onClick="qm(\''.$note.'\'); return false; ">
-                         <b>'.$note.'</b></span><br /><br />';
-        }
-
-        $ret .= '
-                        </div>
-                    <!-- Green Buttons -->
-                    </div>
-                    <div align="left" style="padding: 10px; float: left; width: 5vw"></div>
-                    <div align="left" style="padding: 10px; float: left; text-align:center; width: 45vw">
-                        <span onClick="qm(\'Missing Sale Sign\'); return false; ">
-                            <b>Sale Sign Missing</b></span><br /><br />
-                        <span onClick="qm(\'Queue Narrow Tag \'); return false; ">
-                            <b>Narrow Tag</b></span><br /><br />
-                        <span onClick="qm(\'Product Not In Use\'); return false; ">
-                            <b>Not In Use</b></span><br /><br />
-                        <span onClick="qm(\'Remove This Item From Queue\'); return false; ">
-                            <b>Remove From Queue</b></span><br /><br />
-                    </div>
-                </div>
-            </div>
-        </div>
+                    <span class="qmBtn"  onClick="qm(\'Change Sign Text: \'); return false; ">
+                        <b>Change Sign Text</b></span>
+                    <span class="qmBtn"  onClick="qm(\'Line Price\'); return false; ">
+                        <b>Line Price</b></span>
+                    <span class="qmBtn"  onClick="qm(\'Change Price: \'); return false; ">
+                        <b>Change Price</b></span>
+                    <span class="qmBtn"  onClick="qm(\'Print Tag \'); return false; ">
+                        <b>Print Tag</b></span>
+                    <span class="qmBtn" onClick="qm(\'Missing Sale Sign\'); return false; ">
+                        <b>Sale Sign Missing</b></span>
+                    <span class="qmBtn" onClick="qm(\'Queue Narrow Tag \'); return false; ">
+                        <b>Narrow Tag</b></span>
+                    <span class="qmBtn" onClick="qm(\'Product Not In Use\'); return false; ">
+                        <b>Not In Use</b></span>
+                    <span class="qmBtn" onClick="qm(\'Remove This Item From Queue\'); return false; ">
+                        <b>Remove From Queue</b></span>
+                    <span class="qmBtn" onClick="qm(\'Disco Item\'); return false; ">
+                        <b>Disco Item</b></span>
         ';
+        
+        foreach ($notes as $note) {
+            if ($note != NULL) {
+                $ret .= '<span class="qmBtn"  onClick="qm(\''.$note.'\'); return false; ">
+                    <b>'.$note.'</b></span>';
+            }
+        }
+        
+        $ret .= '
+                </div>
+            </div>';
+        $count = $this->getCount($dbc,$storeID,$username);
+        $ret .= '<div class="counter"><span id="counter">'.$count.'</span></div>';
 
         $ret .= '<br /><br /><br /><br /><br /><br />';
-
+        $this->addOnloadCommand("$('#progressBar').hide();");
+        
         $this->addScript('/git/fannie/src/javascript/jquery.js');
         $this->addScript('/git/fannie/src/javascript/linea/cordova-2.2.0.js');
         $this->addScript('/git/fannie/src/javascript/linea/ScannerLib-Linea-2.0.0.js');
@@ -491,6 +535,16 @@ class AuditScanner extends ScancoordDispatch
         $this->addScript('AuditScanner.js');
 
         return $ret;
+    }
+    
+    private function getCount($dbc,$storeID,$username)
+    {    
+        $args = array($username,$storeID);
+        $prep = $dbc->prepare("SELECT count(*) from woodshed_no_replicate.AuditScanner 
+            WHERE username = ? AND store_id = ?");
+        $res = $dbc->execute($prep,$args);
+        $count = $dbc->fetchRow($res);
+        return $count[0]-1;
     }
 
     private function form_content($dbc)
@@ -524,7 +578,7 @@ class AuditScanner extends ScancoordDispatch
         $argsA = array($data['upc'],$username,$storeID);
         $prepA = $dbc->prepare("SELECT * FROM AuditScanner WHERE upc = ? AND username = ? AND store_id = ? LIMIT 1");
         $resA = $dbc->execute($prepA,$argsA);
-
+            
         if ($dbc->numRows($resA) == 0) {
             $args = array(
                 $data['upc'],
@@ -604,8 +658,22 @@ class AuditScanner extends ScancoordDispatch
                 height: 100%;
                 width: 100%;
                 background: linear-gradient(#d99696, #d64f4f);
-                opacity: 0.8
+                opacity: 0.8;
             }
+            .qmBtn {
+                   background-clip: padding-box;
+                   padding: 5px; 
+                   padding-top: 10px;
+                   border-radius: 5px;
+                   background-color: white;
+                   border: 3px solid transparent;
+                   //height: auto;
+                   //min-height: 50px;
+                   width: 75px;
+                   height: 75px;
+                   float: left;
+                   font-size: 12px;
+                }
             /*
             #note-resp {
                 position: fixed;
@@ -638,6 +706,24 @@ class AuditScanner extends ScancoordDispatch
                 font-size: 12px;
                 color: black;
             }
+            .counter {
+                position: absolute;
+                top: 5;
+                left: 5;
+                width: 25;
+                height: 25;
+                font-size: 40;
+                font-weigth: bold;
+                opacity: 0.5;
+            }
+            #pBar {
+                opacity: 0.5;
+                position: relative;
+                margin-bottom: 0px;
+                margin-top: 0px;
+                padding: 0px;
+                bottom: 27px;
+            }
         ';
     }
 
@@ -647,17 +733,11 @@ class AuditScanner extends ScancoordDispatch
         $ret .= '
             <style>
                 .btn-mobile {
-                    width: 50px;
-                    height: 45px;
-                    background-color: #272822;
-                    color: #cacaca;
                     position: fixed;
                     top: 20px;
                     right: 5px;
-                    border-radius: 3px;
                     padding: 8px;
                     border: none;
-                    opacity: 0.2;
                 }
                 .btn-mobile-lines {
                     border: 2px solid #cacaca;
@@ -677,18 +757,21 @@ class AuditScanner extends ScancoordDispatch
                     text-align: center;
                     cursor: pointer;
                 }
+                #progressBar {
+                    display: none;
+                }
             </style>
         ';
         $ret .= '
             <button class="btn-mobile" data-toggle="modal" data-target="#keypad" id="btn-modal">
-                <div class="btn-mobile-lines">&nbsp;</div>
-                <div class="btn-mobile-sp">&nbsp;</div>
-                <div class="btn-mobile-lines">&nbsp;</div>
-                <div class="btn-mobile-sp">&nbsp;</div>
-                <div class="btn-mobile-lines">&nbsp;</div>
-                <div class="btn-mobile-sp">&nbsp;</div>
+                <img src="http://192.168.1.2/scancoord/common/src/img/numpadIcon.png" 
+                class="numbpadMenuIcon">
             </button>';
-
+        /*   
+        $ret = '<img src="http://192.168.1.2/scancoord/common/src/img/menuIcon.png" 
+            data-toggle="modal" data-target="#keypad" id="btn-modal"
+            class="mobileMenuIcon btn-mobile hidden-lg hidden-md hidden-sm" />';
+        */
         $ret .= '
             <div class="modal" tabindex="-1" role="dialog" id="keypad">
             <br /><br /><br /><br /><br />
