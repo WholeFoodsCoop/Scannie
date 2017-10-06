@@ -2,11 +2,13 @@
     Globally Used Style
 */
 body {
-    //background: linear-gradient(white, #edf7fc);
-    background-size: 100% 100%;
-    background-attachment: fixed;
-    background-image: url("../src/img/bluelines.png");
-    background-repeat: no-repeat;
+    background: linear-gradient(#f7edd2,#f7f3e6);
+    background-size: 1px;
+    background: -moz-repeating-linear-gradient( #f2f0ed, #f5f0eb 5px);
+    
+}
+.green {
+    color: green;
 }
 #border {
     border: 10px solid transparent;
@@ -16,16 +18,13 @@ body {
 }
 .btn-default {
     background: lightgrey; /* For browsers that do not support gradients */
-    //background: -webkit-linear-gradient(white, lightgrey); /* For Safari 5.1 to 6.0 */
-    //background: -o-linear-gradient(white, lightgrey); /* For Opera 11.1 to 12.0 */
-    //background: -moz-linear-gradient(white, lightgrey); /* For Firefox 3.6 to 15 */
     background: linear-gradient(white, lightgrey); /* Standard syntax */
 }
+/*
+    bootstrap -color style additions
+*/
 .btn-danger {
     background: lightgrey; /* For browsers that do not support gradients */
-    //background: -webkit-linear-gradient(#d99696, #d64f4f); /* For Safari 5.1 to 6.0 */
-    //background: -o-linear-gradient(#d99696, #d64f4f); /* For Opera 11.1 to 12.0 */
-    //background: -moz-linear-gradient(#d99696, #d64f4f); /* For Firefox 3.6 to 15 */
     background: linear-gradient(#d99696, #d64f4f); /* Standard syntax */
 }
 .text-danger {
@@ -81,6 +80,23 @@ body {
     background: linear-gradient(#d9b2db,#c674cc); /* Standard syntax */
     color: #6a356e;
 }
+.scan-xs-btn {
+    border-style: outset;
+    border-width: 2px; 
+    padding: 3;
+}
+.scan-xs-btn:hover {
+    text-decoration: none;
+    background: linear-gradient(#e5e5e5,#e5e5e5);
+}
+.scan-xs-btn:active {
+    border-style: inset;
+    outline: none;
+}
+.progress-bar-default {
+    background: white;
+    color: black;
+}
 .table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
    background-color: #e0e0e0;
 }
@@ -101,6 +117,11 @@ tr.click-highlight {
 }
 thead.float {
     background-color: white;
+}
+.iframePage {
+    height: 100%;
+    width: 100%;
+    border: 1px transparent;
 }
 /*
     Pre-loaded Images
@@ -178,8 +199,16 @@ span.delete-icon {
 }
 .mobileMenuIcon {
     position: fixed;
-    top: 20px;
-    right: 15px;
+    top: 35px;
+    right: 10px;
+    cursor: pointer;
+    height: 25px;
+    opacity: 0.33;
+}
+.numbpadMenuIcon {
+    position: fixed;
+    top: 35px;
+    right: 10px;
     cursor: pointer;
     height: 25px;
     opacity: 0.33;
@@ -201,6 +230,30 @@ span.delete-icon {
     padding: 10px;
     cursor: pointer;
 }
+#search-resp {
+    border-radius: 5px;
+    text-align: right;
+    position: relative; 
+    top: 0;
+    right: 50;
+    max-width: 300px;
+    float: right;
+}
+
+/*
+    Panels
+*/
+span.scrollRightIcon {
+    background-image: url("../src/img/rightArrow.png");
+    height: 25px;
+    width: 25px;
+    opacity: 0.33;
+    cursor: pointer;
+    float: right;
+}
+
+
+
 /*
     Vertical Alignment Helper
 */
@@ -230,6 +283,9 @@ span.delete-icon {
 .buttonbox {
     border: 1px solid lightgrey;
     font-weight: bold;
+}
+.bb-btn:hover {
+    color: tomato;
 }
 td.buttonbox {
     font-size: 10px;

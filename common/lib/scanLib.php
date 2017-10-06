@@ -28,6 +28,29 @@
 
 class scanLib
 {
+    
+    /*
+        @strGetDate: parse a str for date in Y-d-m
+        format.
+        @param $str string to parse.
+        Return $str with past/currnet dates(Y-m-d) encapsulated 
+        in span.text-danger. 
+    */
+    public function strGetDate($str)
+    {
+        $curTimeStamp = strtotime(date('Y-m-d'));
+        $pattern = "/\d{4}\-\d{2}\-\d{2}/";
+        preg_match_all($pattern, $str, $matches);
+        foreach ($matches as $array) {
+            foreach ($array as $v) {
+                $thisTimeStamp = strtotime($v);
+                if ($curTimeStamp >= $thisTimeStamp) {
+                    $str = str_replace($v,'<span class="text-danger">'.$v.'</span>',$str);
+                }
+            }
+        }
+        return $str;
+    }
 
     public function readStdin()
     {

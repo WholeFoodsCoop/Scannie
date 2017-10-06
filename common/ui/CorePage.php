@@ -34,7 +34,8 @@ class ScancoordDispatch
     //protected $add_javascript_content = false;
 
     public function help_content() {
-        return 'No help content has been created for this page.';
+        //return 'No help content has been created for this page.';
+        return $this->description;
     }
 
     function __construct() {
@@ -101,10 +102,6 @@ class ScancoordDispatch
             print '<div class="container" id="" style="min-height: 850px;width:95%;border:1px solid #f5ebd0; padding:5px; background-color: white; border-radius: 5px;">';
             print menu::nav_menu();
         }
-        /*
-        print '<a class="menuNav" style="width:160px;" href=""
-                data-toggle="modal" data-target="#quick_lookups">Quick Lookups<span class=""></span></a>';
-        */
         print $this->body_content();
         print $this->get_help_content();
         print $this->quick_lookups();
@@ -187,13 +184,13 @@ class ScancoordDispatch
         $ItemEditor = 'http://192.168.1.2/git/fannie/item/ItemEditorPage.php';
         $batch = 'http://192.168.1.2/git/fannie/batches/newbatch/EditBatchPage.php';
         $LastSold = 'http://192.168.1.2/scancoord/item/last_sold_check.php';
-        $ItemBatchHistory = 'http://192.168.1.2/scancoord/item/Batches/prodBatchHistory.php';
+        $ItemBatchHistory = 'http://key/git/fannie/reports/ItemBatches/ItemBatchesReport.php';
         $SalesBatchPercent = 'http://192.168.1.2/scancoord/item/Batches/CheckBatchPercent.php';
         
         $ret .= '<div align="center">';
 
         $ret .= '
-            <form class="form-inline" method="get"   action="'.$TrackChange.'">
+            <form class="form-inline" method="get"   action="'.$TrackChange.'" target="_blank">
                 <div class="input-group">
                     <span class="input-group-addon alert-info" style="width: 100px; "><a href="'.$TrackChange.'">Track Change</a></span>
                     <input type="text" class="form-control" id="trackchange" name="upc" placeholder="enter upc" style="width: 200px; " autofocus>
@@ -203,7 +200,7 @@ class ScancoordDispatch
         ';
 
         $ret .= '
-            <form class="form-inline" method="get"   action="'.$LastSold.'">
+            <form class="form-inline" method="get"   action="'.$LastSold.'" target="_blank">
                 <div class="input-group">
                     <span class="input-group-addon alert-info" style="width: 100px; "><a href="'.$LastSold.'">Last Sold</a></span>
                     <input type="text" class="form-control" id="lastsold" name="upc" placeholder="enter upc" style="width: 200px; ">
@@ -214,7 +211,7 @@ class ScancoordDispatch
         ';
 
         $ret .= '
-            <form class="form-inline" method="get"   action="'.$ItemEditor.'">
+            <form class="form-inline" method="get"   action="'.$ItemEditor.'" target="_blank">
                 <div class="input-group">
                     <span class="input-group-addon alert-warning" style="width: 100px; "><a href="'.$ItemEditor.'">Item Editor</a></span>
                     <input type="text" class="form-control" id="itemeditor" name="searchupc" placeholder="enter upc" style="width: 200px; ">
@@ -226,7 +223,7 @@ class ScancoordDispatch
         ';
 
         $ret .= '
-            <form class="form-inline" method="get"   action="'.$batch.'">
+            <form class="form-inline" method="get"   action="'.$batch.'" target="_blank">
                 <div class="input-group">
                     <span class="input-group-addon alert-warning" style="width: 100px; "><a href="'.$batch.'">Sales Batches</a></span>
                     <input type="text" class="form-control" id="itemeditor" name="id" placeholder="enter batch ID" style="width: 200px; ">
@@ -238,10 +235,11 @@ class ScancoordDispatch
         ';
 
         $ret .= '
-            <form class="form-inline" method="get"   action="'.$ItemBatchHistory.'">
+            <form class="form-inline" method="get"   action="'.$ItemBatchHistory.'" target="_blank">
                 <div class="input-group">
                     <span class="input-group-addon alert-info" style="width: 100px; "><a href="'.$ItemBatchHistory.'">Item Batch H</a></span>
                     <input type="text" class="form-control" id="itembatchhistory" name="upc" placeholder="enter upc" style="width: 200px; ">
+                    <input type="hidden" name="includePC" value="on">
                     '.$subBtn.'
                 </div>
                 <input type="hidden" name="id" value="1">
@@ -250,7 +248,7 @@ class ScancoordDispatch
 
 
         $ret .= '
-            <form class="form-inline" method="get"   action="'.$SalesBatchPercent.'">
+            <form class="form-inline" method="get"   action="'.$SalesBatchPercent.'" target="_blank">
                 <div class="input-group">
                     <span class="input-group-addon alert-info" style="width: 100px; "><a href="'.$SalesBatchPercent.'">Sales Batch %</a></span>
                     <input type="text" class="form-control" id="salesbatchpercent" name="batchID" placeholder="enter batch id" style="width: 200px; ">
@@ -290,7 +288,6 @@ class ScancoordDispatch
         if ($this->must_authenticate == TRUE) {
             $userPrivilege = $_SESSION['user_type'];
             if ($userPrivilege != 1) {
-                //$_SESSION['prevUrl'] = full_path_to_page_whos_class_was_loaded;
                 header('Location: http://192.168.1.2/scancoord/admin/login.php');
 
             }
@@ -315,6 +312,7 @@ class ScancoordDispatch
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/scancoord/common/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" href="/scancoord/common/css/Scannie_css.css?load=true">
+    <link rel="stylesheet" href="/scancoord/common/javascript/tablesorter/css/theme.blue.css">
     <script src="/scancoord/common/bootstrap/jquery.min.js"></script>
     <script src="/scancoord/common/bootstrap/bootstrap.min.js"></script>
     <title>' . $this->title . '</title>

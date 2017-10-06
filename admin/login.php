@@ -82,15 +82,6 @@ class admin
             } else {
                 echo "<br /><br /><div align='center'><div class='alert alert-danger login-resp' >Username or Password is incorrect</div></div>";
             }
-            /*
-            if ($dbc->numRows($resultB) == 0) {
-                echo '<div class="alert alert-danger">User does not exist.</div>';
-            } else {
-
-            }*/
-            // echo '<h1>'.$_SESSION['user_name'].'</h1>';
-            // echo '<h1>'.$_SESSION['user_type'].'</h1>';
-            // echo '<h1>'.basename($_SERVER['HTTP_REFERER']).'</h1>';
         }
 
     }
@@ -100,13 +91,6 @@ class admin
         include('../config.php');
         include('../common/lib/scanLib.php');
         $ret = '';
-
-        /*  for testing only
-        $ret .= '
-            <b style="color: tomato;">$prev = '.$_SESSION["prevUrl"].'<br />
-            $cur = '.$_SESSION["curUrl"].'</b>
-        ';
-        */
 
         if ($ipod = scanLib::isDeviceIpod()) {
             $width = 'width: 90vw;';
@@ -118,17 +102,20 @@ class admin
                 h2.login {
                     text-shadow: 1px 1px grey;
                 }
+                @media only screen and (max-width: 600px) {
+                    
+                }
             </style>
         ';
         $ret .= '
             <div class="login-form" align="center" style="'.$width.'">
                 <form method="post" class="form-inline">
                     <h2 class="login">Scannie Login</h2><br /><br />
-                    <label style="width:120px">Username:</label>
-                        <input type="text" name="username" class="form-control" style="max-width: 200px;" autofocus><br><br>
-                    <label style="width:120px">Password:</label>
-                        <input type="password" name="pw" class="form-control" style="max-width: 200px;"><br><br><br><br>
-                        <input type="submit" value="LOG IN" class="btn btn-default btn-login" style="width: 150px; "><br /><br /><br />
+                    <label style="width:120px">Username</label>
+                        <input type="text" name="username" class="form-control" style="max-width: 200px;" ><br><br class="hidden-xs">
+                    <label style="width:120px">Password</label>
+                        <input type="password" name="pw" class="form-control" style="max-width: 200px;"><br><br><br class="hidden-xs"><br class="hidden-xs">
+                        <input type="submit" value="LOG IN" class="btn btn-default btn-login" style="width: 150px; "><br /><br  class="hidden-xs"/><br />
                     <a class="" href="'.$SCANWEBPATH.'/misc/mobile.php" style="background: rgba(155,155,155,.9); border: 1px solid grey; padding: 5px;">Mobile Menu</a><br />
                 </form>
 

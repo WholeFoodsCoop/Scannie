@@ -35,7 +35,8 @@ class search
         $this->getList();
 
         $ret = '';
-        $ret .= '<u style="color:#c7bda3">Search Results</u><br />';
+        $ret .= '<u style="color:grey; text-decoration: none;
+            font-weight: bold;">Search Results</u><br />';
         foreach ($this->data as $name => $path) {
             if ( (strstr($name,$s) || strstr($name,ucwords($s))) && strlen($s) > 2) {
                 $ret .= '<a href="'.$path.$name.'">';
@@ -70,14 +71,12 @@ class search
             if ($prevDir != $path) {
                 $prevDir = $path;
                 if ($i) {}
-                //$ret .= '<h4><span style="color:purple">'.substr($path,1,-1).'</span></h4>';
                 $this->pagelist[] = substr($path,1,-1) . ' | <a href="'.$path.$name.'">'.$name.'</a>';
             }
-            //$ret .= '<a href="'.$path.$name.'">'.$name.'</a><br>';
             $i = TRUE;
         }
 
-        return $this->pagelist;
+        rern $this->pagelist;
     }
 
     private function getDirContents($dirname,$path)

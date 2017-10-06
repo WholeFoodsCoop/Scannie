@@ -70,12 +70,29 @@ class menu
             iframe.menu {
                 opacity: 0.95;
             }
-
+            
+            /*
+                Mobile menu
+            */
+            .mobilePage {
+                border: 1px solid black;
+                padding: 10px;
+                list-style-type: none;
+                background-color: darkgrey;
+                background: linear-gradient(darkgrey,grey);
+                margin-left: -15px;
+                z-index: 99;
+            }
+            .aPage {
+                color: white;
+                font-weight: bold;
+                text-shadow: 1px 1px black;
+            }
             </style>
         ';
 
         $ret .=  '
-<div class="container-fluid"  align="center" style="height:80px;width:1000px; ">
+<div class="container-fluid"  align="center" style="height:80px;width:900px; ">
 
     <div class="navbar navbar-default collapse in hidden-xs hidden-print" style="background-color:white;border:none">
         <ul class="nav navbar-nav">
@@ -97,7 +114,7 @@ class menu
                     <li><a class="menu-opt" href="http://192.168.1.2/scancoord/item/coopBasicsScanPage.php">Basics Scan</a></li>
                 <li class="divider"></li><!-- divider with no header -->
                 <li class="dropdown-header">UNFI Sales Change</li>
-                    <li class="test"><a class="test" href="http://192.168.1.2/scancoord/item/SalesChange/SalesChangeIndex.php"> Batch Check </a></li>
+                    <li class="test"><a href="http://192.168.1.2/scancoord/item/SalesChange/SalesChangeIndex.php" style="color: green"> Batch Check </a></li>
                     <li><a class="menu-opt" href="http://192.168.1.2/scancoord/item/SalesChange/CoopDealsReview.php">Quality Assurance</a></li>
                     <li><a class="menu-opt" href="http://192.168.1.2/scancoord/item/Batches/unfiBreakdowns.php">Breakdowns</a></li>
                     <li><a class="menu-opt" href="http://192.168.1.2/scancoord/item/SignInfoHelper.php">Sign Info</a></li>
@@ -119,13 +136,13 @@ class menu
                     <li><a class="menu-opt" href="http://192.168.1.2/scancoord/dataScanning/MultiStoreDiscrepTable.php">Multi-Store Prod Discrep</a></li>
                     <li><a class="menu-opt" href="http://192.168.1.2/scancoord/dataScanning/CashlessCheckPage.php">Cashess Trans. Check</a></li>
                     <li><a class="menu-opt" href="http://192.168.1.2/scancoord/misc/ProdUserChangeReport.php">Prod User Change</a></li>
+                    <li><a class="menu-opt" href="http://192.168.1.2/scancoord/dataScanning/specialPriceCheck.php">Special Price Scan</a></li>
+                    <li><a class="menu-opt" href="" onclick="popitup(\'http://192.168.1.2/scancoord/misc/ipod.php\')">handheld</a></li>
                 </ul>
             </li>
 
             <li class="dropdown"><a class="menuNav"  href=""
                 data-toggle="modal" data-target="#help">Help<span class=""></span></a>
-
-           <!-- <li><a class="menuNav"  href="" data-toggle="modal" data-target="#quick_lookups">QLU<span class=""></span></a></li> -->
 
             <li class="dropdown" style="margin-top: 15px;"><input class="tinyInput menuNav" id="searchbar" name="search" placeholder="search scannie"/></a></li>
 
@@ -197,10 +214,10 @@ class menu
                 <ul>';
         foreach ($menuOptions as $k => $v) {
             if (is_array($v)) {
-                $ret .= '<li class="mobileHeader" data-toggle="collapse" data-target="#li'.$k.'">'.$k.'</li>';
-                $ret .= '<ul class="collapse" id="li'.$k.'">';
+                $ret .= '<li class="mobileHeader" data-toggle="collapse" data-parent="#mobileMenu" data-target="#li'.$k.'">'.$k.'</li>';
+                $ret .= '<ul class="collapse mobileColumn" id="li'.$k.'">';
                 foreach ($v as $vk => $vv) {
-                    $ret .=  '<li><a href="'.$vv.'">'.$vk.'</a></li>';
+                    $ret .=  '<li class="mobilePage"><a class="aPage" href="'.$vv.'">'.$vk.'</a></span></li>';
                 }
                 $ret .= '</ul>';
             } else {
@@ -212,17 +229,12 @@ class menu
                 </ul>
                 
                 <div align="center"><span style="cursor: pointer; font-size: 18px;" 
-                    id="closeMenu"><br />x<br /><br /></span></div>
+                    id="closeMenu"><br />^<br /><br /></span></div>
             </div>
         ';
         
         return $ret;
     }
     
-    public function cssContent()
-    {
-        
-    }
-
 }
 ?>
