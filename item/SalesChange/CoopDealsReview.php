@@ -51,9 +51,41 @@ class CoopDealsReview extends ScancoordDispatch
             $ret .= $this->getBadPriceItems($dbc);
             $ret .= $this->getMissingSignText($dbc);
             $ret .= $this->getBadPrices($dbc);
+            $lineAlerts = substr_replace($this->getLineSales($dbc),"",-1);
+            echo "$lineAlerts<br/><br/>";
         }
         
         return $ret;
+    }
+
+    private function getLineSales($dbc)
+    {
+        $ret = '';
+        $startDate = $_GET['startDate'];
+        $brands = array(
+            "%Aura%" => "Aura Cacia Essential Oils",
+            "%Life Factory%" => "Life Factory Products",
+            "%Hydro Flase%" => "Hydro Flask Products",
+            "%Emergen%" => "Emergen-C Products",
+            "%Ener%" => "Ener-C Products",
+        );
+        $rows = array();
+        foreach ($brands as $brand => $description) {
+            $args = array($startDate,$brand);
+            $query = $dbc->prepare("SELECT COUNT(*) FROM batches AS b 
+                LEFT JOIN batchList AS bl ON b.batchID=bl.batchID 
+                LEFT JOIN products AS p ON bl.upc=p.upc 
+                WHERE startDate = ? 
+                AND p.brand like ? GROUP BY bl.upc;
+            ");
+            $result = $dbc->execute($query,$args);
+            if ($rows = $dbc->numRows($result)) {
+                $ret .= " <b>" . $description . "</b>: <span class=\"alert-danger\">$rows items counted.</span> |";
+            }
+        }
+
+        return $ret;
+
     }
     
     private function getBadPrices($dbc)
