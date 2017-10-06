@@ -43,9 +43,8 @@ class SalesChangeIndex extends ScancoordDispatch
     {           
         
         return '
-            <br>
                 <div class="container" align="center">
-                <div class="panel panel-default" style="width:300px;">
+                <div class="panel panel-default" style="max-width:300px;">
                 <div class="panel-heading">Batch Check</div>
                 <table class="table">
                     <tr><td class="highlight"><a class="btn" href="ListGen.php"> Generate List </a>&nbsp;|&nbsp;
@@ -59,6 +58,7 @@ class SalesChangeIndex extends ScancoordDispatch
         ';
         
     }
+    
     
 }
 

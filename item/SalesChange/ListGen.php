@@ -32,7 +32,7 @@
 </div>
 </fieldset>
 <?php
-
+$store_id = 0;
 include('../../config.php');
 $dbc = mysql_connect($SCANHOST, $SCANUSER, $SCANPASS);
 mysql_select_db($SCANALTDB, $dbc);
