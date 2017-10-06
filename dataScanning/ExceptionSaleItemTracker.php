@@ -106,7 +106,7 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
             $ret .= '<td>' . $array['desc'] . '</td>';
             $ret .= '<td>' . $array['salePrice'][0];
             $ret .= ' | ' . $array['salePrice'][1] . '</td>';
-            $ret .= '<td>' . $array['note'] . '</td>';
+            $ret .= '<td>' . scanLib::strGetDate($array['note']) . '</td>';
         }
         $ret .=  '</table></div>';
         $ret .= '</div>';

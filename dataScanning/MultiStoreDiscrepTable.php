@@ -35,7 +35,6 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
     protected $title = "Multi Store Discrepancies Table";
     protected $description = "[] ";
     protected $ui = TRUE;
-    protected $add_css_content = TRUE;
 
     public function body_content()
     {
@@ -141,8 +140,9 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
         }
 
         $headers = array('Hill Desc','Den Desc','Hill Cost','Den Cost');
-        $ret .= '<table class="table table-condensed table-bordered small">';
-        $ret .= '<thead><th>upc</th><th>Track</th><th>sup_dept</th>';
+        $ret .= '<div class="table-responsive">';
+        $ret .= '<table class="table table-condensed table-bordered small table-responsive">';
+        $ret .= '<thead><th>upc</th><th>chg</th><th>sup_dept</th>';
         foreach ($fields as $field) {
             if ($field != 'super_name') {
                 $ret .= '<th><b>[H]</b>'.$field.'</th><th><b>[D]</b>'.$field.'</th>';
@@ -152,10 +152,10 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
         $ret .= '</thead><tbody>';
         foreach ($itemH as $upc => $row) {
             $ret .= '<tr>';
-            $ret .= '<td class="okay"><a href="http://192.168.1.2/git/fannie/item/ItemEditorPage.php?searchupc='.$upc.'"
+            $ret .= '<td class="okay"><a class="text" href="http://192.168.1.2/git/fannie/item/ItemEditorPage.php?searchupc='.$upc.'"
                 target="_blank">' . $upc . '</a></td>
-                <td class="okay"><a href="http://key/scancoord/item/TrackChangeNew.php?upc=' . $upc . '" target="_blank">
-                    <img src="../common/src/img/q.png" style="height: 15px;">&nbsp;<span class="text-tiny">info</span></a></td>';
+                <td class="okay"><a class="text" href="http://key/scancoord/item/TrackChangeNew.php?upc=' . $upc . '" target="_blank">
+                    <img src="../common/src/img/q.png" style="height: 15px;">&nbsp;<span class="text-tiny"></span></a></td>';
             $ret .= '<td class="'.$row['super_name'].'">' . $row['super_name'] . '</td>';
             foreach ($fields as $field) {
                 if ($field != 'super_name') {
@@ -175,7 +175,7 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
             }
             $ret .= '</tr>';
         }
-        $ret .= '</tbody></table>';
+        $ret .= '</tbody></table></div>';
 
         return $ret;
 
@@ -204,7 +204,7 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
                 //background-image: none;
                 //background-color: black;
             }
-            a {
+            a.text {
                 color: lightgrey;
             }
             tbody {

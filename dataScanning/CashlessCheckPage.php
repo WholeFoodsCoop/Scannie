@@ -32,7 +32,8 @@ class CashlessCheckPage extends ScancoordDispatch
     protected $description = "[Check Cashless Status] Check the status of recent 
         cashless transactions for every lane.";
     protected $ui = TRUE;
-    
+    protected $must_authenticate = TRUE;
+   
     public function body_content()
     {           
         $ret = '';
