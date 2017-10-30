@@ -55,7 +55,7 @@ class CoopDealsSearchPage extends ScancoordDispatch
         $ret = '';
         $ret .= $this->js();
         include('../../config.php');
-        $dbc = new SQLManager($SCANHOST, 'pdo_mysql', 'woodshed_no_replicate', $SCANUSER, $SCANPASS);
+        $dbc = ScanLib::getConObj();
         $ret .= $this->form_content();
 
         if (isset($_GET['brand'])) {
@@ -66,83 +66,81 @@ class CoopDealsSearchPage extends ScancoordDispatch
             $description = $_GET['description'];
         }
         */
-        if ($month = $_GET['month']) {
-            $ret .= 'Month Selected: <strong>' . $month . '</strong>';
+        if ($dealSet = $_GET['dealSet']) {
+            $ret .= 'Month Selected: <strong>' . $dealSet . '</strong>';
 
-            $ret .= $this->form_ext_content($dbc,$month);
+            $ret .= $this->form_ext_content($dbc,$dealSet);
 
+            $args = array();
             $query = $dbc->prepare("
                 SELECT
                     c.upc,
-                    c.flyerPeriod,
-                    c.department,
-                    c.sku,
-                    c.brand,
-                    c.description AS posDesc,
-                    c.packSize,
-                    c.srp,
-                    c.lineNotes,
+                    c.abtpr,
+                    p.department,
+                    v.sku,
+                    p.brand,
+                    p.description AS posDesc,
+                    p.size,
+                    c.price,
+                    c.multiplier,
   					c.promoDiscount,
                     p.normal_price,
                     pu.description AS signDesc
-                FROM CoopDeals".$month." AS c
+                FROM is4c_op.CoopDealsItems AS c
                     LEFT JOIN is4c_op.productUser AS pu ON pu.upc=c.upc
                     LEFT JOIN is4c_op.products AS p ON c.upc=p.upc
+                    LEFT JOIN is4c_op.vendorItems AS v ON p.default_vendor_id=v.vendorID 
+                        AND c.upc=v.upc
+                WHERE c.dealSet = ?
+                    AND p.upc IS NOT NULL;
                 ORDER BY c.upc ASC
             ;");
             $queryBrand = $dbc->prepare("
                 SELECT
-                    upc,
-                    flyerPeriod,
-                    department,
-                    sku,
-                    brand,
-                    description AS posDesc,
-                    packSize,
-                    srp,
-                    lineNotes,
-					promoDiscount
-                FROM CoopDeals".$month."
-                    WHERE brand = '".$brand."'
-                ORDER BY upc ASC
-            ");
-            $queryDesc = $dbc->prepare("
-                SELECT
-                    upc,
-                    flyerPeriod,
-                    department,
-                    sku,
-                    brand,
-                    description,
-                    packSize,
-                    srp,
-                    lineNotes,
-					promoDiscount
-                FROM CoopDeals".$month."
-					WHERE description like '% ? %'
-                ORDER BY upc ASC
+                    c.upc,
+                    c.abtpr,
+                    p.department,
+                    v.sku,
+                    p.brand,
+                    p.description AS posDesc,
+                    p.size,
+                    c.price,
+                    c.multiplier,
+  					c.promoDiscount,
+                    p.normal_price,
+                    pu.description AS signDesc
+                FROM is4c_op.CoopDealsItems AS c
+                    LEFT JOIN is4c_op.productUser AS pu ON pu.upc=c.upc
+                    LEFT JOIN is4c_op.products AS p ON c.upc=p.upc
+                    LEFT JOIN is4c_op.vendorItems AS v ON p.default_vendor_id=v.vendorID 
+                        AND c.upc=v.upc
+                WHERE c.dealSet = ?
+                    AND p.brand = ?
+                    AND p.upc IS NOT NULL;
+                ORDER BY c.upc ASC
             ");
 
 			if (isset($_GET['brand'])) {
-				$result = $dbc->execute($queryBrand);
-			} elseif (isset($_GET['description'])) {
-				$result = $dbc->execute($queryDesc,$description);
+                $args[] = $_GET['dealSet'];
+                $args[] = $_GET['brand'];
+				$result = $dbc->execute($queryBrand,$args);
 			} else {
-	            $result = $dbc->execute($query);
+                $args[] = $_GET['dealSet'];
+	            $result = $dbc->execute($query,$args);
 			}
             $data = array();
             while ($row = $dbc->fetch_row($result)) {
                 $upc = $row['upc'];
-                $data[$upc]['period'] = $row['flyerPeriod'];
+                $data[$upc]['period'] = $row['abtpr'];
                 $data[$upc]['dept'] = $row['department'];
                 $data[$upc]['sku'] = $row['sku'];
                 $data[$upc]['brand'] = $row['brand'];
                 $data[$upc]['desc'] = $row['posDesc'];
                 $data[$upc]['desc2'] = $row['signDesc'];
-                $data[$upc]['size'] = $row['packSize'];
-                $data[$upc]['price'] = $row['srp'];
+                $data[$upc]['size'] = $row['size'];
+                $data[$upc]['price'] = $row['price'];
                 $data[$upc]['normal_price'] = $row['normal_price'];
-                $data[$upc]['lineNotes'] = $row['lineNotes'];
+                $data[$upc]['lineNotes'] = $row['multiplier'];
 				$data[$upc]['promoDiscount'] = ($row['promoDiscount']*100).'% OFF';
             }
             if ($dbc->error()) echo $dbc->error();
@@ -168,7 +166,7 @@ class CoopDealsSearchPage extends ScancoordDispatch
                 $ret .= '<tr class="rowz">';
                 $ret .= '<td>' . $upc . '</td>';
                 foreach ($row as $k => $v) {
-                    $ret .= '<td>' . $v . '</td>';
+                    $ret .= '<td class="col'.$k.'">' . $v . '</td>';
                 }
                 $ret .= '</tr>';
             }
@@ -180,34 +178,35 @@ class CoopDealsSearchPage extends ScancoordDispatch
 
     private function form_content()
     {
+        $dbc = ScanLib::getConObj();
+        $dealSets = "";
+        $prep = $dbc->prepare("SELECT dealSet FROM is4c_op.CoopDealsItems
+            GROUP BY dealSet");
+        $res = $dbc->execute($prep);
+        while ($row = $dbc->fetchRow($res)) {
+            $dealSets .= "<option value='{$row['dealSet']}'>{$row['dealSet']}</option>";
+        }
 
-        return '
-            <form class ="form-inline"  method="get" >
-                <select name="month" class="form-control">
-                    <option value="">Select A Month</option>
-                    <option value="Jan">January</option>
-                    <option value="Feb">February</option>
-                    <option value="Mar">March</option>
-                    <option value="Apr">April</option>
-                    <option value="May">May</option>
-                    <option value="Jun">June</option>
-                    <option value="Jul">July</option>
-                    <option value="Aug">August</option>
-                    <option value="Sep">September</option>
-                    <option value="Oct">October</option>
-                    <option value="Nov">November</option>
-                    <option value="Dec">December</option>
-                </select>&nbsp;
-                <button class="btn btn-default">Submit</button><br>
-            </form>
-        ';
-
+        return <<<HTML
+<form class ="form-inline"  method="get" >
+    <select name="dealSet" class="form-control">
+        <option value="">Select A Month</option>
+        {$dealSets}
+    </select>&nbsp;
+    <button class="btn btn-default">Submit</button><br>
+</form>
+HTML;
     }
 
-    private function form_ext_content($dbc,$month)
+    private function form_ext_content($dbc,$dealSet)
     {
-        $prep = $dbc->prepare("SELECT brand FROM CoopDeals".$month." GROUP BY brand");
-        $res = $dbc->execute($prep);
+        $args = array($dealSet);
+        $prep = $dbc->prepare("
+            SELECT brand FROM is4c_op.CoopDealsItems AS c
+                LEFT JOIN is4c_op.products AS p ON c.upc=p.upc
+            WHERE dealSet = ? 
+            GROUP BY brand");
+        $res = $dbc->execute($prep,$args);
         $brans = array();
         while ($row = $dbc->fetch_row($res)) {
             $brands[] = $row['brand'];
@@ -231,9 +230,9 @@ class CoopDealsSearchPage extends ScancoordDispatch
                         </select>
                     </div>
 
-					<input type="hidden" name="month" value="'.$month.'">
+					<input type="hidden" name="dealSet" value="'.$dealSet.'">
                     <br><br>&nbsp;<button class="btn btn-default btn-sm">Narrow Search</button> &nbsp;&nbsp;
-          			<a class="btn btn-default btn-sm" href="http://key/scancoord/item/Batches/CoopDealsSearchPage.php?month='.$month.'">Clear Search</a>
+          			<a class="btn btn-default btn-sm" href="http://key/scancoord/item/Batches/CoopDealsSearchPage.php?dealSet='.$dealSet.'">Clear Search</a>
                 </form>
         </div>
         ';

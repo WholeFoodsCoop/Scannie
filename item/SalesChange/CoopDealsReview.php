@@ -163,7 +163,7 @@ class CoopDealsReview extends ScancoordDispatch
         $ret .= '<table class="table table-default table-condensed small">';
         while ($row = $dbc->fetchRow($result)) {
             $ret .= '<tr>';
-            $ret .= '<td>' . $row['upc'] . '</td>';
+            $ret .= '<td><a href="http://key/git/fannie/item/ItemEditorPage.php?searchupc=' . $row['upc'] . '&ntype=UPC&searchBtn=" target="_blank">'.$row['upc'].'</a></td>';
             $ret .= '<td>' . $row['pBrand'] . '</td>';
             $ret .= '<td></td>';
             $ret .= '<td>' . $row['pDesc'] . '</td>';
