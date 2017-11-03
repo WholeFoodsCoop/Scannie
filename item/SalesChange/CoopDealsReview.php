@@ -30,7 +30,8 @@ if (!class_exists('SQLManager')) {
 /**
 *   @class CoopDealsBadPriceCheck
 *
-*   Find bad deals & missing sign info in Batches.
+*   Find bad deals & missing sign info in batches,
+*   make suggestions for sign style. 
 */
 class CoopDealsReview extends ScancoordDispatch
 {
@@ -42,20 +43,61 @@ class CoopDealsReview extends ScancoordDispatch
     public function body_content() {
         
         include('../../config.php');
-        $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
+        $dbc = ScanLib::getConObj("FANNIE_OP_DB");
         
         $ret = '';
         $ret .= $this->form_content();
         $start = $_GET['startDate'];
+        $upcs = $this->getProdsInBatches($dbc);
         if (isset($start)) {
             $ret .= $this->getBadPriceItems($dbc);
             $ret .= $this->getMissingSignText($dbc);
             $ret .= $this->getBadPrices($dbc);
+            $ret .= $this->getNarrowItems($dbc,$upcs);
             $lineAlerts = substr_replace($this->getLineSales($dbc),"",-1);
             echo "$lineAlerts<br/><br/>";
         }
         
         return $ret;
+    }
+
+    private function getProdsInBatches($dbc) {
+        $startDate = $_GET['startDate'];
+        $args = array($startDate);
+        $prep = $dbc->prepare("SELECT bl.upc FROM batchList AS bl
+            LEFT JOIN batches AS b ON bl.batchID=b.batchID 
+            LEFT JOIN products AS p ON bl.upc=p.upc
+            LEFT JOIN MasterSuperDepts AS m ON p.department=m.dept_ID
+            WHERE startDate = ?
+                AND m.superID in (0,1,3,4,7,8,9,13,17)
+            GROUP BY bl.upc    
+        ");
+        $res = $dbc->execute($prep,$args);
+        $upcs = array();
+        while ($row = $dbc->fetchRow($res)) {
+            $upcs[] = $row['upc'];
+        }
+
+        return $upcs;
+    }
+
+    private function getNarrowItems($dbc,$upcs) {
+        list($inStr, $args) = $dbc->safeInClause($upcs);
+        $prep = $dbc->prepare("SELECT upc FROM NarrowTags WHERE upc IN ({$inStr})");
+        $res = $dbc->execute($prep,$args);
+        $td = "";
+        while ($row = $dbc->fetchRow($res)) {
+            $td .= "<tr><td>{$row['upc']}</td></tr>";
+        }
+
+        return <<<HTML
+<div class="panel panel-default mypanel">
+    <legend class="panel-heading small">Print Narrow Signs</legend>
+    <table class="table table-default table-condensed small">
+    {$td}
+    </table>
+</div>
+HTML;
     }
 
     private function getLineSales($dbc)
@@ -114,7 +156,7 @@ class CoopDealsReview extends ScancoordDispatch
         }
         $ret .= $dbc->error();
         
-        $ret .='<div class="panel panel-default" style="float:left" >
+        $ret .='<div class="panel panel-default mypanel">
             <legend class="panel-heading small">Items with HIGH % Deals</legend>';
         $ret .= '<table class="table table-default table-condensed small">';
         foreach ($discount as $upc => $percent) {
@@ -137,7 +179,7 @@ class CoopDealsReview extends ScancoordDispatch
     {
         $startDate = $_GET['startDate'];;
         $ret = '';
-        $ret .='<div class="panel panel-default" style="float:left" >
+        $ret .='<div class="panel panel-default mypanel">
             <legend class="panel-heading small">Items Missing Sign Text</legend>';
          
         $query = $dbc->prepare("
@@ -186,7 +228,7 @@ class CoopDealsReview extends ScancoordDispatch
     {           
         $startDate = $_GET['startDate'];
         $ret = '';
-        $ret .='<div class="panel panel-default" style="float:left" >
+        $ret .='<div class="panel panel-default mypanel">
             <legend class="panel-heading small">Items with Bad Sales Prices</legend>';
         
         $query = $dbc->prepare("
@@ -237,6 +279,19 @@ class CoopDealsReview extends ScancoordDispatch
         return $ret;
     }
     
+    public function cssContent()
+    {
+        return <<<HTML
+.mypanel {
+}
+@media only screen and (min-width: 1170px) {
+    .mypanel {
+        float: left;
+        margin-left: 5px;
+    }
+}
+HTML;
+    }
     
 }
 
