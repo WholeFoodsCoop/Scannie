@@ -32,7 +32,6 @@ class TrackChangeNew extends ScancoordDispatch
     protected $title = "Track Change";
     protected $description = "[Track Change] Track all changes made to an item in POS/OFFICE.";
     protected $ui = TRUE;
-    protected $add_javascript_content = TRUE;
     
     public function body_content()
     {
@@ -113,11 +112,13 @@ class TrackChangeNew extends ScancoordDispatch
             if (mysql_errno() > 0) {
                 $ret .=  mysql_errno() . ": " . mysql_error(). "<br>";
             }
-
-            $ret .=  "<div class='panel panel-default'>";
-            $ret .=  "<table class='table' id='mytable'>";
-            $ret .=  "
-                <thead>
+            
+            $ret .=  "<div class='panel panel-default panelScroll table-responsive'>";
+            $ret .= '<span class="scrollRightIcon collapse" id="scrollRight"> </span>';
+            $table = '';
+            $table .=  "<table class='table' id='mytable'>";
+            $table .=  "
+                <thead style='position: relative;'>
                 <th>Description</th>
                 <th>Price</th><th>Sale</th>
                 <th>Cost</th>
@@ -131,6 +132,7 @@ class TrackChangeNew extends ScancoordDispatch
                 <th>Modified</th>
                 <th>Modified By</th>
                 </thead>
+                <tbody>
             ";
             for ($i=0; $i<count($desc); $i++) {
                 if($store_id[$i] == 1) $store_id[$i] = "Hillside";
@@ -153,9 +155,9 @@ class TrackChangeNew extends ScancoordDispatch
                 ) 
                 {   
                     if ($store_id[$i] == 'Hillside') {
-                        $ret .=  "<tr >";
+                        $table .=  "<tr >";
                     } else {
-                        $ret .=  "<tr class='warning'>";
+                        $table .=  "<tr class='warning'>";
                     }
                     
                     //$switch = array(0=>"<span class=\"text-danger\">O</span>",1=>"<span class=\"text-success\">|</span>");
@@ -164,29 +166,33 @@ class TrackChangeNew extends ScancoordDispatch
                         1=>"<span class=\"alert-success\"> on </span>"
                     );
                     
-                    $ret .=  "<td>" . $desc[$i] . "</td>";
-                    $ret .=  "<td>" . $price[$i] . "</td>";
-                    $ret .=  "<td>" . $salePrice[$i]  . "</td>";
-                    $ret .=  "<td>" . $cost[$i] . "</td>";
-                    $ret .=  "<td>" . $dept[$i] . "</td>";
-                    $ret .=  "<td>" . $switch[$tax[$i]] . "</td>";
-                    $ret .=  "<td>" . $switch[$fs[$i]] . "</td>";
-                    $ret .=  "<td>" . $switch[$scale[$i]] . "</td>";
-                    $ret .=  "<td>" . $switch[$wic[$i]] . "</td>";
-                    $ret .=  "<td>" . $store_id[$i] . "</td>";
-                    $ret .=  "<td>" . $switch[$inUse[$i]] . "</td>";
-                    $ret .=  "<td>" . $modified[$i] . "</td> ";
+                    $table .=  "<td>" . $desc[$i] . "</td>";
+                    $table .=  "<td>" . $price[$i] . "</td>";
+                    $table .=  "<td>" . $salePrice[$i]  . "</td>";
+                    $table .=  "<td>" . $cost[$i] . "</td>";
+                    $table .=  "<td>" . $dept[$i] . "</td>";
+                    $table .=  "<td>" . $switch[$tax[$i]] . "</td>";
+                    $table .=  "<td>" . $switch[$fs[$i]] . "</td>";
+                    $table .=  "<td>" . $switch[$scale[$i]] . "</td>";
+                    $table .=  "<td>" . $switch[$wic[$i]] . "</td>";
+                    $table .=  "<td>" . $store_id[$i] . "</td>";
+                    $table .=  "<td>" . $switch[$inUse[$i]] . "</td>";
+                    $table .=  "<td>" . $modified[$i] . "</td> ";
                     if ($realName[$i] == NULL) {
-                        $ret .=  "<td><i>unknown / scheduled change " . $uid[$i] . "</i></tr>";
+                        $table .=  "<td><i>unknown / scheduled change " . $uid[$i] . "</i></tr>";
                     } else {
-                        $ret .=  "<td>" . $realName[$i] . "</tr> ";
+                        $table .=  "<td>" . $realName[$i] . "</tr> ";
                     }
                 }
                 
             }
-            $ret .=  "</table>";
+            $table .=  "</tbody></table>";
+            $ret .= $table;
             $ret .=  "</div></div>";    // <- panel / container
         }
+        
+        $this->addScript('../common/javascript/jquery.floatThead.min.js');
+        $this->addOnloadCommand("\$('.table-float').floatThead();\n");
         
         return $ret;
     }
@@ -204,20 +210,6 @@ class TrackChangeNew extends ScancoordDispatch
                     </div>
                 </form>
         ';
-    }
-    
-        public function javascript_content()
-    {
-        
-        $ret = '';
-        $ret .= '
-<script type="text/javascript">
-    var $table = $(\'#mytable\');
-    $table.floatThead();
-</script>
-<script src="/scancoord/common/javascript/jquery.floatThead.min.js"></script>
-        ';
-        return $ret;
     }
     
 }
