@@ -31,7 +31,6 @@ class AuditScannerReport extends ScancoordDispatch
     protected $title = "Audit Scanner Report";
     protected $description = "[Audit Scanner Report] View data from recent scan job.";
     protected $ui = TRUE;
-    //protected $add_javascript_content = TRUE;
     protected $must_authenticate = TRUE;
     
     private function clear_scandata_hander($dbc,$storeID,$username) 
