@@ -140,3 +140,6 @@ function calcView(name)
     }
 }
 
+$(function(){
+        $( ".draggable" ).draggable();
+});

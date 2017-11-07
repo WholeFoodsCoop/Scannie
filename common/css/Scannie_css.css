@@ -5,7 +5,6 @@ body {
     background: linear-gradient(#f7edd2,#f7f3e6);
     background-size: 1px;
     background: -moz-repeating-linear-gradient( #f2f0ed, #f5f0eb 5px);
-    
 }
 .green {
     color: green;
@@ -19,6 +18,13 @@ body {
 .btn-default {
     background: lightgrey; /* For browsers that do not support gradients */
     background: linear-gradient(white, lightgrey); /* Standard syntax */
+}
+.no-transition {
+    -webkit-transition: height 0;
+    -moz-transition: height 0;
+    -ms-transition: height 0;
+    -o-transition: height 0;
+    transition: height 0;
 }
 /*
     bootstrap -color style additions
@@ -123,6 +129,14 @@ thead.float {
     width: 100%;
     border: 1px transparent;
 }
+.scanicon-book {
+    background-image: url("../src/img/glyphicon-book.png");
+    background-repeat: no-repeat;
+    width: 15px;
+    height: 15px;
+    display: block;
+    float: left;
+}
 /*
     Pre-loaded Images
 */
@@ -187,6 +201,21 @@ span.delete-icon {
     border: 0.5px solid #cacaca;
     border-radius: 5px;
     box-shadow: 5px 5px 3px #cacaca;
+    max-width: 300px;
+    z-index: 990;
+}
+.menuCalcCloseBtn {
+    position: fixed;
+    top: 295px;
+    left: 20px;
+    z-index: 999;
+    font-weight: bold;
+    color: grey;
+    text-shadow: 1px 1px lightgrey;
+}
+.menuCalcCloseBtn:hover {
+    cursor: pointer; 
+    color: lightblue;
 }
 .backToTop {
     position: fixed;
