@@ -28,6 +28,23 @@
 
 class scanLib
 {
+
+    public function getConObj($db="default", $depth="2")
+    {
+        $path = "";
+        for ($i=0; $i<$depth; $i++) {
+            $path .= "../";
+        }
+        $path .= "config.php";
+        include $path;
+        if ($db === "default") {
+           $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANALTDB, $SCANUSER, $SCANPASS);
+        } elseif($db === "FANNIE_OP_DB") {
+           $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
+        }
+
+        return $dbc;
+    }
     
     /*
         @strGetDate: parse a str for date in Y-d-m
