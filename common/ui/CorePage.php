@@ -30,11 +30,8 @@ class ScancoordDispatch
     protected $must_authenticate = false;
     protected $current_user = false;
     protected $auth_classes = array();
-    //protected $add_css_content = false;
-    //protected $add_javascript_content = false;
 
     public function help_content() {
-        //return 'No help content has been created for this page.';
         return $this->description;
     }
 
@@ -65,7 +62,7 @@ class ScancoordDispatch
         if ($this->ui === TRUE) {
             print '
                 <div class="container" style="width:95%;">
-                    <div style="font-size:28px;margin-bottom:5px;" class="primaryColor hidden-sm hidden-xs">
+                    <div style="font-size:28px;margin-bottom:5px;"  class="primaryColor hidden-sm hidden-xs">
                         <img src="/scancoord/common/src/img/scanner.png" style="width:75px;heigh:75px;float:left">
                         <a href="/scancoord">Scannie</a> | an extension of
                         <a href="http://192.168.1.2/git/fannie">CORE-POS</a>
@@ -128,7 +125,7 @@ class ScancoordDispatch
     {
         return '
             <div id="help" class="modal">
-                <div class="vertical-alignment-helper">
+                <div class="vertical-alignment-helper draggable">
                     <div class="modal-dialog vertical-align-center" role="document">
                         <div class="modal-content">
                           <div class="modal-header">
@@ -152,7 +149,7 @@ class ScancoordDispatch
     {
         return '
             <div id="quick_lookups" class="modal" >
-                <div class="vertical-alignment-helper">
+                <div class="vertical-alignment-helper draggable">
                     <div class="modal-dialog vertical-align-center" role="document">
                         <div class="modal-content">
                           <div class="modal-header">
@@ -279,7 +276,7 @@ class ScancoordDispatch
         }
     }
 
-    private function preflight($class)
+    private function preflight()
     {
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
@@ -315,6 +312,13 @@ class ScancoordDispatch
     <link rel="stylesheet" href="/scancoord/common/javascript/tablesorter/css/theme.blue.css">
     <script src="/scancoord/common/bootstrap/jquery.min.js"></script>
     <script src="/scancoord/common/bootstrap/bootstrap.min.js"></script>
+    <!-- <script src="/scancoord/common/javascript/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+        <script src="/scancoord/common/javascript/jquery-ui-1.12.1/external/jquery/jquery.js"></script>
+        <link rel="stylesheet" href="/scancoord/common/javascript/jquery-ui-1.12.1/jquery-ui.min.css"> -->
+    <link rel="stylesheet" href="/scancoord/common/javascript/jquery-ui/jquery-ui.css">
+    <!--<script src="/scancoord/common/javascript/jquery-ui/jquery-1.12.4.js"></script>-->
+    <script src="/scancoord/common/javascript/jquery-ui/jquery-ui.js"></script> 
+
     <title>' . $this->title . '</title>
 <style>';
         $ret .= $this->cssContent();
