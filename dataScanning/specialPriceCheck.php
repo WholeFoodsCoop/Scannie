@@ -35,45 +35,128 @@ class specialPriceCheck extends ScancoordDispatch
 
     public function body_content()
     {
+        ini_set('memory_limit', '1G');
         $this->getSales();
-        $opdb = $this->getMissingSales("SCANHOST","SCANDB","back");
-        /*$regNos = array(1,2,3);
-        foreach ($regNos as $regNo) {
-            $posdb .= $this->getMissingSales("SCANHOST","POSOPDB",$regNo);
-        }*/
+        $opdb = $this->checkSales();
 
+/*
+        $opdb = $this->getMissingSales("SCANHOST","SCANDB","back");
+        $regNos = array(1,2,3);
+        foreach ($regNos as $regNo) {
+            $posdb .= $this->getMissingSales("SCANHOST","POSOPDB","front",$regNo);
+        }
+*/
         return <<<HTML
-<h4>Product/Batch Special Price Discrepancies <b>OP</b><span style="font-size: 12px;"> Operational Data Conflicts</span></h4>
+<h3>Sale Price Discrepancies </h3>
+<h4 data-toggle="popover" data-trigger="hover" data-content="hello"><b>OP</b><span style="font-size: 12px;"> Operational Data Conflicts</span></h4>
 <div id="mydiv" style="border: 2px solid lightgrey"> </div>
     {$opdb}
 <div style="height: 5px;">&nbsp;</div>
 
-<h4>Product/Batch Special Price Discrepancies <b>POS</b><span style="font-size: 12px;"> Point of Sale Data Conflicts</span></h4>
+<h4><b>POS</b><span style="font-size: 12px;"> Point of Sale Data Conflicts</span></h4>
 <div id="mydiv" style="border: 2px solid lightgrey"> </div>
+    <div class="hovA">This is some text.</div>
     {$posdb}
+    This part of the page is not yet functional. It will find items that OP says
+    should be on sale but POS does not (special_price = 0 in registers) 
 <div style="height: 5px;">&nbsp;</div>
 HTML;
     }
 
     private function getSales()
     {
-        include('../config.php');
-        $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
-
+        $dbc = scanLib::getConObj("FANNIE_OP_DB",1);
         $prep = $dbc->prepare("
-            SELECT bl.salePrice, bl.upc  
+            SELECT bl.salePrice, bl.upc, s.storeID, b.batchID, b.batchName, p.special_price, p.store_id,
+                p.brand, p.description
             FROM batches AS b 
                 LEFT JOIN batchList AS bl ON b.batchID=bl.batchID 
+                LEFT JOIN StoreBatchMap AS s ON b.batchID=s.batchID
+                LEFT JOIN products AS p ON bl.upc=p.upc
+                LEFT JOIN MasterSuperDepts AS m ON p.department=m.dept_ID
             WHERE NOW() BETWEEN b.startDate AND b.endDate 
-                AND b.batchName like '%Co-op Deals%' 
-            GROUP BY bl.upc; 
+                AND bl.upc NOT LIKE 'LC%'
+            GROUP BY b.batchID, bl.upc, p.store_id, s.storeID; 
         ");
         $res = $dbc->execute($prep);
+        $cols = array('upc','batchID','batchName','salePrice','storeID','store_id','special_price',
+            'brand','description');
         while ($row = $dbc->fetchRow($res)) {
-            $this->upcs[$row['upc']] = $row['salePrice'];
+            foreach ($cols as $col) {
+                ${$col} = $row[$col];
+            }
+            $this->upcs[$upc]['B'][$batchID]['batchName'] = $batchName;
+            $this->upcs[$upc]['B'][$batchID]['salePrice'][$storeID] = $salePrice;
+
+            $this->upcs[$upc]['P'][$store_id] = $special_price;
+            $this->upcs[$upc]['P']['brand'] = $brand;
+            $this->upcs[$upc]['P']['description'] = $description;
         }
-    
-        return false;
+
+        //var_dump($this->upcs);
+
+        return false; 
+    }
+
+    private function checkSales($numstores=2)
+    {
+        $ret = "";
+        $td = "";
+        $stores = array();
+        for ($i=1; $i<=$numstores; $i++) {
+            $stores[] = $i;
+        }
+        $alphaStore = array(1=>'[H]',2=>'[D]');
+        foreach ($this->upcs as $upc => $data) {
+            $bids = array();
+            $sps = array();
+            $spstr = "";
+            foreach ($data['B'] as $k => $v) {
+                $bids[] = $k;
+            }
+            foreach ($stores as $store) {
+                foreach ($bids as $bid) {
+                    $sps[] = $data['B'][$bid]['salePrice'][$store];
+                    $curHref = "http://192.168.1.2/git/fannie/batches/newbatch/EditBatchPage.php?id=";
+                    $l = "<span style='color: grey'> | </span>";
+                    $spstr .= "{$l}<a href='{$curHref}{$bid}' target='_blank'>"
+                        .$data['B'][$bid]['salePrice'][$store] ."</a>";
+                }
+                foreach ($bids as $bid) {
+                    if ($saleprice = $data['B'][$bid]['salePrice'][$store]) {
+                        $specialprice = $this->upcs[$upc]['P'][$store];
+                        if ($saleprice != $specialprice && !in_array($speicalprice, $sps)) {
+                            //echo $upc . " " . $saleprice . " " . $specialprice . "<br/>";
+                            $curHref = "http://192.168.1.2/git/fannie/batches/batchhistory/BatchHistoryPage.php?upc=";
+                            $ln = "<a href='{$curHref}{$upc}' target='_blank'><span class=\"scanicon-book\"></span></a>";
+                            $ieHref = "<a href='http://192.168.1.2/git/fannie/item/ItemEditorPage.php?searchupc={$upc}
+                                &ntype=UPC&searchBtn=' target='_blank'>{$upc}</a>";
+                            $td .= "
+                                <tr>
+                                <td>{$ieHref}</td>
+                                <td>{$this->upcs[$upc]['P']['brand']}</td>
+                                <td>{$this->upcs[$upc]['P']['description']}</td>
+                                <td>{$this->upcs[$upc]['P'][1]} | {$this->upcs[$upc]['P'][2]}</td>
+                                <td>{$ln}{$spstr}</td>
+                                <td>{$alphaStore[$store]}</td>
+                                {$regtd}
+                                </tr>";
+                        }
+                    }
+                }
+            }
+            unset($bids);
+            unset($sps);
+        }
+
+        return <<<HTML
+<table class="table table-condensed small">
+    <thead><th>upc</th><th>Brand</th><th>Description</th><th>[H] | [D]</th>
+        <th>Current Batches</th><th>Reported</th></thead><tbody>
+        {$td}
+    </tbody>
+</table>
+HTML;
     }
 
     private function getMissingSales($h,$db,$end,$regNo="")
@@ -84,14 +167,14 @@ HTML;
         /* backend is more straight-forward. Check items on sale against price they should be on sale for. */
         $backA= array();
         $backP = $dbc->prepare("
-            SELECT b.batchName, p.special_price, bl.salePrice, p.upc, p.brand, p.description  
+            SELECT b.batchName, p.special_price, bl.salePrice, p.upc, p.brand, p.description, p.store_id 
             FROM batches AS b 
                 LEFT JOIN batchList AS bl ON b.batchID=bl.batchID 
                 LEFT JOIN products AS p ON bl.upc=p.upc 
             WHERE NOW() BETWEEN b.startDate AND b.endDate 
                 AND p.special_price <> bl.salePrice 
                 AND b.batchName like '%Co-op Deals%' 
-            GROUP BY bl.upc; 
+            GROUP BY bl.upc, p.store_id; 
         ");
         /* front-end: check if item should be on sale, if it is not, return the upc. */
         $frontA = array();
@@ -107,10 +190,18 @@ HTML;
             $regtd = "";
         }
         while ($row = $dbc->fetchRow($res)) {
-            $cols = array('upc','brand','description','batchName','salePrice','special_price');
-            foreach ($cols as $col) ${$col} = $row[$col];
+            $cols = array('upc','brand','description','batchName','salePrice','special_price','store_id');
+            foreach ($cols as $col) {
+                ${$col} = $row[$col];
+                if ($col == 'store_id') {
+                    $this->upcs[$k][$store_id] = $specialPrice;
+                } else {
+                    $this->upcs[$upc][$col] = ${$col};
+                }
+            }
+
             $td .= "<tr><td>{$upc}</td><td>{$brand}</td><td>{$description}</td>
-                <td>{$batchName}</td><td>{$salePrice}</td><td>{$special_price}</td>{$regtd}</tr>";
+                <td>{$batchName}</td><td>OP: {$salePrice}</td><td>POS: {$special_price}</td><td>STORE: {$store_id}</td>{$regtd}</tr>";
         }
 
         return <<<HTML
@@ -119,39 +210,28 @@ HTML;
 </table>
 HTML;
     }
+
+/* how i'll create the table after I have data collected
+$cols = array('upc','brand','description','batchName','salePrice','special_price');
+foreach ($cols as $col) ${$col} = $row[$col];
+$td .= "<tr><td>{$upc}</td><td>{$brand}</td><td>{$description}</td>
+    <td>{$batchName}</td><td>OP: {$salePrice}</td><td>POS: {$special_price}</td>{$regtd}</tr>";
+*/
     
     public function css_content()
     {
-return <<< HTML
+return <<<HTML
 #logview {
     height: 300px;
     overflow-y: auto;
 }
-HTML;
-    }
-
-    private function js()
-    {
-        ob_start();
-        ?>
-<script type="text/javascript">
-$(document).ready( function () {
-});
-
-function getSpecialPriceCheck()
-{
-    $.ajax({
-        url: 'specialPriceQuery.php',
-        data: 'liveList=true',
-        success: function(response) {
-            $('#mydiv').html(response);
-        }
-    });
+.hovA {
+    display: none;
 }
-
-</script>
-        <?php
-        return ob_get_clean();
+b:hover + .hovA {
+    display: block;
+}
+HTML;
     }
 
 }
