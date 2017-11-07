@@ -150,11 +150,11 @@ class menu
 
             <li><span><img class="menuIcon"
                 src="http://192.168.1.2/scancoord/common/src/img/calc.png"
-                onClick="calcView(\'marginCalc\');"></span>
+                data-toggle="collapse" data-target="#marginCalc"></span>
 
                 <span ><img class="menuIcon"
                 src="http://192.168.1.2/scancoord/common/src/img/percentCalc.png"
-                onClick="calcView(\'percentCalc\');" ></span>
+                data-toggle="collapse" data-target="#percentCalc"></span>
             </li>
 
             <li></li>
@@ -176,10 +176,14 @@ class menu
     private function calciframes()
     {
         $ret = '';
-        $ret .= '<iframe class="fixedCalc menu collapse" id="marginCalc" frameBorder="0"
-            src="http://192.168.1.2/scancoord/item/MarginCalcNew.php?iframe=true"></iframe>';
-        $ret .= '<iframe class="fixedCalc menu collapse" id="percentCalc" frameBorder="0"
-            src="http://192.168.1.2/scancoord/item/PercentCalc.php?iframe=true"></iframe>';
+        $ret .= '<div id="marginCalc" class="fixedCalc collapse"><iframe class="fixedCalc menu" id="" frameBorder="0"
+            src="http://192.168.1.2/scancoord/item/MarginCalcNew.php?iframe=true"></iframe>
+            <span class="menuCalcCloseBtn" data-toggle="collapse" data-target="#marginCalc">x</span>
+            </div>';
+        $ret .= '<div id="percentCalc" class="fixedCalc collapse"><iframe class="fixedCalc menu" id="" frameBorder="0"
+            src="http://192.168.1.2/scancoord/item/PercentCalc.php?iframe=true"></iframe>
+            <span class="menuCalcCloseBtn" data-toggle="collapse" data-target="#percentCalc">x</span>
+            </div>';
         return $ret;
     }
     
