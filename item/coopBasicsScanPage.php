@@ -162,18 +162,26 @@ class coopBasicsScanPage
 
         echo '<br>Signs that are missing<br>----------------------------------<br>';
         echo '<table class="table">';
+        $missingCopyPaste = '';
         foreach ($missing as $upc) {
             $product = "<tr><td>".$upc."</td><td>".$products[$upc]['brand']."</td><td>"
             .$products[$upc]['description']."</td></tr>";
             echo $product;
+            $missingCopyPaste .= $upc . "\n";
         }
+        echo '</table>';
+        echo '<textarea rows="3" cols="15">' . $missingCopyPaste . '</textarea><br />';
+        echo '<table class="table">';
         echo '<tr><td></td><td></td><td>These signs are on the sales floor and should be taken down</td></tr>';
+        $removeCopyPaste = '';
         foreach ($remove as $upc) {
             $product = "<tr><td>".$upc."</td><td>".$products[$upc]['brand']."</td><td>"
             .$products[$upc]['description']."</td></tr>";
             echo $product;
+            $removeCopyPaste .= $upc . "\n";
         }
         echo "</table>";
+        echo '<textarea rows="3" cols="15">' . $removeCopyPaste . '</textarea><br />';
 
         return false;
     }
