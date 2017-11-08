@@ -19,8 +19,8 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *********************************************************************************/-->
-<?php 
-//session_start(); 
+<?php
+//session_start();
 ?>
 <html>
 <head>
@@ -70,7 +70,7 @@ class coopBasicsScanPage
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
 
         $store_id = scanLib::getStoreID();
-        
+
         $storeName = scanLib::getStoreName($store_id);
         echo '<h4>Coop Basics Review for <strong>'.$storeName.'</strong></h4>';
 
@@ -82,14 +82,17 @@ class coopBasicsScanPage
         }
 
         $list = array();
+        $products = array();
         $queryA = ("
-            SELECT g.upc FROM is4c_op.GenericUpload AS g
+            SELECT g.upc,p.brand,p.description FROM is4c_op.GenericUpload AS g
             LEFT JOIN products AS p ON g.upc=p.upc
             WHERE p.store_id = 1;
         ");
         $resA = $dbc->query($queryA);
         while ($row = $dbc->fetchRow($resA))  {
             $list[] = $row['upc'];
+            $products[$row['upc']]['brand'] = $row['brand'];
+            $products[$row['upc']]['description'] = $row['description'];
         }
 
         if (count($list) < 1) {
@@ -97,15 +100,6 @@ class coopBasicsScanPage
                 Check that barcodes are in the correct queue.<br>
                 Check your query.</span>';
         }
-
-		/*
-        $scanned = array();
-        $queryB = ('SELECT * FROM shelftags WHERE id = 13');
-        $resB = $dbc->query($queryB);
-        while ($row = $dbc->fetchRow($resB))  {
-            $scanned[] = $row['upc'];
-        }
-		*/
 
         $storeID = scanLib::getStoreID();
 		$scanned = array();
@@ -150,21 +144,6 @@ class coopBasicsScanPage
         $notInUse = array();
         $curM = date('m');
         foreach ($missing as $key => $upc) {
-            /*
-            $query = ("select last_sold from products where upc = {$upc} and store_id = 1");
-            $res = $dbc->query($query);
-            while ($row = $dbc->fetchRow($res))  {
-                if (substr($row['last_sold'],0,4) < 2016) {
-                    unset($missing[$key]);
-
-                } elseif (substr($row['last_sold'],5,2) < ($curM-2)) {
-                    unset($missing[$key]);
-                    $notInUse[] = $upc;
-                } else {
-                    //  do nothing
-                }
-            }
-            */
             $query = ("select inUse from products where upc = {$upc} and store_id = 1");
             $res = $dbc->query($query);
             while ($row = $dbc->fetchRow($res))  {
@@ -182,13 +161,19 @@ class coopBasicsScanPage
         }
 
         echo '<br>Signs that are missing<br>----------------------------------<br>';
-        foreach ($missing as $upc) echo $upc . '<br>';
-        echo '<br>These signs are on the sales floor and should be taken down<br>---------------------------------------------------------------------<br>';
-        foreach ($remove as $upc) echo $upc . '<br>';
-        echo '<br><span style="text-decoration: line-through;">These items should be marked as not in use for this store</span>
-            <br>---------------------------------------------------------<br>';
-        foreach ($notInUse as $upc) echo $upc . '<br>';
-
+        echo '<table class="table">';
+        foreach ($missing as $upc) {
+            $product = "<tr><td>".$upc."</td><td>".$products[$upc]['brand']."</td><td>"
+            .$products[$upc]['description']."</td></tr>";
+            echo $product;
+        }
+        echo '<tr><td></td><td></td><td>These signs are on the sales floor and should be taken down</td></tr>';
+        foreach ($remove as $upc) {
+            $product = "<tr><td>".$upc."</td><td>".$products[$upc]['brand']."</td><td>"
+            .$products[$upc]['description']."</td></tr>";
+            echo $product;
+        }
+        echo "</table>";
 
         return false;
     }
