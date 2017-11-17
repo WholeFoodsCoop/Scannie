@@ -57,6 +57,7 @@ class ScancoordDispatch
         if (!class_exists('MenuClass')) {
             include(dirname(__FILE__).'/MenuClass.php');
         }
+        include(dirname(__FILE__).'/../../config.php');
         print "<br />";
 
         if ($this->ui === TRUE) {
@@ -65,7 +66,7 @@ class ScancoordDispatch
                     <div style="font-size:28px;margin-bottom:5px;"  class="primaryColor hidden-sm hidden-xs">
                         <img src="/scancoord/common/src/img/scanner.png" style="width:75px;heigh:75px;float:left">
                         <a href="/scancoord">Scannie</a> | an extension of
-                        <a href="http://192.168.1.2/git/fannie">CORE-POS</a>
+                        <a href="http://'.$SCANHOST.'/IS4C/fannie">CORE-POS</a>
                         <!-- this span is for detecting bootstrap screensize -->
                             <span class="device-xs visible-xs"></span>
                             <div style="font-size:20px;" class="secondaryColor" data-toggle="collapse" data-target=".navbar-default" onclick="smartToggle();">
@@ -82,7 +83,7 @@ class ScancoordDispatch
                 <div class="container" style="width:95%;">
                     <div style="font-size:14px;margin-bottom:5px;" class="primaryColor hidden-lg hidden-md">
                         <a href="/scancoord">Scannie</a> | an extension of
-                        <a href="http://192.168.1.2/git/fannie">CORE-POS</a>
+                        <a href="http://'.$SCANHOST.'/IS4C/fannie">CORE-POS</a>
                         <!-- this span is for detecting bootstrap screensize -->
                             <span class="device-xs visible-xs"></span>
                             <div style="font-size:14px;" class="secondaryColor" data-toggle="collapse" data-target=".navbar-default" onclick="smartToggle();">
@@ -171,18 +172,18 @@ class ScancoordDispatch
 
     private function quick_lookups_content()
     {
-
+        include(dirname(__FILE__).'/../../config.php');
         $ret = '';
         $ret .= '
 
         ';
         $subBtn = '&nbsp;<button type="submit" class="btn btn-info btn-xs" href=""><span class="go-icon">&nbsp;</span></a>';
-        $TrackChange = 'http://192.168.1.2/scancoord/item/TrackChangeNew.php';
-        $ItemEditor = 'http://192.168.1.2/git/fannie/item/ItemEditorPage.php';
-        $batch = 'http://192.168.1.2/git/fannie/batches/newbatch/EditBatchPage.php';
-        $LastSold = 'http://192.168.1.2/scancoord/item/last_sold_check.php';
-        $ItemBatchHistory = 'http://key/git/fannie/reports/ItemBatches/ItemBatchesReport.php';
-        $SalesBatchPercent = 'http://192.168.1.2/scancoord/item/Batches/CheckBatchPercent.php';
+        $TrackChange = 'http://'.$SCANHOST.'/scancoord/item/TrackChangeNew.php';
+        $ItemEditor = 'http://'.$SCANHOST.'/fannie/item/ItemEditorPage.php';
+        $batch = 'http://'.$SCANHOST.'/IS4C/fannie/batches/newbatch/EditBatchPage.php';
+        $LastSold = 'http://'.$SCANHOST.'/scancoord/item/last_sold_check.php';
+        $ItemBatchHistory = 'http://'.$SCANHOST.'/IS4C/fannie/reports/ItemBatches/ItemBatchesReport.php';
+        $SalesBatchPercent = 'http://'.$SCANHOST.'scancoord/item/Batches/CheckBatchPercent.php';
         
         $ret .= '<div align="center">';
 
@@ -278,14 +279,17 @@ class ScancoordDispatch
 
     private function preflight()
     {
+        /* oldkey php -v too old to use session_status() ? 
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
+        */
+        include(dirname(__FILE__).'/../../config.php');
 
         if ($this->must_authenticate == TRUE) {
             $userPrivilege = $_SESSION['user_type'];
             if ($userPrivilege != 1) {
-                header('Location: http://192.168.1.2/scancoord/admin/login.php');
+                header("Location: http://{$SCANHOST}/scancoord/admin/login.php");
 
             }
         }
@@ -301,6 +305,7 @@ class ScancoordDispatch
 
     private function header($class)
     {
+        include(dirname(__FILE__).'/../../config.php');
         $ret = '';
         $ret .= $this->preprocess();
         $ret .= '
@@ -324,7 +329,7 @@ class ScancoordDispatch
         $ret .= $this->cssContent();
         $ret .= '
 </style>';
-        $this->addScript('http://192.168.1.2/scancoord/common/javascript/scannie.js');
+        $this->addScript("http://{$SCANHOST}/scancoord/common/javascript/scannie.js");
         if ($this->add_javascript_content == TRUE) {
             $ret .= $class::javascript_content();
         }
@@ -338,15 +343,16 @@ class ScancoordDispatch
 
     private function footer()
     {
+        include(dirname(__FILE__).'/../../config.php');
         $ret ='';
         $user = $_SESSION['user_name'];
         if (empty($user)) {
             $user = 'Generic User';
             $logVerb = 'Login';
-            $link = '<a href="http://192.168.1.2/scancoord/admin/login.php">['.$logVerb.']</a><br />';
+            $link = "<a href='http://{$SCANHOST}/scancoord/admin/login.php'>[{$logVerb}]</a><br />";
         } else {
             $logVerb = 'Logout';
-            $link = '<a href="http://192.168.1.2/scancoord/admin/logout.php">['.$logVerb.']</a><br />';
+            $link = "<a href='http://{$SCANHOST}/scancoord/admin/logout.php'>[{$logVerb}]</a><br />";
         }
         $ret .= '
             <div class="container" id="" style="width:96%;">
@@ -355,7 +361,7 @@ class ScancoordDispatch
             You are logged in as <strong>'.$user.'</strong>.
             '.$link.'
             Current version: 0.0.1-dev<br />
-            <a href="http://192.168.1.2/scancoord/testing/SiteMap.php">Site Map</a><br />
+            <a href="http://'.$SCANHOST.'/scancoord/testing/SiteMap.php">Site Map</a><br />
             <br />
        ';
         $ret .= '
