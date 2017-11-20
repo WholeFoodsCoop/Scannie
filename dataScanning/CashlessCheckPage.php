@@ -20,7 +20,7 @@ session_start();
 *********************************************************************************/
 include(__DIR__.'/../config.php');
 if (!class_exists('ScancoordDispatch')) {
-    include($SCANROOT.'/common/ui/CorePage.php');
+    include(__DIR__.'/../common/ui/CorePage.php');
 }
 if (!class_exists('SQLManager')) {
     include_once(dirname(dirname(__FILE__)).'/common/sqlconnect/SQLManager.php');

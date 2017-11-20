@@ -21,12 +21,12 @@
 
 *********************************************************************************/
 
-include('../config.php');
+include(__DIR__.'/../config.php');
 if (!class_exists('ScancoordDispatch')) {
-    include($SCANROOT.'/common/ui/CorePage.php');
+    include(__DIR__.'/../common/ui/CorePage.php');
 }
 if (!class_exists('SQLManager')) {
-    include_once(dirname(dirname(__FILE__)) . '/common/sqlconnect/SQLManager.php');
+    include_once(__DIR__.'/../common/sqlconnect/SQLManager.php');
 }
 
 class MultiStoreDiscrepTable extends ScancoordDispatch
@@ -39,8 +39,8 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
     public function body_content()
     {
         $ret = '';
-        include('../config.php');
-        $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
+        include(__DIR__.'/../config.php');
+        $dbc = scanLib::getConObj();
 
         if ($_GET['upcs']) {
             $upcs = $_GET['upcs'];
@@ -65,7 +65,6 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
 
         $data = array_unique($data);
         $ret .= $this->getProdInfo($dbc,$data,$fields);
-        $ret .= $this->js();
 
         return $ret;
     }
@@ -99,8 +98,8 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
 
     private function getProdInfo($dbc,$data)
     {
-
         $ret = '';
+        include(__DIR__.'/../config.php');
         $fields = array(
             'super_name',
             'description',
@@ -152,10 +151,14 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
         $ret .= '</thead><tbody>';
         foreach ($itemH as $upc => $row) {
             $ret .= '<tr>';
-            $ret .= '<td class="okay"><a class="text" href="http://192.168.1.2/git/fannie/item/ItemEditorPage.php?searchupc='.$upc.'"
-                target="_blank">' . $upc . '</a></td>
-                <td class="okay"><a class="text" href="http://key/scancoord/item/TrackChangeNew.php?upc=' . $upc . '" target="_blank">
-                    <img src="../common/src/img/q.png" style="height: 15px;">&nbsp;<span class="text-tiny"></span></a></td>';
+            $ret .= '<td class="okay">
+                <a class="text" href="http://'.$FANNIEROOT_DIR.'/item/ItemEditorPage.php?searchupc=
+                    '.$upc.'" target="_blank">' . $upc . '</a></td>
+                    <td class="okay">
+                    <a class="text" href="http://'.$SCANROOT_DIR.'/item/TrackChangeNew.php?upc=
+                    ' . $upc . '" target="_blank">
+                    <img src="../common/src/img/q.png" style="height: 15px;">&nbsp;<span class="text-tiny"></span>
+                </a></td>';
             $ret .= '<td class="'.$row['super_name'].'">' . $row['super_name'] . '</td>';
             foreach ($fields as $field) {
                 if ($field != 'super_name') {
@@ -178,7 +181,6 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
         $ret .= '</tbody></table></div>';
 
         return $ret;
-
     }
 
     public function css_content()
@@ -222,14 +224,6 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
         ';
     }
 
-    public function js()
-    {
-        ob_start();?>
-
-        <?php
-        return ob_get_clean();
-    }
-
     public function help_content()
     {
         return '
@@ -241,14 +235,10 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
                     <li>Cells that are highlighted reflect discrepancies that should be checked/corrected.</lii>
                 </lu>
             </p>
-
-
         ';
     }
 
-
 }
-
 ScancoordDispatch::conditionalExec();
 
 

@@ -17,12 +17,12 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *********************************************************************************/
-include('../config.php');
+include(__DIR__.'/../config.php');
 if (!class_exists('ScancoordDispatch')) {
-    include($SCANROOT.'/common/ui/CorePage.php');
+    include(__DIR__.'/../common/ui/CorePage.php');
 }
 if (!class_exists('SQLManager')) {
-    include_once(dirname(dirname(__FILE__)) . '/common/sqlconnect/SQLManager.php');
+    include_once(__DIR__.'/../common/sqlconnect/SQLManager.php');
 }
 class specialPriceCheck extends ScancoordDispatch
 {
@@ -71,7 +71,9 @@ HTML;
 
     private function getSales()
     {
-        $dbc = scanLib::getConObj("FANNIE_OP_DB",1);
+        include(__DIR__.'/../config.php');
+        $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
+        $dbc = scanLib::getConObj();
         $prep = $dbc->prepare("
             SELECT bl.salePrice, bl.upc, s.storeID, b.batchID, b.batchName, p.special_price, p.store_id,
                 p.brand, p.description
@@ -97,6 +99,9 @@ HTML;
             $this->upcs[$upc]['P']['brand'] = $brand;
             $this->upcs[$upc]['P']['description'] = $description;
         }
+        if ($er = $dbc->error()) {
+            echo "<div class='alert alert-warning'>{$dbc->error()}</div>";
+        }
 
         return false;
     }
@@ -104,6 +109,7 @@ HTML;
     private function checkSales($numstores=2)
     {
         $ret = "";
+        include(__DIR__.'/../config.php');
         $td = "";
         $stores = array();
         for ($i=1; $i<=$numstores; $i++) {
@@ -120,7 +126,7 @@ HTML;
             foreach ($stores as $store) {
                 foreach ($bids as $bid) {
                     $sps[] = $data['B'][$bid]['salePrice'][$store];
-                    $curHref = "http://192.168.1.2/git/fannie/batches/newbatch/EditBatchPage.php?id=";
+                    $curHref = "http://{$FANNIEROOT_DIR}/batches/newbatch/EditBatchPage.php?id=";
                     $l = "<span style='color: grey'> | </span>";
                     $spstr .= "{$l}<a href='{$curHref}{$bid}' target='_blank'>"
                         .$data['B'][$bid]['salePrice'][$store] ."</a>";
@@ -129,9 +135,9 @@ HTML;
                     if ($saleprice = $data['B'][$bid]['salePrice'][$store]) {
                         $specialprice = $this->upcs[$upc]['P'][$store];
                         if ($saleprice != $specialprice && !in_array($specialprice, $sps)) {
-                            $curHref = "http://192.168.1.2/git/fannie/batches/batchhistory/BatchHistoryPage.php?upc=";
+                            $curHref = "http://{$FANNIEROOT_DIR}/batches/batchhistory/BatchHistoryPage.php?upc=";
                             $ln = "<a href='{$curHref}{$upc}' target='_blank'><span class=\"scanicon-book\"></span></a>";
-                            $ieHref = "<a href='http://192.168.1.2/git/fannie/item/ItemEditorPage.php?searchupc={$upc}
+                            $ieHref = "<a href='http://{$FANNIEROOT_DIR}/item/ItemEditorPage.php?searchupc={$upc}
                                 &ntype=UPC&searchBtn=' target='_blank'>{$upc}</a>";
                             $td .= "
                                 <tr>
@@ -163,7 +169,7 @@ HTML;
 
     private function getMissingSales($h,$db,$regNo="",$numstores=2)
     {
-        include('../config.php');
+        include(__DIR__.'/../config.php');
         $dbc = new SQLManager(${$h}.$regNo, 'pdo_mysql', ${$db}, $SCANUSER, $SCANPASS);
 
         $upcs = array();
@@ -197,7 +203,7 @@ HTML;
             foreach ($stores as $store) {
                 foreach ($bids as $bid) {
                     $sps[] = $this->upcs[$upc]['B'][$bid]['salePrice'][$store];
-                    $curHref = "http://192.168.1.2/git/fannie/batches/newbatch/EditBatchPage.php?id=";
+                    $curHref = "http://{$FANNIEROOT_DIR}/batches/newbatch/EditBatchPage.php?id=";
                     $l = "<span style='color: grey'> | </span>";
                     $spstr .= "{$l}<a href='{$curHref}{$bid}' target='_blank'>"
                         .$this->upcs[$upc]['B'][$bid]['salePrice'][$store] ."</a>";
@@ -206,9 +212,9 @@ HTML;
                     if ($saleprice = $this->upcs[$upc]['B'][$bid]['salePrice'][$store]) {
                         $specialprice = $this->upcs[$upc]['P'][$store];
                         if ($saleprice != $specialprice && !in_array($specialprice, $sps)) {
-                            $curHref = "http://192.168.1.2/git/fannie/batches/batchhistory/BatchHistoryPage.php?upc=";
+                            $curHref = "http://{$FANNIEROOT_DIR}/batches/batchhistory/BatchHistoryPage.php?upc=";
                             $ln = "<a href='{$curHref}{$upc}' target='_blank'><span class=\"scanicon-book\"></span></a>";
-                            $ieHref = "<a href='http://192.168.1.2/git/fannie/item/ItemEditorPage.php?searchupc={$upc}
+                            $ieHref = "<a href='http://{$FANNIEROOT_DIR}/item/ItemEditorPage.php?searchupc={$upc}
                                 &ntype=UPC&searchBtn=' target='_blank'>{$upc}</a>";
                             $td .= "
                                 <tr>

@@ -2,9 +2,9 @@
 /*******************************************************************************
 
     Copyright 2013 Whole Foods Community Co-op.
-    
+
     This file is a part of CORE-POS.
-    
+
     CORE-POS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -18,38 +18,38 @@
     You should have received a copy of the GNU General Public License
     in the file LICENSE along with CORE-POS; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-    
+
 *********************************************************************************/
 
-include('../config.php');
+include(__DIR__.'/../config.php');
 if (!class_exists('ScancoordDispatch')) {
-    include($SCANROOT.'/common/ui/CorePage.php');
+    include(__DIR__.'/../common/ui/CorePage.php');
 }
 if (!class_exists('SQLManager')) {
-    include_once(dirname(dirname(__FILE__)) . '/common/sqlconnect/SQLManager.php');
+    include_once(__DIR__.'/../common/sqlconnect/SQLManager.php');
 }
 
 class zeroPriceCheck extends ScancoordDispatch
 {
-    
+
     protected $title = "Bad Price Scan";
     protected $description = "[Bad Price Scan] Scan for in-use items with bad prices.";
     protected $ui = TRUE;
-    
+
     public function body_content()
-    {           
+    {
         $ret = '';
-        include('../config.php');
+        include(__DIR__.'/../config.php');
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
-        include('../common/lib/PriceRounder.php');
+        include(__DIR__.'/../common/lib/PriceRounder.php');
         $rounder = new PriceRounder();
         if($_GET['upc']) {
             $_GET['upc'] = trim($_GET['upc']);
             $upc = str_pad($_GET['upc'], 13, 0, STR_PAD_LEFT);
         }
-        
+
         $item = array ( array() );
-        $query = $dbc->prepare("SELECT 
+        $query = $dbc->prepare("SELECT
                 p.upc,
                 p.normal_price,
                 p.brand,
@@ -77,7 +77,7 @@ class zeroPriceCheck extends ScancoordDispatch
                         AND m.superID != 3
                         AND m.superID != 6
                         AND m.superID != 7
-                        AND normal_price < cost 
+                        AND normal_price < cost
                         AND inUse = 1
                         AND normal_price > 0
                         AND upc <> 0000000003361
@@ -96,7 +96,7 @@ class zeroPriceCheck extends ScancoordDispatch
         } else {
             echo  '<div class="alert alert-danger" align="center">
                 '.$count.' products with bad prices discovered.<br></div>';
-                
+
             $ret .=  '<table class="table table-condensed table-striped">';
             $headers = array('upc','description','brand','super Dept.','price','cost','store','&Delta;');
             $ret .= '<thead>';
@@ -104,30 +104,27 @@ class zeroPriceCheck extends ScancoordDispatch
                 $ret .= '<th>'.$header.'</th>';
             }
             $ret .= '</thead>';
-          
+
             while ($row = $dbc->fetchRow($result)) {
-                $ret .=  '<tr><td><a href="http://key/git/fannie/item/ItemEditorPage.php?searchupc=' . $row['upc'] . '" target="_blank">' . $row['upc'] . '</a>';
+                $ret .=  '<tr><td><a href="http://'.$FANNIEROOT_DIR.'/item/ItemEditorPage.php?searchupc=' . $row['upc'] . '" target="_blank">' . $row['upc'] . '</a>';
                 $ret .=  '<td>' . $row['description'];
                 $ret .=  '<td>' . $row['brand'];
                 $ret .=  '<td>' . $row['super_name'];
                 $ret .=  '<td style="color: red; ">' . $row['normal_price'];
                 $ret .=  '<td style="color: grey; ">' . $row['cost'];
                 $ret .=  '<td>'.$row['store_id'] . '</b>';
-                $ret .=  '<td> <a href="http://key/scancoord/item/TrackChangeNew.php?upc=' . $row['upc'] . '" target="_blank">See Change</a>';
+                $ret .=  '<td> <a href="http://'.$SCANROOT_DIR.'/item/TrackChangeNew.php?upc=' . $row['upc'] . '" target="_blank">See Change</a>';
             }
-            if (mysql_errno() > 0) {
-                $ret .=  mysql_errno() . ": " . mysql_error(). "<br>";
-            }
+            echo scanLib::getDbcError($dbc);
             $ret .=  '</table>';
         }
-        //$ret .= $this->help_content();
-        
+
         return $ret;
     }
-    
+
     public function help_content()
     {
-        return 
+        return
         '
             <p>Scans products to locate prices that may be bad.</p>
             <label>Scans for products that meet the following criteria</label>
@@ -146,10 +143,9 @@ class zeroPriceCheck extends ScancoordDispatch
                 <li>Products with a Price Rule ID (variably priced items)</li>
                 <li>Products that are NOT in use.</li>
             </ul>
-        ';    
-        
-    }
-    
-}
+        ';
 
+    }
+
+}
 ScancoordDispatch::conditionalExec();

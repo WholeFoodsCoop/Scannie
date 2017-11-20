@@ -1,11 +1,10 @@
 <?php
-
-include('../config.php');
+include(__DIR__.'/../config.php');
 if (!class_exists('ScancoordDispatch')) {
-    include($SCANROOT.'/common/ui/CorePage.php');
+    include(__DIR__.'/../common/ui/CorePage.php');
 }
 if (!class_exists('SQLManager')) {
-    include_once(dirname(dirname(__FILE__)) . '/common/sqlconnect/SQLManager.php');
+    include_once(__DIR__.'/../common/sqlconnect/SQLManager.php');
 }
 
 class scaleCheckPage extends ScancoordDispatch
@@ -18,74 +17,20 @@ class scaleCheckPage extends ScancoordDispatch
     public function body_content()
     {
         $ret = '';
-        include('../config.php');
-        include('../common/lib/PriceRounder.php');
+        include(__DIR__.'/../config.php');
+        include(__DIR__.'/../common/lib/PriceRounder.php');
         $ret .= '<div class="container">';
         $rounder = new PriceRounder();
-        $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
+        $dbc = scanlib::getConObj();
 
         if($_GET['upc']) {
             $_GET['upc'] = trim($_GET['upc']);
             $upc = str_pad($_GET['upc'], 13, 0, STR_PAD_LEFT);
         }
 
-        /*
-        $query = $dbc->prepare("");
-        $result = $dbc->execute($query);
-        while ($row = $dbc->fetch_row($result)) {
-        }
-        if ($dbc->error()) echo $dbc->error();
-        */
-
-
-        $dontCheck = array(
-            0,
-            0,
-            5,
-            6,
-            40,
-            52,
-            103,
-            104,
-            105,
-            107,
-            109,
-            111,
-            112,
-            123,
-            160,
-            184,
-            194,
-            195,
-            234,
-            237,
-            245,
-            247,
-            248,
-            250,
-            256,
-            265,
-            324,
-            549,
-            550,
-            666,
-            759,
-            799,
-            800,
-            852,
-            868,
-            869,
-            918,
-            919,
-            920,
-            958,
-            983,
-            984,
-            985,
-            917,
-            154,
-            155
-        );
+        $dontCheck = array( 0, 0, 5, 6, 40, 52, 103, 104, 105, 107, 109, 111, 112, 123, 160, 184, 
+            194, 195, 234, 237, 245, 247, 248, 250, 256, 265, 324, 549, 550, 666, 759, 799, 800, 
+            852, 868, 869, 918, 919, 920, 958, 983, 984, 985, 917, 154, 155);
 
         $dontCheck[] = '189'; //  Marlenes bulk inventory debacle.
         $dontCheck[] = '190'; //  Marlenes bulk inventory debacle.
@@ -106,17 +51,6 @@ class scaleCheckPage extends ScancoordDispatch
             $i++;
         }
 
-
-        /*  Add a column
-        $i = 0;
-        foreach ($data as $k => $array) {
-            $newColumnName = 'column_name';
-            $data[$i][$newColumnName] = 'data_to_put_into_column';
-            $headers[$newColumnName] = $newColumnName;
-            $i++;
-        }
-        */
-
         //Add a flags
         $i = 0;
         $flags = array();
@@ -126,7 +60,6 @@ class scaleCheckPage extends ScancoordDispatch
             }
             $i++;
         }
-
         $ret .=  '<h4>Bulk Product Scale Settings Check</h4>
             <p>If no table is drawn, there are no bulk products that need to be checked for scale settings.
             Products that appear in table should be investigated.</p>
@@ -157,11 +90,6 @@ class scaleCheckPage extends ScancoordDispatch
             $prevKey = $k;
         }
         $ret .=  '</table></div>';
-
-        /*
-        $upcLink = "<a href='http://key/git/fannie/item/ItemEditorPage.php?searchupc="
-                . $upc . "&ntype=UPC&searchBtn=' target='_blank'>{$upc}</a>";
-        */
         if ($dbc->error()) $ret .=  $dbc->error();
         $ret .= '</div>';
 
@@ -169,7 +97,4 @@ class scaleCheckPage extends ScancoordDispatch
     }
 
 }
-
 ScancoordDispatch::conditionalExec();
-
-

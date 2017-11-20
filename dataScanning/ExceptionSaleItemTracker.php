@@ -2,9 +2,9 @@
 /*******************************************************************************
 
     Copyright 2016 Whole Foods Community Co-op.
-    
+
     This file is a part of Scannie.
-    
+
     Scannie is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -18,35 +18,33 @@
     You should have received a copy of the GNU General Public License
     in the file LICENSE along with Scannie; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-    
+
 *********************************************************************************/
 
-include('../config.php');
+include(__DIR__.'/../config.php');
 if (!class_exists('ScancoordDispatch')) {
-    include($SCANROOT.'/common/ui/CorePage.php');
+    include(__DIR__.'/../common/ui/CorePage.php');
 }
 if (!class_exists('SQLManager')) {
-    include_once(dirname(dirname(__FILE__)) . '/common/sqlconnect/SQLManager.php');
+    include_once(__DIR__.'/../common/sqlconnect/SQLManager.php');
 }
-
 class ExceptionSaleItemTracker extends ScancoordDispatch
 {
-    
+
     protected $title = "Exception Sales";
     protected $description = "[Exception Sales] Monitor special prices of sale items.";
     protected $ui = TRUE;
-    
+
     public function body_content()
-    {           
+    {
         $ret = '';
-        //include(dirname(__FILE__).'/ExceptionSaleItems.php');
-        include('../config.php');
-        $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
-        
+        include(__DIR__.'/../config.php');
+        $dbc = scanLib::getConObj();
+
         $ret .= '<div class="container">';
         $ret .= '<h4>Exception Sale Items</h4>';
         $ret .= $this->form_content();
-        
+
         if ($addItem = str_pad($_POST['addItem'], 13, 0, STR_PAD_LEFT)) {
             $note = $_POST['note'];
             $args = array($addItem,$note);
@@ -59,14 +57,12 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
             $dbc->execute($prep,$rmItem);
             unset($_POST['rmItem']);
         }
-         
-        //var_dump($items);
-        
+
         list($in_sql, $args) = $dbc->safeInClause($items);
         $query = '
-            SELECT 
-                p.upc, 
-                p.brand, 
+            SELECT
+                p.upc,
+                p.brand,
                 p.description,
                 p.special_price,
                 e.note
@@ -84,7 +80,7 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
             $data[$row['upc']]['note'] = $row['note'];
         }
         if ($dbc->error()) $ret .=  $dbc->error();
-        
+
         $ret .=  '<div class="panel panel-default" style="width:1000px"><table class="table table-striped">';
         $ret .=  '
             <thead>
@@ -95,10 +91,10 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
                 <th>Hill | Den</th>
                 <th>Notes</th>
             </thead>';
-        
-        foreach ($data as $upc => $array) { 
-            $batchLink = '<a id="upcLink" href="http://192.168.1.2/git/fannie/reports/ItemBatches/ItemBatchesReport.php?upc=' . $upc . '" target="_blank">view</a>';
-            $upcLink = '<a id="upcLink" href="http://192.168.1.2/git/fannie/item/ItemEditorPage.php?searchupc=' . $upc . '" target="_blank">' . $upc . '</a>';
+
+        foreach ($data as $upc => $array) {
+            $batchLink = '<a id="upcLink" href="http://'.$FANNIEROOT_DIR.'/reports/ItemBatches/ItemBatchesReport.php?upc=' . $upc . '" target="_blank">view</a>';
+            $upcLink = '<a id="upcLink" href="http://'.$FANNIEROOT_DIR.'/item/ItemEditorPage.php?searchupc=' . $upc . '" target="_blank">' . $upc . '</a>';
             $ret .= '<tr>';
             $ret .= '<td>' . $upcLink . '</td>';
             $ret .= '<td align="center">' . $batchLink . '</td>';
@@ -110,10 +106,10 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
         }
         $ret .=  '</table></div>';
         $ret .= '</div>';
-        
+
         return $ret;
     }
-    
+
     public function form_content()
     {
         $ret .= '
@@ -133,13 +129,13 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
                 <button type="submit" class="btn btn-default">Add/Remove Item</button>
             </form>
         ';
-        
+
         return $ret;
     }
-    
-    
+
+
 }
 
 ScancoordDispatch::conditionalExec();
 
- 
+
