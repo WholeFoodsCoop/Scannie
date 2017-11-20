@@ -29,21 +29,21 @@
 class scanLib
 {
 
-    public function getConObj($db="default", $depth="2")
+    public function getConObj($db="SCANDB")
     {
-        $path = "";
-        for ($i=0; $i<$depth; $i++) {
-            $path .= "../";
-        }
-        $path .= "config.php";
-        include $path;
-        if ($db === "default") {
-           $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANALTDB, $SCANUSER, $SCANPASS);
-        } elseif($db === "FANNIE_OP_DB") {
-           $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
-        }
+        include(dirname(__FILE__).'/../../config.php');
+        $dbc = new SQLManager($SCANHOST, 'pdo_mysql', ${$db}, $SCANUSER, $SCANPASS);
 
         return $dbc;
+    }
+
+    public function getDbcError($dbc)
+    {
+        if (!$er = $dbc->error()) {
+            return false;
+        } else {
+            return "<div class='alert alert-danger'>{$er}</div>";
+        }
     }
     
     /*

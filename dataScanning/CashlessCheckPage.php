@@ -18,12 +18,12 @@ session_start();
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     
 *********************************************************************************/
-include('../config.php');
+include(__DIR__.'/../config.php');
 if (!class_exists('ScancoordDispatch')) {
     include($SCANROOT.'/common/ui/CorePage.php');
 }
 if (!class_exists('SQLManager')) {
-    include_once(dirname(dirname(__FILE__)) . '/common/sqlconnect/SQLManager.php');
+    include_once(dirname(dirname(__FILE__)).'/common/sqlconnect/SQLManager.php');
 }
 class CashlessCheckPage extends ScancoordDispatch
 {
@@ -37,8 +37,7 @@ class CashlessCheckPage extends ScancoordDispatch
     public function body_content()
     {           
         $ret = '';
-        include('../config.php');
-        $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANTRANSDB, $SCANUSER, $SCANPASS);
+        $dbc = scanLib::getConObj('SCANTRANSDB');
         
         if ($_GET['store_id']) {
             $_SESSION['store_id'] = $_GET['store_id'];

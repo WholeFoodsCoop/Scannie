@@ -54,7 +54,6 @@ class CoopDealsSearchPage extends ScancoordDispatch
     {
         $ret = '';
         $ret .= $this->js();
-        include('../../config.php');
         $dbc = ScanLib::getConObj();
         $ret .= $this->form_content();
 

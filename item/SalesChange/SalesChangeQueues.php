@@ -107,7 +107,7 @@ HTML;
             if ($key == 'queue') $thisQueue = $value;
         }
         if(isset($_POST['session'])) $_SESSION['session'] = $_POST['session'];
-        $dbc = Scanlib::getConObj();
+        $dbc = Scanlib::getConObj('SCANALTDB');
         $curQueue = $_GET['queue'];
 
         if($_SESSION['store_id'])
