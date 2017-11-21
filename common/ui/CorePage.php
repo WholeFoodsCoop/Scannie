@@ -44,7 +44,7 @@ class ScancoordDispatch
     private function runPage($class)
     {
         if(!class_exists('scanLib')) {
-            include(dirname(dirname(__FILE__)).'/lib/scanLib.php');
+            include(__DIR__.'/../lib/scanLib.php');
         }
         $obj = new $class();
         $obj->draw_page($class);
@@ -55,49 +55,40 @@ class ScancoordDispatch
         $this->preflight();
         print $this->header($class);
         if (!class_exists('MenuClass')) {
-            include(dirname(__FILE__).'/MenuClass.php');
+            include(__DIR__.'/MenuClass.php');
         }
-        include(dirname(__FILE__).'/../../config.php');
+        include(__DIR__.'/../../config.php');
         print "<br />";
 
         if ($this->ui === TRUE) {
             print '
-                <div class="container" style="width:95%;">
-                    <div style="font-size:28px;margin-bottom:5px;"  class="primaryColor hidden-sm hidden-xs">
-                        <img src="/scancoord/common/src/img/scanner.png" style="width:75px;heigh:75px;float:left">
-                        <a href="/scancoord">Scannie</a> | an extension of
-                        <a href="http://'.$SCANHOST.'/IS4C/fannie">CORE-POS</a>
-                        <!-- this span is for detecting bootstrap screensize -->
-                            <span class="device-xs visible-xs"></span>
-                            <div style="font-size:20px;" class="secondaryColor" data-toggle="collapse" data-target=".navbar-default" onclick="smartToggle();">
-                                IT COREY maintenance &amp; reporting <span style="color: grey;">|</span>  <span style="color: #8c7b70;">'.$this->title.'</span>
-                            </div>
-                        <!-- for testing only
-                            $prev = '.$_SESSION["prevUrl"].'<br />
-                            $cur = '.$_SESSION["curUrl"].'
-                        -->
-                    </div>
-                </div>
-            ';
+<div class="container" style="width:95%;">
+    <div style="font-size:28px;margin-bottom:5px;"  class="primaryColor hidden-sm hidden-xs">
+        <img src="/scancoord/common/src/img/scanner.png" style="width:75px;heigh:75px;float:left">
+        <a href="/scancoord">Scannie</a> | an extension of
+        <a href="http://'.$SCAN_IP.'/git/IS4C/fannie">CORE-POS</a>
+        <!-- this span is for detecting bootstrap screensize -->
+            <span class="device-xs visible-xs"></span>
+            <div style="font-size:20px;" class="secondaryColor" data-toggle="collapse" data-target=".navbar-default" onclick="smartToggle();">
+                IT COREY maintenance &amp; reporting <span style="color: grey;">|</span>  <span style="color: #8c7b70;">'.$this->title.'</span>
+            </div>
+    </div>
+</div>
+';
             print '
-                <div class="container" style="width:95%;">
-                    <div style="font-size:14px;margin-bottom:5px;" class="primaryColor hidden-lg hidden-md">
-                        <a href="/scancoord">Scannie</a> | an extension of
-                        <a href="http://'.$SCANHOST.'/IS4C/fannie">CORE-POS</a>
-                        <!-- this span is for detecting bootstrap screensize -->
-                            <span class="device-xs visible-xs"></span>
-                            <div style="font-size:14px;" class="secondaryColor" data-toggle="collapse" data-target=".navbar-default" onclick="smartToggle();">
-                                ITCM&amp;R <span style="color: grey;">|</span>  <span style="color: #8c7b70;">'.$this->title.'</span>
-                            </div>
-                        <!-- for testing only
-                            $prev = '.$_SESSION["prevUrl"].'<br />
-                            $cur = '.$_SESSION["curUrl"].'
-                        -->
-                    </div>
-                </div>
-            ';
-            //print '<div class="container" id="border" style="width:95%;padding:5px">';
-            print '<div class="container" id="" style="min-height: 850px;width:95%;border:1px solid #f5ebd0; padding:5px; background-color: white; border-radius: 5px;">';
+<div class="container" style="width:95%;">
+    <div style="font-size:14px;margin-bottom:5px;" class="primaryColor hidden-lg hidden-md">
+        <a href="/scancoord">Scannie</a> | an extension of
+        <a href="http://'.$FANNIEROOT_DIR.'">CORE-POS</a>
+            <span class="device-xs visible-xs"></span>
+            <div style="font-size:14px;" class="secondaryColor" data-toggle="collapse" data-target=".navbar-default" onclick="smartToggle();">
+                ITCM&amp;R <span style="color: grey;">|</span>  <span style="color: #8c7b70;">'.$this->title.'</span>
+            </div>
+    </div>
+</div>
+';
+            print '
+<div class="container" id="" style="min-height: 850px;width:95%;border:1px solid #f5ebd0; padding:5px; background-color: white; border-radius: 5px;">';
             print menu::nav_menu();
         }
         print $this->body_content();
@@ -172,89 +163,37 @@ class ScancoordDispatch
 
     private function quick_lookups_content()
     {
-        include(dirname(__FILE__).'/../../config.php');
+        include(__DIR__.'/../../config.php');
         $ret = '';
-        $ret .= '
-
-        ';
         $subBtn = '&nbsp;<button type="submit" class="btn btn-info btn-xs" href=""><span class="go-icon">&nbsp;</span></a>';
-        $TrackChange = 'http://'.$SCANHOST.'/scancoord/item/TrackChangeNew.php';
-        $ItemEditor = 'http://'.$SCANHOST.'/fannie/item/ItemEditorPage.php';
-        $batch = 'http://'.$SCANHOST.'/IS4C/fannie/batches/newbatch/EditBatchPage.php';
-        $LastSold = 'http://'.$SCANHOST.'/scancoord/item/last_sold_check.php';
-        $ItemBatchHistory = 'http://'.$SCANHOST.'/IS4C/fannie/reports/ItemBatches/ItemBatchesReport.php';
-        $SalesBatchPercent = 'http://'.$SCANHOST.'scancoord/item/Batches/CheckBatchPercent.php';
-        
+        $TrackChange = 'http://'.$SCANROOT_DIR.'/item/TrackChangeNew.php';
+        $ItemEditor = 'http://'.$FANNIEROOT_DIR.'/item/ItemEditorPage.php';
+        $batch = 'http://'.$FANNIEROOT_DIR.'/batches/newbatch/EditBatchPage.php';
+        $LastSold = 'http://'.$SCANROOT_DIR.'/item/last_sold_check.php';
+        $ItemBatchHistory = 'http://'.$FANNIEROOT_DIR.'/reports/ItemBatches/ItemBatchesReport.php';
+        $SalesBatchPercent = 'http://'.$SCANROOT_DIR.'/item/Batches/CheckBatchPercent.php';
+        $quickPages = array(
+            'TrackChange'=>'upc',
+            'LastSold'=>'upc',
+            'ItemEditor'=>'searchupc',
+            'batch'=>'id',
+            'LastSold'=>'upc',
+            'ItemBatchHistory'=>'upc',
+            'SalesBatchPercent'=>'batchID'
+        );
+
         $ret .= '<div align="center">';
-
-        $ret .= '
-            <form class="form-inline" method="get"   action="'.$TrackChange.'" target="_blank">
-                <div class="input-group">
-                    <span class="input-group-addon alert-info" style="width: 100px; "><a href="'.$TrackChange.'">Track Change</a></span>
-                    <input type="text" class="form-control" id="trackchange" name="upc" placeholder="enter upc" style="width: 200px; " autofocus>
-                    '.$subBtn.'
-                </div>
-            </form>
-        ';
-
-        $ret .= '
-            <form class="form-inline" method="get"   action="'.$LastSold.'" target="_blank">
-                <div class="input-group">
-                    <span class="input-group-addon alert-info" style="width: 100px; "><a href="'.$LastSold.'">Last Sold</a></span>
-                    <input type="text" class="form-control" id="lastsold" name="upc" placeholder="enter upc" style="width: 200px; ">
-                    '.$subBtn.'
-                </div>
-                <input type="hidden" name="id" value="1">
-            </form>
-        ';
-
-        $ret .= '
-            <form class="form-inline" method="get"   action="'.$ItemEditor.'" target="_blank">
-                <div class="input-group">
-                    <span class="input-group-addon alert-warning" style="width: 100px; "><a href="'.$ItemEditor.'">Item Editor</a></span>
-                    <input type="text" class="form-control" id="itemeditor" name="searchupc" placeholder="enter upc" style="width: 200px; ">
-                    '.$subBtn.'
-                </div>
-                <input type="hidden" name="ntype" value="UPC">
-                <input type="hidden" name="searchBtn" value="">
-            </form>
-        ';
-
-        $ret .= '
-            <form class="form-inline" method="get"   action="'.$batch.'" target="_blank">
-                <div class="input-group">
-                    <span class="input-group-addon alert-warning" style="width: 100px; "><a href="'.$batch.'">Sales Batches</a></span>
-                    <input type="text" class="form-control" id="itemeditor" name="id" placeholder="enter batch ID" style="width: 200px; ">
-                    '.$subBtn.'
-                </div>
-                <input type="hidden" name="ntype" value="UPC">
-                <input type="hidden" name="searchBtn" value="">
-            </form>
-        ';
-
-        $ret .= '
-            <form class="form-inline" method="get"   action="'.$ItemBatchHistory.'" target="_blank">
-                <div class="input-group">
-                    <span class="input-group-addon alert-info" style="width: 100px; "><a href="'.$ItemBatchHistory.'">Item Batch H</a></span>
-                    <input type="text" class="form-control" id="itembatchhistory" name="upc" placeholder="enter upc" style="width: 200px; ">
-                    <input type="hidden" name="includePC" value="on">
-                    '.$subBtn.'
-                </div>
-                <input type="hidden" name="id" value="1">
-            </form>
-        ';
-
-
-        $ret .= '
-            <form class="form-inline" method="get"   action="'.$SalesBatchPercent.'" target="_blank">
-                <div class="input-group">
-                    <span class="input-group-addon alert-info" style="width: 100px; "><a href="'.$SalesBatchPercent.'">Sales Batch %</a></span>
-                    <input type="text" class="form-control" id="salesbatchpercent" name="batchID" placeholder="enter batch id" style="width: 200px; ">
-                    '.$subBtn.'
-                </div>
-            </form>
-        ';
-
+        foreach ($quickPages as $page => $input) {
+            $ret .= '
+                <form class="form-inline" method="get"   action="'.${$page}.'" target="_blank">
+                    <div class="input-group">
+                        <span class="input-group-addon alert-info" style="width: 100px; "><a href="'.${$page}.'">'.$page.'</a></span>
+                        <input type="text" class="form-control" id="trackchange" name="'.$input.'" placeholder="enter upc" style="width: 200px; " autofocus>
+                        '.$subBtn.'
+                    </div>
+                </form>
+            ';
+        }
         $ret .= '</div>';
 
         return $ret;
@@ -263,9 +202,7 @@ class ScancoordDispatch
     static public function conditionalExec($custom_errors=true)
     {
         $frames = debug_backtrace();
-        // conditionalExec() is the only function on the stack
         if (count($frames) == 1) {
-            // draw current page
             $page = basename(filter_input(INPUT_SERVER, 'PHP_SELF'));
             $class = substr($page,0,strlen($page)-4);
             if ($class != 'index' && class_exists($class)) {
@@ -279,18 +216,15 @@ class ScancoordDispatch
 
     private function preflight()
     {
-        /* oldkey php -v too old to use session_status() ? 
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
-        */
-        include(dirname(__FILE__).'/../../config.php');
+        include(__DIR__.'/../../config.php');
 
         if ($this->must_authenticate == TRUE) {
             $userPrivilege = $_SESSION['user_type'];
             if ($userPrivilege != 1) {
-                header("Location: http://{$SCANHOST}/scancoord/admin/login.php");
-
+                header("Location: http://{$SCANROOT_DIR}/admin/login.php");
             }
         }
     }
@@ -305,7 +239,7 @@ class ScancoordDispatch
 
     private function header($class)
     {
-        include(dirname(__FILE__).'/../../config.php');
+        include(__DIR__.'/../../config.php');
         $ret = '';
         $ret .= $this->preprocess();
         $ret .= '
@@ -317,19 +251,16 @@ class ScancoordDispatch
     <link rel="stylesheet" href="/scancoord/common/javascript/tablesorter/css/theme.blue.css">
     <script src="/scancoord/common/bootstrap/jquery.min.js"></script>
     <script src="/scancoord/common/bootstrap/bootstrap.min.js"></script>
-    <!-- <script src="/scancoord/common/javascript/jquery-ui-1.12.1/jquery-ui.min.js"></script>
-        <script src="/scancoord/common/javascript/jquery-ui-1.12.1/external/jquery/jquery.js"></script>
-        <link rel="stylesheet" href="/scancoord/common/javascript/jquery-ui-1.12.1/jquery-ui.min.css"> -->
+    <script src="/scancoord/common/javascript/jquery-ui-1.12.1/external/jquery/jquery.js"></script>
+    <link rel="stylesheet" href="/scancoord/common/javascript/jquery-ui-1.12.1/jquery-ui.min.css"> -->
     <link rel="stylesheet" href="/scancoord/common/javascript/jquery-ui/jquery-ui.css">
-    <!--<script src="/scancoord/common/javascript/jquery-ui/jquery-1.12.4.js"></script>-->
     <script src="/scancoord/common/javascript/jquery-ui/jquery-ui.js"></script> 
-
     <title>' . $this->title . '</title>
 <style>';
         $ret .= $this->cssContent();
         $ret .= '
 </style>';
-        $this->addScript("http://{$SCANHOST}/scancoord/common/javascript/scannie.js");
+        $this->addScript("http://{$SCANROOT_DIR}/common/javascript/scannie.js");
         if ($this->add_javascript_content == TRUE) {
             $ret .= $class::javascript_content();
         }
@@ -343,16 +274,16 @@ class ScancoordDispatch
 
     private function footer()
     {
-        include(dirname(__FILE__).'/../../config.php');
+        include(__DIR__.'/../../config.php');
         $ret ='';
         $user = $_SESSION['user_name'];
         if (empty($user)) {
             $user = 'Generic User';
             $logVerb = 'Login';
-            $link = "<a href='http://{$SCANHOST}/scancoord/admin/login.php'>[{$logVerb}]</a><br />";
+            $link = "<a href='http://{$SCANROOT_DIR}/admin/login.php'>[{$logVerb}]</a><br />";
         } else {
             $logVerb = 'Logout';
-            $link = "<a href='http://{$SCANHOST}/scancoord/admin/logout.php'>[{$logVerb}]</a><br />";
+            $link = "<a href='http://{$SCANROOT_DIR}/admin/logout.php'>[{$logVerb}]</a><br />";
         }
         $ret .= '
             <div class="container" id="" style="width:96%;">
@@ -361,7 +292,7 @@ class ScancoordDispatch
             You are logged in as <strong>'.$user.'</strong>.
             '.$link.'
             Current version: 0.0.1-dev<br />
-            <a href="http://'.$SCANHOST.'/scancoord/testing/SiteMap.php">Site Map</a><br />
+            <a href="http://'.$SCANROOT_DIR.'/testing/SiteMap.php">Site Map</a><br />
             <br />
        ';
         $ret .= '
