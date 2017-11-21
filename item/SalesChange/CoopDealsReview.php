@@ -46,6 +46,12 @@ class CoopDealsReview extends ScancoordDispatch
         $dbc = ScanLib::getConObj('SCANDB');
 
         $ret = '';
+        $ret .= "
+            <p>
+                Coop Deals Review Page | 
+                <a href='../Batches/unfiBreakdowns.php'>Breakdown Items</a>
+            </p>
+        ";
         $ret .= $this->form_content();
         $start = $_GET['startDate'];
         $upcs = $this->getProdsInBatches($dbc);
@@ -180,7 +186,14 @@ HTML;
         $startDate = $_GET['startDate'];;
         $ret = '';
         $ret .='<div class="panel panel-default mypanel">
-            <legend class="panel-heading small">Items Missing Sign Text</legend>';
+            <legend class="panel-heading small">Items Missing Sign Text
+                <div>
+                    <button type="button" class="btn btn-default btn-xs"
+                        onClick="hideNoSales(); return false;">Hide <i>no sales</i> items</button>
+                    <button type="button" class="btn btn-default btn-xs"
+                        onClick="hideKleanKanteen(); return false;">Hide <i>Klean Kanteen</i></button>
+                </div>
+            </legend>';
 
         $query = $dbc->prepare("
             SELECT
@@ -202,7 +215,7 @@ HTML;
         ;");
 
         $result = $dbc->execute($query);
-        $ret .= '<table class="table table-default table-condensed small">';
+        $ret .= '<table class="table table-default table-condensed small" id="signText">';
         while ($row = $dbc->fetchRow($result)) {
             $ret .= '<tr>';
             $ret .= '<td><a href="http://key/git/fannie/item/ItemEditorPage.php?searchupc=' . $row['upc'] . '&ntype=UPC&searchBtn=" target="_blank">'.$row['upc'].'</a></td>';
@@ -274,9 +287,38 @@ HTML;
                     <input type="input" class="form-control" name="startDate">
                     <button type="submit" class="btn btn-default">Submit</button>
                 </form>
-
         ';
         return $ret;
+    }
+
+    public function javascriptContent()
+    {
+        return <<<HTML
+function hideNoSales()
+{
+    $('#signText').find('td').each(function() {
+        var thisHTML = $(this).text();
+        if (thisHTML.includes('no')) {
+            $(this).closest('tr').hide();
+        }
+    });
+
+    return false; 
+}
+
+function hideKleanKanteen()
+{
+    $('#signText').find('td').each(function() {
+        var thisHTML = $(this).text();
+        if (thisHTML.includes('KLEAN')) {
+            $(this).closest('tr').hide();
+        }
+    });
+
+    return false; 
+}
+
+HTML;
     }
 
     public function cssContent()
