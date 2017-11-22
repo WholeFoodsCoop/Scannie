@@ -2,9 +2,9 @@
 /*******************************************************************************
 
     Copyright 2016 Whole Foods Community Co-op.
-    
+
     This file is a part of Scannie.
-    
+
     Scannie is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -18,7 +18,7 @@
     You should have received a copy of the GNU General Public License
     in the file LICENSE along with Scannie; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-    
+
 *********************************************************************************/
 
 include('../config.php');
@@ -28,13 +28,13 @@ if (!class_exists('ScancoordDispatch')) {
 
 class last_sold_check extends scancoordDispatch
 {
-    
+
     protected $title = "Last Sold Check";
-    protected $description = "[Last Sold Check] Tracks last sale date, most 
+    protected $description = "[Last Sold Check] Tracks last sale date, most
         recent purchase order and displays Vendor Item information relavant
         to the matching SKU in relation to the purchase order.";
     protected $ui = TRUE;
-    
+
     private function last_sold_check_list($dbc)
     {
         $ret = "";
@@ -42,7 +42,7 @@ class last_sold_check extends scancoordDispatch
             <form method="get" class="form-inline">
                 <textarea class="form-control" style="width:170px" name="upcs"></textarea>
                 <input type="hidden" name="paste_list" value="1">
-                <img src="../common/src/img/back.png" height="10px" width="10px"> 
+                <img src="../common/src/img/back.png" height="10px" width="10px">
                 <button type="submit" class="btn btn-default btn-xs">Submit</button>
             </form>
         ';
@@ -55,18 +55,19 @@ class last_sold_check extends scancoordDispatch
                 $plus[] = $str;
             }
         }
-        
+
         $link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
         $ret .= '
             <div align="right">
-                <a href="'.$link.'&hide=1" class="btn btn-default btn-xs" id="btn-hill">Hide Hillside</a>
-                <a href="'.$link.'&hide=2" class="btn btn-default btn-xs" id="btn-denf">Hide Denfeld</a>
+                <button class="btn btn-default btn-xs" id="hideHill">Hide Hillside</button>
+                <button class="btn btn-default btn-xs" id="hideDenf">Hide Denfeld</button>
                 <button id="hideBlue" class="btn btn-info btn-xs">Hide Recent</button>
                 <button id="hideRed" class="btn btn-danger btn-xs">Hide Unsold</button>
+                <button id="showAll" class="btn btn-default btn-xs">Show All</button>
             </div><br>
         ';
-        
-        $ret .= '<table class="table table-condensed small" id="dataTable" 
+
+        $ret .= '<table class="table table-condensed small" id="dataTable"
             style="width:900 px;border:2px solid lightgrey"><tbody>';
         $ret .= '
             <th>UPC</th>
@@ -81,7 +82,7 @@ class last_sold_check extends scancoordDispatch
         foreach ($plus as $upc) {
             $query = "SELECT
                         last_sold, store_id, description, brand
-                    FROM products 
+                    FROM products
                     WHERE upc = {$upc}
                     ORDER BY store_id
                 ";
@@ -99,7 +100,7 @@ class last_sold_check extends scancoordDispatch
                         $last_sold = '<span class="text-danger">' . $last_sold = substr($last_sold,0,10) . '</span>';
                     } else {
                         $last_sold = '<span class="text-info">' . $last_sold = substr($last_sold,0,10) . '</span>';
-                    }                       
+                    }
                 }
                 $upcLink = '<a href="http://192.168.1.2/git/fannie/item/ItemEditorPage.php?searchupc=' . $upc . '" target="_blank">' . $upc . '</a>';
                 $ret .= "<tr>";
@@ -108,18 +109,10 @@ class last_sold_check extends scancoordDispatch
             }
         }
         $ret .= "</tbody></table>";
-        
-        if ($_GET['hide'] == 1) {
-            $ret .= $this->javascript_hide_hillside();
-        } elseif ($_GET['hide'] == 2) {
-            $ret .= $this->javascript_hide_denfeld();
-        } elseif ($_GET['hide'] == 3) {
-            $ret .= $this->javascript_hide_unsold();   
-        }
-        
+
         return $ret;
     }
-    
+
     public function body_content()
     {
         $ret = '';
@@ -131,7 +124,7 @@ class last_sold_check extends scancoordDispatch
         include('../config.php');
         $dbc = mysql_connect($SCANHOST, $SCANUSER, $SCANPASS);
         mysql_select_db($SCANDB, $dbc);
-        
+
         $ret .= '<div class="container"><h4>Item Last Sold Check</h4>';
         $ret .= self::form_content();
         $ret .= '<a value="back" onClick="history.go(-1);return false;">BACK</a>';
@@ -139,17 +132,17 @@ class last_sold_check extends scancoordDispatch
 		$upc = str_pad($_GET['upc'], 13, 0, STR_PAD_LEFT);
         $ret .= '<a href="http://key/scancoord/item/TrackChangeNew.php?upc=' . $upc . '">TRACK CHANGE PAGE</a><br>';
 
-        
+
         if ($_GET['paste_list']) {
             $ret .= self::last_sold_check_list($dbc);
         }
-        
+
         $ret .= '<div class="container">';
-        
+
 
         $query = "SELECT
                     last_sold, store_id
-                FROM products 
+                FROM products
                 WHERE upc = {$_GET['upc']}
                 ORDER BY store_id
             ";
@@ -164,12 +157,12 @@ class last_sold_check extends scancoordDispatch
             </div>
             </div>
         ';
-        */ 
-         
+        */
+
         if($_GET['upc']){
             $result = mysql_query($query, $dbc);
             $ret .= '
-                
+
                     <div class="row">
                         <div class="panel panel-info" style="max-width: 390px;">
                             <div class="panel-heading"><label style="color:darkslategrey;">This Product Last Sold On</label></div>
@@ -183,21 +176,21 @@ class last_sold_check extends scancoordDispatch
                 $year = substr($row['last_sold'], 0, 4);
                 $month = substr($row['last_sold'], 5, 2);
                 $day = substr($row['last_sold'], 8, 2);
-                
+
                 //$ret .= $year . '<br>' . $month . '<br>'  . $day . '<br>'  . '<br>';
                 //<div class="col-md-2">' . substr($row['last_sold'], 0, 10) . '</div>
-                
+
                 $ret .= '
                 <div class="container">
                     <div class="row">
                         <div class="col-md-1">' . $row['store_id'] . '</div>
                 ';
-                        
+
                 if (($year < $curY) or ($month < ($curM - 2))) $ret .= '<div class="col-md-2" style="color:red;" class="red">' . substr($row['last_sold'], 0, 10) . '</div>';
                 else $ret .= '<div class="col-md-1">' . substr($row['last_sold'], 0, 10) . '</div>';
-                        
-                $ret .= '        
-                        
+
+                $ret .= '
+
                     </div><br>
                 </div>
                 ';
@@ -205,7 +198,7 @@ class last_sold_check extends scancoordDispatch
             if (mysql_errno() > 0) {
                 $ret .= mysql_errno() . ": " . mysql_error(). "<br>";
             }
-            
+
             //$ret .= "</table>";
             $ret .= "</div>";
             $ret .= "</div>";
@@ -216,10 +209,10 @@ class last_sold_check extends scancoordDispatch
             if ($_GET['id'] && isset($_GET['id'])) {
                 $upc = str_pad($_GET['upc'], 13, 0, STR_PAD_LEFT);
                 $query = "
-                    SELECT * 
-                    FROM PurchaseOrderItems 
-                    WHERE internalUPC={$_GET['upc']} 
-                        AND receivedDate = (SELECT max(receivedDate) FROM PurchaseOrderItems WHERE internalUPC = {$_GET['upc']}); 
+                    SELECT *
+                    FROM PurchaseOrderItems
+                    WHERE internalUPC={$_GET['upc']}
+                        AND receivedDate = (SELECT max(receivedDate) FROM PurchaseOrderItems WHERE internalUPC = {$_GET['upc']});
                 ";
                 $result = mysql_query($query, $dbc);
                 $sku = 0;
@@ -240,10 +233,10 @@ class last_sold_check extends scancoordDispatch
                 }
                 if (mysql_errno() > 0) {
                     $ret .= mysql_errno() . ": " . mysql_error(). "<br>";
-                } 
+                }
                 $ret .= '</table>';
                 $ret .='</div>';
-                
+
                 $query = "
                     SELECT upc
                     FROM VendorBreakdowns
@@ -255,19 +248,19 @@ class last_sold_check extends scancoordDispatch
                 while ($row = mysql_fetch_assoc($result)){
                     $ret .= $row['upc'];
                 }*/
-                
+
                 if (!$sku && $result = mysql_query($query, $dbc)) {
                     $ret .= '
-                        <span class="alert-danger" align="center"> 
-                        No purchase orders were found for this item. 
+                        <span class="alert-danger" align="center">
+                        No purchase orders were found for this item.
                         </span><br><br>
                     ';
                 }
-                    
+
                 $query = "
                     SELECT
                         *
-                    FROM vendorItems 
+                    FROM vendorItems
                     WHERE upc = {$_GET['upc']}
                         AND vendorID = 1
                 ";
@@ -292,7 +285,7 @@ class last_sold_check extends scancoordDispatch
                     } else {
                         $ret .= '<tr>';
                     }
-                    $ret .= '<td><a href="http://key/git/fannie/item/ItemEditorPage.php?searchupc=' 
+                    $ret .= '<td><a href="http://key/git/fannie/item/ItemEditorPage.php?searchupc='
                         . $row['upc'] . '" target="_blank">' . $row['upc'] . '</a></td>';
                     $ret .= '<td><b>' . $row['sku'] . '</b></td>';
                     $ret .= '<td>' . $row['brand'] . '</td>';
@@ -304,29 +297,29 @@ class last_sold_check extends scancoordDispatch
                 }
                 if (mysql_errno() > 0) {
                     $ret .= mysql_errno() . ": " . mysql_error(). "<br>";
-                }    
+                }
                 $ret .= '</table>';
                 $ret .= '</div>';
-                
+
                 if ($sku) {
                     $ret .= '
                         <span class="alert-success">&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                            Highlighted row related to sku associated with the 
+                            Highlighted row related to sku associated with the
                             most recent purchase order for this product.
                         <br><br>
                     ';
                 }
-                
+
             } else {
                 $ret .= 'This UPC is not recoginzed by Office.';
             }
-            
+
             //$ret .= '</div><br>';
         }
-        
+
         return $ret;
     }
-    
+
     private function form_content()
     {
         return '
@@ -339,55 +332,6 @@ class last_sold_check extends scancoordDispatch
                 or <button type="submit" class="btn  btn-default btn-xs" " name="paste_list" value="1">Copy/Paste a List of UPCs</button>
             </form>
         ';
-    }
-    
-    private function javascript_hide_hillside()
-    {     
-        return <<<HTML
-<script type="text/javascript">
-    $("tr").each(function() { 
-        var op_store = 1;
-        var id = $(this).find(\'td.store_id\').text();
-        if (id == op_store) {
-            $(this).closest(\'tr\').hide();
-        }
-    });
-    $("#btn-hill").hide();
-</script>
-HTML;
-    
-    }
-    
-    private function javascript_hide_denfeld()
-    {     
-        return <<<HTML
-<script type="text/javascript">
-    $("tr").each(function() { 
-        var op_store = 2;
-        var id = $(this).find(\'td.store_id\').text();
-        if (id == op_store) {
-            $(this).closest(\'tr\').hide();
-        }
-    });
-    $("#btn-denf").hide();
-</script>
-HTML;
-    
-    }
-
-    private function javascript_hide_unsold()
-    {
-        return <<<HTML
-<script type="text/javascript">
-    $(\'tr\').each( function() {
-        //alert("hello!");
-        //$(this).find(\'div.red\').closest(\'tr\').hide();
-    });
-    $(\.red\').each( function() {
-        $(this).closest(\'tr\').hide();
-    });
-</script>
-HTML;
     }
 
     public function javascriptContent()
@@ -410,6 +354,25 @@ $(document).ready(function() {
             }
         });
     });
+    $('#hideHill').click(function() {
+        $('#dataTable').find('td').each(function() {
+            var text= $(this).text();
+            if ( text == 1 ) {
+                $(this).closest('tr').hide();
+            }
+        });
+    });
+    $('#hideDenf').click(function() {
+        $('#dataTable').find('td').each(function() {
+            var text= $(this).text();
+            if ( text == 2 ) {
+                $(this).closest('tr').hide();
+            }
+        });
+    });
+    $('#showAll').click(function() {
+        location.reload(true);
+    });
 });
 HTML;
     }
@@ -417,16 +380,16 @@ HTML;
     public function cssContent()
     {
         return <<<HTML
-#btn-hill {
+#hideHill {
     border: 2px solid #95cc93;
 }
-#btn-denf {
+#hideDenf {
     border: 2px solid lightblue;
 }
 HTML;
     }
 
-    
+
 }
 
 scancoordDispatch::conditionalExec();
