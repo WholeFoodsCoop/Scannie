@@ -20,12 +20,13 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *********************************************************************************/
-
-include('../config.php');
+include(__DIR__.'/../config.php');
 if (!class_exists('ScancoordDispatch')) {
-    include($SCANROOT.'/common/ui/CorePage.php');
+    include(__DIR__.'/../common/ui/CorePage.php');
 }
-
+if (!class_exists('SQLManager')) {
+    include_once(__DIR__.'/../common/sqlconnect/SQLManager.php');
+}
 class last_sold_check extends scancoordDispatch
 {
 
@@ -38,6 +39,7 @@ class last_sold_check extends scancoordDispatch
     private function last_sold_check_list($dbc)
     {
         $ret = "";
+        include(__DIR__.'/../config.php');
         $ret .= '
             <form method="get" class="form-inline">
                 <textarea class="form-control" style="width:170px" name="upcs"></textarea>
@@ -52,7 +54,7 @@ class last_sold_check extends scancoordDispatch
             $plus = array();
             $chunks = explode("\r\n", $upcs);
             foreach ($chunks as $key => $str) {
-                $plus[] = $str;
+                $plus[] = scanLib::upcPreparse($str);
             }
         }
 
@@ -80,14 +82,16 @@ class last_sold_check extends scancoordDispatch
         $curM = date('m');
         $curD = date('d');
         foreach ($plus as $upc) {
-            $query = "SELECT
+            $args = array($upc);
+            $prep = $dbc->prepare("
+                    SELECT
                         last_sold, store_id, description, brand
                     FROM products
-                    WHERE upc = {$upc}
+                    WHERE upc = ?
                     ORDER BY store_id
-                ";
-            $result = mysql_query($query, $dbc);
-            while ($row = mysql_fetch_assoc($result)) {
+                ");
+            $result = $dbc->execute($prep,$args);
+            while ($row = $dbc->fetchRow($result)) {
                 $last_sold = $row['last_sold'];
                 if (is_null($last_sold)) {
                     $last_sold = "<span class='text-danger'>no recorded sales</span>";
@@ -102,7 +106,7 @@ class last_sold_check extends scancoordDispatch
                         $last_sold = '<span class="text-info">' . $last_sold = substr($last_sold,0,10) . '</span>';
                     }
                 }
-                $upcLink = '<a href="http://192.168.1.2/git/fannie/item/ItemEditorPage.php?searchupc=' . $upc . '" target="_blank">' . $upc . '</a>';
+                $upcLink = '<a href="http://'.$FANNIEROOT_DIR.'/item/ItemEditorPage.php?searchupc=' . $upc . '" target="_blank">' . $upc . '</a>';
                 $ret .= "<tr>";
                 $ret .= "<td>" . $upcLink . "</td><td>" . $last_sold . "</td><td class='store_id'>" . $row['store_id'] . "</td><td>" . $row['description'] . "</td><td>" . $row['brand'] . "</td>";
                 $ret .= "</tr>";
@@ -121,15 +125,14 @@ class last_sold_check extends scancoordDispatch
         $curM = date('m');
         $curD = date('d');
 
-        include('../config.php');
-        $dbc = mysql_connect($SCANHOST, $SCANUSER, $SCANPASS);
-        mysql_select_db($SCANDB, $dbc);
+        include(__DIR__.'/../config.php');
+        $dbc = scanlib::getConObj();
 
         $ret .= '<div class="container"><h4>Item Last Sold Check</h4>';
         $ret .= self::form_content();
         $ret .= '<a value="back" onClick="history.go(-1);return false;">BACK</a>';
 		$ret .= "<span class='pipe'>&nbsp;|&nbsp;</span>";
-		$upc = str_pad($_GET['upc'], 13, 0, STR_PAD_LEFT);
+		$upc = scanLib::upcPreparse($_GET['upc']);
         $ret .= '<a href="http://key/scancoord/item/TrackChangeNew.php?upc=' . $upc . '">TRACK CHANGE PAGE</a><br>';
 
 
@@ -139,47 +142,29 @@ class last_sold_check extends scancoordDispatch
 
         $ret .= '<div class="container">';
 
+        $args = array($upc);
+        $prep = $dbc->prepare("
+            SELECT last_sold, store_id
+            FROM products
+            WHERE upc = ?
+            ORDER BY store_id
+        ");
 
-        $query = "SELECT
-                    last_sold, store_id
-                FROM products
-                WHERE upc = {$_GET['upc']}
-                ORDER BY store_id
-            ";
-        //$ret .= '<table class="table">';
-        //$ret .= '<tr><td>upc: ' . $_GET['upc'] . '</td><td></td></tr>';
-
-        /*
-        $ret .= '
-            <div class="row">
-            <div class="col-mg-4">
-            ' . $_GET['upc'] . '
-            </div>
-            </div>
-        ';
-        */
-
-        if($_GET['upc']){
-            $result = mysql_query($query, $dbc);
+        if(!$_GET['paste_list']){
+            $result = $dbc->execute($prep,$args);
             $ret .= '
-
                     <div class="row">
                         <div class="panel panel-info" style="max-width: 390px;">
                             <div class="panel-heading"><label style="color:darkslategrey;">This Product Last Sold On</label></div>
                             <br />
             ';
             $i = 0;
-            while ($row = mysql_fetch_assoc($result)) {
+            while ($row = $dbc->fetchRow($result)) {
                 if ($row['store_id'] == 1) $row['store_id'] = 'Hillside';
                 else $row['store_id'] = 'Denfeld';
-                //$ret .= '<tr><td>' . $row['store_id'] . '</td><td>' . substr($row['last_sold'], 0, 10) . '</tr>';
                 $year = substr($row['last_sold'], 0, 4);
                 $month = substr($row['last_sold'], 5, 2);
                 $day = substr($row['last_sold'], 8, 2);
-
-                //$ret .= $year . '<br>' . $month . '<br>'  . $day . '<br>'  . '<br>';
-                //<div class="col-md-2">' . substr($row['last_sold'], 0, 10) . '</div>
-
                 $ret .= '
                 <div class="container">
                     <div class="row">
@@ -195,26 +180,22 @@ class last_sold_check extends scancoordDispatch
                 </div>
                 ';
             }
-            if (mysql_errno() > 0) {
-                $ret .= mysql_errno() . ": " . mysql_error(). "<br>";
-            }
-
-            //$ret .= "</table>";
+            $ret .= scanLib::getDbcError($dbc);
             $ret .= "</div>";
             $ret .= "</div>";
             $ret .= "</div>";
-
             //  Purchase Order Scanner
             $item = array ( array() );
             if ($_GET['id'] && isset($_GET['id'])) {
-                $upc = str_pad($_GET['upc'], 13, 0, STR_PAD_LEFT);
-                $query = "
+                $upc = scanLib::upcPreparse($_GET['upc']);
+                $args = array($upc,$upc);
+                $prep = $dbc->prepare("
                     SELECT *
                     FROM PurchaseOrderItems
-                    WHERE internalUPC={$_GET['upc']}
-                        AND receivedDate = (SELECT max(receivedDate) FROM PurchaseOrderItems WHERE internalUPC = {$_GET['upc']});
-                ";
-                $result = mysql_query($query, $dbc);
+                    WHERE internalUPC=?
+                        AND receivedDate = (SELECT max(receivedDate) FROM PurchaseOrderItems WHERE internalUPC = ?);
+                ");
+                $result = $dbc->execute($prep,$args);
                 $sku = 0;
                 $ret .= '<div class="panel panel-info" style="width: 390px;">';
                 $ret .= '
@@ -225,31 +206,24 @@ class last_sold_check extends scancoordDispatch
                 $ret .= '<th>SKU</th>';
                 $ret .= '<th>Case Size</th>';
                 $ret .= '<th>Received Date</th>';
-                while ($row = mysql_fetch_assoc($result)) {
+                while ($row = $dbc->fetchRow($result)) {
                     $ret .= '<tr><td>' . $row['sku'] . '</td>';
                     $ret .= '<td>' . $row['caseSize'] . '</td>';
                     $ret .= '<td>' . substr($row['receivedDate'], 0, 10) . '</td>';
                     $sku = $row['sku'];
                 }
-                if (mysql_errno() > 0) {
-                    $ret .= mysql_errno() . ": " . mysql_error(). "<br>";
-                }
+                $ret .= scanLib::getDbcError($dbc);
                 $ret .= '</table>';
                 $ret .='</div>';
 
-                $query = "
+                $args = array($upc);
+                $prep = $dbc->prepare("
                     SELECT upc
                     FROM VendorBreakdowns
                     WHERE vendorID = 1
-                        AND upc = {$_GET['upc']}
-                ";
-                /*
-                $result = mysql_query($query, $dbc);
-                while ($row = mysql_fetch_assoc($result)){
-                    $ret .= $row['upc'];
-                }*/
-
-                if (!$sku && $result = mysql_query($query, $dbc)) {
+                        AND upc = ?
+                ");
+                if (!$sku && $result = $dbc->execute($prep,$args)) {
                     $ret .= '
                         <span class="alert-danger" align="center">
                         No purchase orders were found for this item.
@@ -257,14 +231,15 @@ class last_sold_check extends scancoordDispatch
                     ';
                 }
 
-                $query = "
+                $args = array($upc);
+                $prep = $dbc->prepare("
                     SELECT
                         *
                     FROM vendorItems
-                    WHERE upc = {$_GET['upc']}
+                    WHERE upc = ?
                         AND vendorID = 1
-                ";
-                $result = mysql_query($query, $dbc);
+                ");
+                $result = $dbc->execute($prep,$args);
                 $ret .= '<div class="panel panel-info">';
                 $ret .= '
                     <div class="panel-heading">
@@ -279,7 +254,7 @@ class last_sold_check extends scancoordDispatch
                 $ret .= '<th>Units</th>';
                 $ret .= '<th>Cost</th>';
                 $ret .= '<th>Modified</th>';
-                while ($row = mysql_fetch_assoc($result)) {
+                while ($row = $dbc->fetchRow($result)) {
                     if ($row['sku'] == $sku) {
                         $ret .= '<tr class="success">';
                     } else {
@@ -295,9 +270,7 @@ class last_sold_check extends scancoordDispatch
                     $ret .= '<td><b>' . $row['cost'] . '</b></td>';
                     $ret .= '<td>' . substr($row['modified'], 0, 10) . '</td>';
                 }
-                if (mysql_errno() > 0) {
-                    $ret .= mysql_errno() . ": " . mysql_error(). "<br>";
-                }
+                $ret .= scanLib::getDbcError($dbc);
                 $ret .= '</table>';
                 $ret .= '</div>';
 
@@ -313,8 +286,6 @@ class last_sold_check extends scancoordDispatch
             } else {
                 $ret .= 'This UPC is not recoginzed by Office.';
             }
-
-            //$ret .= '</div><br>';
         }
 
         return $ret;
@@ -389,8 +360,5 @@ HTML;
 HTML;
     }
 
-
 }
-
 scancoordDispatch::conditionalExec();
-
