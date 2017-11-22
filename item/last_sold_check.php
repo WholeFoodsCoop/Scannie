@@ -61,10 +61,13 @@ class last_sold_check extends scancoordDispatch
             <div align="right">
                 <a href="'.$link.'&hide=1" class="btn btn-default btn-xs" id="btn-hill">Hide Hillside</a>
                 <a href="'.$link.'&hide=2" class="btn btn-default btn-xs" id="btn-denf">Hide Denfeld</a>
+                <button id="hideBlue" class="btn btn-info btn-xs">Hide Recent</button>
+                <button id="hideRed" class="btn btn-danger btn-xs">Hide Unsold</button>
             </div><br>
         ';
         
-        $ret .= '<table class="table table-condensed small" style="width:900 px;border:2px solid lightgrey"><tbody>';
+        $ret .= '<table class="table table-condensed small" id="dataTable" 
+            style="width:900 px;border:2px solid lightgrey"><tbody>';
         $ret .= '
             <th>UPC</th>
             <th>Last Date Sold</th>
@@ -110,7 +113,9 @@ class last_sold_check extends scancoordDispatch
             $ret .= $this->javascript_hide_hillside();
         } elseif ($_GET['hide'] == 2) {
             $ret .= $this->javascript_hide_denfeld();
-        } 
+        } elseif ($_GET['hide'] == 3) {
+            $ret .= $this->javascript_hide_unsold();   
+        }
         
         return $ret;
     }
@@ -188,7 +193,7 @@ class last_sold_check extends scancoordDispatch
                         <div class="col-md-1">' . $row['store_id'] . '</div>
                 ';
                         
-                if (($year < $curY) or ($month < ($curM - 2))) $ret .= '<div class="col-md-2" style="color:red;">' . substr($row['last_sold'], 0, 10) . '</div>';
+                if (($year < $curY) or ($month < ($curM - 2))) $ret .= '<div class="col-md-2" style="color:red;" class="red">' . substr($row['last_sold'], 0, 10) . '</div>';
                 else $ret .= '<div class="col-md-1">' . substr($row['last_sold'], 0, 10) . '</div>';
                         
                 $ret .= '        
@@ -338,7 +343,7 @@ class last_sold_check extends scancoordDispatch
     
     private function javascript_hide_hillside()
     {     
-        return '
+        return <<<HTML
 <script type="text/javascript">
     $("tr").each(function() { 
         var op_store = 1;
@@ -347,15 +352,15 @@ class last_sold_check extends scancoordDispatch
             $(this).closest(\'tr\').hide();
         }
     });
-        $("#btn-hill").hide();
+    $("#btn-hill").hide();
 </script>
-        ';
+HTML;
     
     }
     
     private function javascript_hide_denfeld()
     {     
-        return '
+        return <<<HTML
 <script type="text/javascript">
     $("tr").each(function() { 
         var op_store = 2;
@@ -366,8 +371,59 @@ class last_sold_check extends scancoordDispatch
     });
     $("#btn-denf").hide();
 </script>
-        ';
+HTML;
     
+    }
+
+    private function javascript_hide_unsold()
+    {
+        return <<<HTML
+<script type="text/javascript">
+    $(\'tr\').each( function() {
+        //alert("hello!");
+        //$(this).find(\'div.red\').closest(\'tr\').hide();
+    });
+    $(\.red\').each( function() {
+        $(this).closest(\'tr\').hide();
+    });
+</script>
+HTML;
+    }
+
+    public function javascriptContent()
+    {
+        return <<<HTML
+$(document).ready(function() {
+    $('#hideBlue').click(function() {
+        $('#dataTable').find('td').each(function() {
+            var html = $(this).html();
+            if ( html.includes('text-info') ) {
+                $(this).closest('tr').hide();
+            }
+        });
+    });
+    $('#hideRed').click(function() {
+        $('#dataTable').find('td').each(function() {
+            var html = $(this).html();
+            if ( html.includes('text-danger') ) {
+                $(this).closest('tr').hide();
+            }
+        });
+    });
+});
+HTML;
+    }
+
+    public function cssContent()
+    {
+        return <<<HTML
+#btn-hill {
+    border: 2px solid #95cc93;
+}
+#btn-denf {
+    border: 2px solid lightblue;
+}
+HTML;
     }
 
     
