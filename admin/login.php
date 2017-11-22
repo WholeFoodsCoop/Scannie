@@ -3,13 +3,10 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 ?>
-
-
 <?php
 if (!class_exists('SQLManager')) {
-    include('../common/sqlconnect/SQLManager.php');
+    include(__DIR__.'/../common/sqlconnect/SQLManager.php');
 }
-
 class admin
 {
 
@@ -22,7 +19,7 @@ class admin
     private function view()
     {
 
-        include('../config.php');
+        include(__DIR__.'/../config.php');
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANALTDB, $SCANUSER, $SCANPASS);
 
         $cur_from_page = basename($_SERVER['HTTP_REFERER']);
@@ -88,8 +85,8 @@ class admin
 
     private function form_content()
     {
-        include('../config.php');
-        include('../common/lib/scanLib.php');
+        include(__DIR__.'/../config.php');
+        include(__DIR__.'/../common/lib/scanLib.php');
         $ret = '';
 
         if ($ipod = scanLib::isDeviceIpod()) {
@@ -116,7 +113,7 @@ class admin
                     <label style="width:120px">Password</label>
                         <input type="password" name="pw" class="form-control" style="max-width: 200px;"><br><br><br class="hidden-xs"><br class="hidden-xs">
                         <input type="submit" value="LOG IN" class="btn btn-default btn-login" style="width: 150px; "><br /><br  class="hidden-xs"/><br />
-                    <a class="" href="'.$SCANWEBPATH.'/misc/mobile.php" style="background: rgba(155,155,155,.9); border: 1px solid grey; padding: 5px;">Mobile Menu</a><br />
+                    <a class="" href="'.$SCANROOT_DIR.'/misc/mobile.php" style="background: rgba(155,155,155,.9); border: 1px solid grey; padding: 5px;">Mobile Menu</a><br />
                 </form>
 
             </div>

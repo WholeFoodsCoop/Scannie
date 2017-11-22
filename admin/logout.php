@@ -8,20 +8,20 @@
 <style media="screen">
 
 <?php
-include('../common/sqlconnect/SQLManager.php');
+include(__DIR__.'/../common/sqlconnect/SQLManager.php');
 
 class logout
 {
     public function run()
     {
-
+        include(__DIR__.'/../config.php');
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
         unset($_SESSION['user_type']);
         unset($_SESSION['user_name']);
 
-        return header('location: http://192.168.1.2/scancoord/admin/login.php');
+        return header('location: http://'.$SCANROOT_DIR.'/admin/login.php');
     }
 
     private function jsRedirect()
