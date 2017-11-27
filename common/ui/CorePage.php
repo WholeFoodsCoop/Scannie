@@ -146,8 +146,9 @@ class ScancoordDispatch
                         <div class="modal-content">
                           <div class="modal-header">
                             <h3 class="modal-title" style="color: #8c7b70">Quick Lookups</h3>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                                style="position: absolute; top:20; right: 20">
+                            <button type="button" class="close" 
+                                style="position: absolute; top:20; right: 20" 
+                                onClick="hideModal()">
                               <span aria-hidden="true">&times;</span>
                             </button>
                           </div>
@@ -168,7 +169,7 @@ class ScancoordDispatch
         $subBtn = '&nbsp;<button type="submit" class="btn btn-info btn-xs" href=""><span class="go-icon">&nbsp;</span></a>';
         $TrackChange = 'http://'.$SCANROOT_DIR.'/item/TrackChangeNew.php';
         $ItemEditor = 'http://'.$FANNIEROOT_DIR.'/item/ItemEditorPage.php';
-        $batch = 'http://'.$FANNIEROOT_DIR.'/batches/newbatch/EditBatchPage.php';
+        $EditBatchPage = 'http://'.$FANNIEROOT_DIR.'/batches/newbatch/EditBatchPage.php';
         $LastSold = 'http://'.$SCANROOT_DIR.'/item/last_sold_check.php';
         $ItemBatchHistory = 'http://'.$FANNIEROOT_DIR.'/reports/ItemBatches/ItemBatchesReport.php';
         $SalesBatchPercent = 'http://'.$SCANROOT_DIR.'/item/Batches/CheckBatchPercent.php';
@@ -176,7 +177,7 @@ class ScancoordDispatch
             'TrackChange'=>'upc',
             'LastSold'=>'upc',
             'ItemEditor'=>'searchupc',
-            'batch'=>'id',
+            'EditBatchPage'=>'id',
             'LastSold'=>'upc',
             'ItemBatchHistory'=>'upc',
             'SalesBatchPercent'=>'batchID'
@@ -185,10 +186,10 @@ class ScancoordDispatch
         $ret .= '<div align="center">';
         foreach ($quickPages as $page => $input) {
             $ret .= '
-                <form class="form-inline" method="get"   action="'.${$page}.'" target="_blank">
-                    <div class="input-group">
-                        <span class="input-group-addon alert-info" style="width: 100px; "><a href="'.${$page}.'">'.$page.'</a></span>
-                        <input type="text" class="form-control" id="trackchange" name="'.$input.'" placeholder="enter upc" style="width: 200px; " autofocus>
+                <form class="form-inline" method="get" action="'.${$page}.'" target="_blank">
+                    <div class="input-group"> 
+                        <span class="input-group-addon" style="width: 200px; "><a href="'.${$page}.'">'.$page.'</a></span>
+                        <input type="text" class="form-control" id="trackchange" name="'.$input.'" placeholder="enter '.$input.'" style="width: 200px; " autofocus>
                         '.$subBtn.'
                     </div>
                 </form>
@@ -246,15 +247,14 @@ class ScancoordDispatch
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/scancoord/common/bootstrap/bootstrap.min.css">
-    <link rel="stylesheet" href="/scancoord/common/css/Scannie_css.css?load=true">
-    <link rel="stylesheet" href="/scancoord/common/javascript/tablesorter/css/theme.blue.css">
-    <script src="/scancoord/common/bootstrap/jquery.min.js"></script>
-    <script src="/scancoord/common/bootstrap/bootstrap.min.js"></script>
-    <script src="/scancoord/common/javascript/jquery-ui-1.12.1/external/jquery/jquery.js"></script>
-    <link rel="stylesheet" href="/scancoord/common/javascript/jquery-ui-1.12.1/jquery-ui.min.css"> -->
-    <link rel="stylesheet" href="/scancoord/common/javascript/jquery-ui/jquery-ui.css">
-    <script src="/scancoord/common/javascript/jquery-ui/jquery-ui.js"></script> 
+    <link rel="stylesheet" href="http://'.$SCANROOT_DIR.'/common/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="http://'.$SCANROOT_DIR.'/common/css/Scannie_css.css?load=true">
+    <link rel="stylesheet" href="http://'.$SCANROOT_DIR.'/common/javascript/tablesorter/css/theme.blue.css">
+    <script src="http://'.$SCANROOT_DIR.'/common/bootstrap/jquery.min.js"></script>
+    <script src="http://'.$SCANROOT_DIR.'/common/bootstrap/bootstrap.min.js"></script>
+    <script src="http://'.$SCANROOT_DIR.'/common/javascript/jquery-ui-1.12.1/external/jquery/jquery.js"></script>
+    <link rel="stylesheet" href="http://'.$SCANROOT_DIR.'/common/javascript/jquery-ui/jquery-ui.css">
+    <script src="http://'.$SCANROOT_DIR.'/common/javascript/jquery-ui/jquery-ui.js"></script> 
     <title>' . $this->title . '</title>
 <style>';
         $ret .= $this->cssContent();
