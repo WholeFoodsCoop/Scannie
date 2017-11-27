@@ -84,6 +84,7 @@ HTML;
                 LEFT JOIN MasterSuperDepts AS m ON p.department=m.dept_ID
             WHERE CONCAT(CURDATE(),' 00:00:00') BETWEEN b.startDate AND b.endDate
                 AND bl.upc NOT LIKE 'LC%'
+                AND b.discountType > 0
             GROUP BY b.batchID, bl.upc, p.store_id, s.storeID;
         ");
         $res = $dbc->execute($prep);
