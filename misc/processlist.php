@@ -46,6 +46,16 @@ class processlist extends ScancoordDispatch
 
         return $ret;
     }
+    
+    public function css_content()
+    {
+return <<< HTML
+#logview {
+    height: 300px;
+    overflow-y: auto;
+}
+HTML;
+    }
 
     private function js()
     {

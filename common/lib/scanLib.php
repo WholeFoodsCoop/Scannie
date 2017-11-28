@@ -45,13 +45,13 @@ class scanLib
             return "<div class='alert alert-danger'>{$er}</div>";
         }
     }
-    
+
     /*
         @strGetDate: parse a str for date in Y-d-m
         format.
         @param $str string to parse.
-        Return $str with past/currnet dates(Y-m-d) encapsulated 
-        in span.text-danger. 
+        Return $str with past/currnet dates(Y-m-d) encapsulated
+        in span.text-danger.
     */
     public function strGetDate($str)
     {
@@ -270,11 +270,11 @@ class scanLib
         }
         return $str;
     }
-    
+
     public function upcParse($str)
     {
         $rstr = str_replace(" ","",$str);
-        
+
         if (strstr($str,"-")) {
             $split = array();
             $split = preg_split("/[-]+/",$str);
@@ -287,11 +287,11 @@ class scanLib
                 $rstr = $split[0].substr($split[1],0,5);
             }
         }
-        
+
         if (strlen($rstr) != 13) {
             $rstr = str_pad($rstr, 13, 0, STR_PAD_LEFT);
         }
-        
+
         return $rstr;
     }
 

@@ -171,8 +171,13 @@ class last_sold_check extends scancoordDispatch
                         <div class="col-md-1">' . $row['store_id'] . '</div>
                 ';
 
-                if (($year < $curY) or ($month < ($curM - 2))) $ret .= '<div class="col-md-2" style="color:red;" class="red">' . substr($row['last_sold'], 0, 10) . '</div>';
-                else $ret .= '<div class="col-md-1">' . substr($row['last_sold'], 0, 10) . '</div>';
+                $soldData = "";
+                if (($year < $curY) or ($month < ($curM - 2))) {
+                    $ret .= '<div class="col-md-2" style="color:red;" class="red">' . substr($row['last_sold'], 0, 10) . '</div>';
+                    $soldData = substr($row['last_sold'],0,10);
+                } else {
+                    $ret .= '<div class="col-md-1">' . substr($row['last_sold'], 0, 10) . '</div>';
+                }
 
                 $ret .= '
 

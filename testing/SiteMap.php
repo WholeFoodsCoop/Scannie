@@ -109,6 +109,10 @@ class SiteMap extends ScancoordDispatch
         $exceptions[] = "DenfeldDeptMap.php";
         $exceptions[] = "DenfeldDeptMap2.php";
         $exceptions[] = "BatchReviewPage.html";
+        $exceptions[] = "getProcesslist.php";
+        $exceptions[] = "quickLookups.php";
+        $exceptions[] = "ipod.php";
+         
         
         $dir = opendir($dirname);
         

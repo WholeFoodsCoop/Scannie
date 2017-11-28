@@ -14,7 +14,6 @@ class SignInfoNaturalizer extends ScancoordDispatch
     protected $description = "[Sign Info Helper] Find product information in relation 
         to sales on a specified date.";
     protected $ui = TRUE;
-    protected $add_javascript_content = TRUE;
     
     public function body_content()
     {
@@ -26,8 +25,8 @@ class SignInfoNaturalizer extends ScancoordDispatch
         $endID = $_POST['endID'];
         
         //  dev. temp. delete me
-        $startID = 7578;
-        $endID = 7599;
+        $startID = 7962;
+        $endID = 7984;
         
         echo '
             <style>
@@ -129,11 +128,10 @@ class SignInfoNaturalizer extends ScancoordDispatch
         return $ret;
     }
     
-    public function javascript_content()
+    public function javascriptContent()
     {
         ob_start();
         ?>
-<script type="text/javascript">
 function load_iframe() {
     $('.upc').click(function () {
         var upc = $(this).html();
@@ -146,7 +144,6 @@ function load_iframe() {
 $(document).ready(function () {
    load_iframe(); 
 });
-</script>
         <?php
         return ob_get_clean();
     }

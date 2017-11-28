@@ -23,6 +23,11 @@ class unfiBreakdowns extends ScancoordDispatch
         $rounder = new PriceRounder();
         
         $ret = '<div class="container">';
+        $ret .= "<p>
+                <a href='../SalesChange/CoopDealsReview.php'>Coop Deals Review Page</a> | 
+                Breakdown Items
+            </p>
+        ";
         $ret .=  self::form_content();
         
         $start = $_GET['start'];
