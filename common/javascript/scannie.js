@@ -21,7 +21,7 @@ function KeyDown(evt) {
             break;
 
         case 192:  /* Tilde */
-            $('#quick_lookups').modal('toggle');
+            $('#quick_lookups').toggle('modal');
             break;
     }
 }
@@ -48,18 +48,18 @@ function popitupIpod(url) {
 }
 
 $(document).ready( function () {
-        $('#searchbar').keypress( function () {
-            var text = $("#searchbar").val();
-            if (text.length) {
-                //alert(text);
-                getSearchResults(text);
-            } else {
-                $('#search-resp').html('')
-            }
-        });
-        backToTop();
-        getMobileMenu();
-        closeMenu();
+    $('#searchbar').keypress( function () {
+        var text = $("#searchbar").val();
+        if (text.length) {
+            //alert(text);
+            getSearchResults(text);
+        } else {
+            $('#search-resp').html('')
+        }
+    });
+    backToTop();
+    getMobileMenu();
+    closeMenu();
 });
 
 function backToTop()
@@ -121,12 +121,14 @@ function closeMenu()
 function getSearchResults(search)
 {
     $.ajax({
-        url: '../common/ui/searchbar.php',
-        //dataType: 'POST',
+        url: 'http://192.168.1.2/scancoord/common/ui/searchbar.php',
+        dataType: 'json',
+        type: 'GET',
         data: 'search='+search,
         success: function(response)
         {
             $('#search-resp').html(response);
+            $('#search-resp').html("<h1>hello!</h1>");
         }
     });
 }
@@ -143,3 +145,8 @@ function calcView(name)
 $(function(){
         $( ".draggable" ).draggable();
 });
+
+function hideModal()
+{
+    $('#quick_lookups').toggle('modal');
+}

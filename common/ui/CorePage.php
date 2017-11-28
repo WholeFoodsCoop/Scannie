@@ -275,6 +275,7 @@ class ScancoordDispatch
     private function footer()
     {
         include(__DIR__.'/../../config.php');
+        $this->addScript('http://'.$SCANROOT_DIR.'/common/ui/search.js');
         $ret ='';
         $user = $_SESSION['user_name'];
         if (empty($user)) {

@@ -21,7 +21,7 @@
 
 *********************************************************************************/
 if (!class_exists('SQLManager')) {
-    include_once(dirname(dirname(dirname(__FILE__))) . '/common/sqlconnect/SQLManager.php');
+    include_once(__DIR__.'/../sqlconnect/SQLManager.php');
 }
 class search
 {
@@ -35,8 +35,6 @@ class search
         $this->getList();
 
         $ret = '';
-        $ret .= '<u style="color:grey; text-decoration: none;
-            font-weight: bold;">Search Results</u><br />';
         foreach ($this->data as $name => $path) {
             if ( (strstr($name,$s) || strstr($name,ucwords($s))) && strlen($s) > 2) {
                 $ret .= '<a href="'.$path.$name.'">';
@@ -46,14 +44,17 @@ class search
                 $ret .= '</a><br />';
             }
         }
-        return $ret;
+        return <<<HTML
+<u style="color:grey; text-decoration: none;font-weight: bold;">Search Results</u><br />
+<div style="background: linear-gradient(to right, rgba(255,255,255,0.3), #f8fff7);">{$ret}</div>    
+HTML;
     }
 
     public function getList()
     {
 
-        include('../../config.php');
-        $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
+        include(__DIR__.'/../../config.php');
+        $dbc = new SQLManager($SCAN_IP, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
 
         $this->getDirContents('.','/scancoord/testing/');
         $this->getDirContents('.','/scancoord/');
@@ -76,7 +77,7 @@ class search
             $i = TRUE;
         }
 
-        rern $this->pagelist;
+        return $this->pagelist;
     }
 
     private function getDirContents($dirname,$path)

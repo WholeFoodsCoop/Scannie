@@ -84,10 +84,10 @@ class menu
             </style>
         ';
         $ret .= '<div id="search-resp"></div>';
-        $ret .= '<img class="backToTop collapse" id="backToTop" src="http://'.$SCANHOST.'/scancoord/common/src/img/upArrow.png" />';
+        $ret .= '<img class="backToTop collapse" id="backToTop" src="http://'.$SCAN_IP.'/scancoord/common/src/img/upArrow.png" />';
         $calculators = self::calciframes();
         $mobileMenu = self::mobileMenu();
-        $path = "http://".$SCANHOST;
+        $path = "http://".$SCAN_IP;
         return <<<HTML
 <div class="container-fluid"  align="center" style="height:80px;width:900px; ">
     <div class="navbar navbar-default collapse in hidden-xs hidden-print" style="background-color:white;border:none">
@@ -107,7 +107,7 @@ class menu
             <li class="dropdown"><a  class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Batches<span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                 <li class="dropdown-header">Basics</li>
-                    <li><a class="menu-opt" href="http://{$SEVER_IP}scancoord/item/coopBasicsScanPage.php">Basics Scan</a></li>
+                    <li><a class="menu-opt" href="{$path}/scancoord/item/coopBasicsScanPage.php">Basics Scan</a></li>
                 <li class="divider"></li><!-- divider with no header -->
                 <li class="dropdown-header">UNFI Sales Change</li>
                     <li class="test"><a href="{$path}/scancoord/item/SalesChange/SalesChangeIndex.php" style="color: green"> Batch Check </a></li>
@@ -118,7 +118,7 @@ class menu
                 <li class="divider"></li><!-- divider with no header -->
                 <li class="dropdown-header">Price Changes</li>
                     <li><a class="menu-opt" href="{$path}/scancoord/item/Batches/BatchReview/">Batch Review</a></li>
-                    <li><a class="menu-opt" href="http://{SCANHOST}/scancoord/item/Batches/CheckBatchPercent.php">Sales Batch %</a></li>
+                    <li><a class="menu-opt" href="http://{$path}/scancoord/item/Batches/CheckBatchPercent.php">Sales Batch %</a></li>
             </ul>
             </li>
             <li class="dropdown"><a  class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Data<span class="caret"></span></a>
@@ -126,7 +126,7 @@ class menu
                 <li class="dropdown-header">Discrepancy Tasks</li>
                     <li><a class="menu-opt" href="{$path}/scancoord/dataScanning/zeroPriceCheck.php">Bad Price Scan</a></li>
                     <li><a class="menu-opt" href="{$path}/scancoord/dataScanning/ExceptionSaleItemTracker.php">Exception Sale Items</a></li>
-                    <li><a class="menu-opt" href="{$path}scancoord/dataScanning/MultiStoreDiscrepTable.php">Multi-Store Prod Discrep</a></li>
+                    <li><a class="menu-opt" href="{$path}/scancoord/dataScanning/MultiStoreDiscrepTable.php">Multi-Store Prod Discrep</a></li>
                     <li><a class="menu-opt" href="{$path}/scancoord/dataScanning/CashlessCheckPage.php">Cashess Trans. Check</a></li>
                     <li><a class="menu-opt" href="{$path}/scancoord/misc/ProdUserChangeReport.php">Prod User Change</a></li>
                     <li><a class="menu-opt" href="{$path}/scancoord/dataScanning/specialPriceCheck.php">Special Price Scan</a></li>
@@ -159,11 +159,11 @@ HTML;
         include(dirname(__FILE__).'/../../config.php');
         return <<<HTML
 <div id='marginCalc' class='fixedCalc collapse'><iframe class='fixedCalc menu' id='' frameBorder='0'
-    src='http://{$SCANHOST}/scancoord/item/MarginCalcNew.php?iframe=true'></iframe>
+    src='http://{$SCAN_IP}/scancoord/item/MarginCalcNew.php?iframe=true'></iframe>
     <span class='menuCalcCloseBtn' data-toggle='collapse' data-target='#marginCalc'>x</span>
 </div>
 <div id='percentCalc' class='fixedCalc collapse'><iframe class='fixedCalc menu' id='' frameBorder='0'
-    src='http://{$SCANHOST}/scancoord/item/PercentCalc.php?iframe=true'></iframe>
+    src='http://{$SCAN_IP}/scancoord/item/PercentCalc.php?iframe=true'></iframe>
     <span class='menuCalcCloseBtn' data-toggle='collapse' data-target='#percentCalc'>x</span>
 </div>
 HTML;
@@ -171,8 +171,8 @@ HTML;
     
     private function mobileMenu()
     {
-        include(dirname(__FILE__).'../../config.php');
-        $path = "http://".$SCANHOST;
+        include(dirname(__FILE__).'/../../config.php');
+        $path = "http://".$SCAN_IP;
         $menuOptions = array(
             "Item" => array(
                 "Last Sold" => "{$path}/scancoord/item/last_sold_check.php",
