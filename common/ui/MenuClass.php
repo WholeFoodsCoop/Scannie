@@ -25,127 +25,103 @@ class menu
     
     public function nav_menu()
     {
-        include(dirname(__FILE__).'/../../config.php');
+        include(__DIR__.'/../../config.php');
         $ret = '';
-        $ret .= '
-            <style>
-            span.hd.grey {
-                background-color: grey;
-            }
-            span.hd.green {
-                background-color: green;
-                color: white;
-                font-size: 12px;
-                padding: 2px;
-                font-family: consolas;
-                border-radius: 2px;
-            }
-            span.hd.blue {
-                background-color: lightblue;
-            }
-            a.menuNav {
-                width: 160px;
-            }
-            a.menu-opt {
-                color: red;
-                border: 1px solid white;
-                border-radius: 2px;
-            }
-            .tinyInput {
-                height: 20px;
-                width: 122px;
-                font-size: 10px;
-                border: 1px solid lightgrey;
-                border-radius: 2px;
-            }
-            .tooltip1 { position: relative; }
-            .tooltip1 a span { display: none; color: #FFFFFF; }
-            .tooltip1 a:hover span { display: block; position: absolute; width: 200px; background: #aaa url(images/horses200x50.jpg); height: 50px; left: 100px; top: -10px; color: #FFFFFF; padding: 0 5px; }
-            iframe.menu {
-                opacity: 0.92;
-            }
-            /*
-                Mobile menu
-            */
-            .mobilePage {
-                border: 1px solid black;
-                padding: 10px;
-                list-style-type: none;
-                background-color: darkgrey;
-                background: linear-gradient(darkgrey,grey);
-                margin-left: -12px;
-                z-index: 99;
-            }
-            .aPage {
-                color: white;
-                font-weight: bold;
-                text-shadow: 1px 1px black;
-            }
-            </style>
-        ';
         $ret .= '<div id="search-resp"></div>';
-        $ret .= '<img class="backToTop collapse" id="backToTop" src="http://'.$SCAN_IP.'/scancoord/common/src/img/upArrow.png" />';
+        $ret .= '<img class="backToTop collapse" id="backToTop" src="http://'.$SCANROOT_DIR.'/common/src/img/upArrow.png" />';
         $calculators = self::calciframes();
         $mobileMenu = self::mobileMenu();
-        $path = "http://".$SCAN_IP;
+
+        $user = $_SESSION['user_name'];
+        if (empty($user)) {
+            $user = 'Generic User';
+            $logVerb = 'Login';
+            $link = "<a href='http://{$SCANROOT_DIR}/admin/login.php'>[{$logVerb}]</a>";
+        } else {
+            $logVerb = 'Logout';
+            $link = "<a href='http://{$SCANROOT_DIR}/admin/logout.php'>[{$logVerb}]</a>";
+        }
+        $loginText = '
+            <div style="color: #cacaca; margin-left: 25px; margin-top: 5px;">
+            <strong>'.$user.'</strong><br/>
+            '.$link.' | <a href="http://'.$SCANROOT_DIR.'/testing/SiteMap.php">Site Map</a>
+            </div>
+       ';
+
         return <<<HTML
-<div class="container-fluid"  align="center" style="height:80px;width:900px; ">
-    <div class="navbar navbar-default collapse in hidden-xs hidden-print" style="background-color:white;border:none">
+<div class=""  align="center">
+    <div class="mainNavBox" align="center" style="">
+    <div class="navbar navbar-default hidden-xs hidden-sm hidden-print" id="mainNav">
         <ul class="nav navbar-nav">
+            <li> 
+                <span class="hidden-sm hidden-xs">
+                    <p class="navText">
+                        <a class="logo" href="http://{$SCANROOT_DIR}">Scannie</a>
+                        <a class="logo" href="http://{$FANNIEROOT_DIR}">CORE-POS</a>
+                    </p>
+                </span>
+                <img src="http://{$SCANROOT_DIR}/common/src/img/wfcLogo_smaller.jpg" class="logo">
+            </li>
+
+            <li class="dropdown">
+                <input class="form-control" id="searchbar" name="search" placeholder="search scannie"/></a>
+            </li>
+
             <li class="dropdown">
                 <a  class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Item<span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
-                    <li><a class="menu-opt" href="{$path}/scancoord/item/last_sold_check.php">Last Sold</a></li>
-                    <li><a class="menu-opt" href="{$path}/scancoord/item/TrackChangeNew.php">Track Change</a></li>
-                    <li><a class="menu-opt" href="" onclick="popitup('{$path}/scancoord/item/MarginCalcNew.php')">Margin Calc</a></li>
-                    <li><a class="menu-opt" href="" onclick="popitup('{$path}/scancoord/item/PercentCalc.php')">Percent Calc</a></li>
+                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/last_sold_check.php">Last Sold</a></li>
+                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/TrackChangeNew.php">Track Change</a></li>
+                    <li><a class="menu-opt" href="" onclick="popitup('http://{$SCANROOT_DIR}/item/MarginCalcNew.php')">Margin Calc</a></li>
+                    <li><a class="menu-opt" href="" onclick="popitup('http://{$SCANROOT_DIR}/item/PercentCalc.php')">Percent Calc</a></li>
                 <li class="divider"></li><!-- divider with no header -->
                 <li class="dropdown-header">Scanning</li>
-                    <li><a class="menu-opt" href="{$path}/scancoord/item/AuditScanner.php">Audit Scanner</a></li>
-                    <li><a class="menu-opt" href="{$path}/scancoord/item/AuditScannerReport.php">Audit Scan Report</a></li>
+                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/AuditScanner.php">Audit Scanner</a></li>
+                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/AuditScannerReport.php">Audit Scan Report</a></li>
             </ul></li>
             <li class="dropdown"><a  class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Batches<span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                 <li class="dropdown-header">Basics</li>
-                    <li><a class="menu-opt" href="{$path}/scancoord/item/coopBasicsScanPage.php">Basics Scan</a></li>
+                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/coopBasicsScanPage.php">Basics Scan</a></li>
                 <li class="divider"></li><!-- divider with no header -->
                 <li class="dropdown-header">UNFI Sales Change</li>
-                    <li class="test"><a href="{$path}/scancoord/item/SalesChange/SalesChangeIndex.php" style="color: green"> Batch Check </a></li>
-                    <li><a class="menu-opt" href="{$path}/scancoord/item/SalesChange/CoopDealsReview.php">Quality Assurance</a></li>
-                    <li><a class="menu-opt" href="{$path}/scancoord/item/Batches/unfiBreakdowns.php">Breakdowns</a></li>
-                    <li><a class="menu-opt" href="{$path}/scancoord/item/Batches/prodBatchHistory.php">Item Batch History</a></li>
-                    <li><a class="menu-opt" href="{$path}/scancoord/item/Batches/CoopDealsSearchPage.php">Coop+Deals File</a></li>
+                    <li class="test"><a href="http://{$SCANROOT_DIR}/item/SalesChange/SalesChangeIndex.php" style="color: green"> Batch Check </a></li>
+                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/SalesChange/CoopDealsReview.php">Quality Assurance</a></li>
+                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/Batches/unfiBreakdowns.php">Breakdowns</a></li>
+                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/Batches/prodBatchHistory.php">Item Batch History</a></li>
+                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/Batches/CoopDealsSearchPage.php">Coop+Deals File</a></li>
                 <li class="divider"></li><!-- divider with no header -->
                 <li class="dropdown-header">Price Changes</li>
-                    <li><a class="menu-opt" href="{$path}/scancoord/item/Batches/BatchReview/">Batch Review</a></li>
-                    <li><a class="menu-opt" href="http://{$path}/scancoord/item/Batches/CheckBatchPercent.php">Sales Batch %</a></li>
+                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/Batches/BatchReview/">Batch Review</a></li>
+                    <li><a class="menu-opt" href="http://http://{$SCANROOT_DIR}/item/Batches/CheckBatchPercent.php">Sales Batch %</a></li>
             </ul>
             </li>
             <li class="dropdown"><a  class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Data<span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                 <li class="dropdown-header">Discrepancy Tasks</li>
-                    <li><a class="menu-opt" href="{$path}/scancoord/dataScanning/zeroPriceCheck.php">Bad Price Scan</a></li>
-                    <li><a class="menu-opt" href="{$path}/scancoord/dataScanning/ExceptionSaleItemTracker.php">Exception Sale Items</a></li>
-                    <li><a class="menu-opt" href="{$path}/scancoord/dataScanning/MultiStoreDiscrepTable.php">Multi-Store Prod Discrep</a></li>
-                    <li><a class="menu-opt" href="{$path}/scancoord/dataScanning/CashlessCheckPage.php">Cashess Trans. Check</a></li>
-                    <li><a class="menu-opt" href="{$path}/scancoord/misc/ProdUserChangeReport.php">Prod User Change</a></li>
-                    <li><a class="menu-opt" href="{$path}/scancoord/dataScanning/specialPriceCheck.php">Special Price Scan</a></li>
-                    <li><a class="menu-opt" href="" onclick="popitup('{$path}/scancoord/misc/ipod.php')">handheld</a></li>
+                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/dataScanning/zeroPriceCheck.php">Bad Price Scan</a></li>
+                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/dataScanning/ExceptionSaleItemTracker.php">Exception Sale Items</a></li>
+                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/dataScanning/MultiStoreDiscrepTable.php">Multi-Store Prod Discrep</a></li>
+                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/dataScanning/CashlessCheckPage.php">Cashess Trans. Check</a></li>
+                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/misc/ProdUserChangeReport.php">Prod User Change</a></li>
+                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/dataScanning/specialPriceCheck.php">Special Price Scan</a></li>
+                    <li><a class="menu-opt" href="" onclick="popitup('http://{$SCANROOT_DIR}/misc/ipod.php')">handheld</a></li>
                 </ul>
             </li>
             <li class="dropdown"><a class="menuNav"  href=""
                 data-toggle="modal" data-target="#help">Help<span class=""></span></a>
-            <li class="dropdown" style="margin-top: 12px;">
-                <input class="tinyInput menuNav" id="searchbar" name="search" placeholder="search scannie"/></a></li>
             <li style="padding: 10px;"></li>
-            <li><span><img class="menuIcon"
-                src="{$path}/scancoord/common/src/img/calc.png"
-                data-toggle="collapse" data-target="#marginCalc"></span>
-                <span ><img class="menuIcon"
-                src="{$path}/scancoord/common/src/img/percentCalc.png"
-                data-toggle="collapse" data-target="#percentCalc"></span>
+            <li><span><a class="menuIcon"
+                src="http://{$SCANROOT_DIR}/common/src/img/calc.png"
+                data-toggle="collapse" data-target="#marginCalc">M</a></span>
+                <span ><a class="menuIcon"
+                src="http://{$SCANROOT_DIR}/common/src/img/percentCalc.png"
+                data-toggle="collapse" data-target="#percentCalc">%</a></span>
             </li>
-            <li></li>
+            <li>
+               {$loginText} 
+            </li>
+    </div>
     </div>
 </div>
 {$ret}
@@ -156,14 +132,14 @@ HTML;
 
     private function calciframes()
     {
-        include(dirname(__FILE__).'/../../config.php');
+        include(__DIR__.'/../../config.php');
         return <<<HTML
 <div id='marginCalc' class='fixedCalc collapse'><iframe class='fixedCalc menu' id='' frameBorder='0'
-    src='http://{$SCAN_IP}/scancoord/item/MarginCalcNew.php?iframe=true'></iframe>
+    src='http://{$SCANROOT_DIR}/item/MarginCalcNew.php?iframe=true'></iframe>
     <span class='menuCalcCloseBtn' data-toggle='collapse' data-target='#marginCalc'>x</span>
 </div>
 <div id='percentCalc' class='fixedCalc collapse'><iframe class='fixedCalc menu' id='' frameBorder='0'
-    src='http://{$SCAN_IP}/scancoord/item/PercentCalc.php?iframe=true'></iframe>
+    src='http://{$SCANROOT_DIR}/item/PercentCalc.php?iframe=true'></iframe>
     <span class='menuCalcCloseBtn' data-toggle='collapse' data-target='#percentCalc'>x</span>
 </div>
 HTML;
@@ -171,29 +147,28 @@ HTML;
     
     private function mobileMenu()
     {
-        include(dirname(__FILE__).'/../../config.php');
-        $path = "http://".$SCAN_IP;
+        include(__DIR__.'/../../config.php');
         $menuOptions = array(
             "Item" => array(
-                "Last Sold" => "{$path}/scancoord/item/last_sold_check.php",
-                "Track Change" => "{$path}/scancoord/item/TrackChangeNew.php",
-                "Audit Scanner" => "{$path}/scancoord/item/AuditScanner.php",
-                "Audit Report"  => "{$path}/scancoord/item/AuditScannerReport.php"
+                "Last Sold" => "http://{$SCANROOT_DIR}/item/last_sold_check.php",
+                "Track Change" => "http://{$SCANROOT_DIR}/item/TrackChangeNew.php",
+                "Audit Scanner" => "http://{$SCANROOT_DIR}/item/AuditScanner.php",
+                "Audit Report"  => "http://{$SCANROOT_DIR}/item/AuditScannerReport.php"
             ),
             "Batches" => array(
-                "BatchCheck" => "{$path}/scancoord/item/SalesChange/SalesChangeIndex.php",
-                "ItemBatchHistory" => "{$path}/scancoord/item/Batches/prodBatchHistory.php",
-                "CoopDealsFile" => "{$path}/scancoord/item/Batches/CoopDealsSearchPage.php",
-                "BatchForceCheck" => "{$path}/scancoord/item/Batches/batchForceCheck.php"
+                "BatchCheck" => "http://{$SCANROOT_DIR}/item/SalesChange/SalesChangeIndex.php",
+                "ItemBatchHistory" => "http://{$SCANROOT_DIR}/item/Batches/prodBatchHistory.php",
+                "CoopDealsFile" => "http://{$SCANROOT_DIR}/item/Batches/CoopDealsSearchPage.php",
+                "BatchForceCheck" => "http://{$SCANROOT_DIR}/item/Batches/batchForceCheck.php"
             ),
             "Data" => array(
-                "BadPriceScan" => "{$path}/scancoord/dataScanning/zeroPriceCheck.php",
-                "ExceptionSaleItems" => "{$path}/scancoord/dataScanning/ExceptionSaleItemTracker.php",
-                "Multi-StoreDiscreps" => "{$path}/scancoord/dataScanning/MultiStoreDiscrepTable.php"
+                "BadPriceScan" => "http://{$SCANROOT_DIR}/dataScanning/zeroPriceCheck.php",
+                "ExceptionSaleItems" => "http://{$SCANROOT_DIR}/dataScanning/ExceptionSaleItemTracker.php",
+                "Multi-StoreDiscreps" => "http://{$SCANROOT_DIR}/dataScanning/MultiStoreDiscrepTable.php"
             )
         );
         $ret = "";
-        $ret = "<img src='{$path}/scancoord/common/src/img/menuIcon.png' 
+        $ret = "<img src='http://{$SCANROOT_DIR}/common/src/img/menuIcon.png' 
             id='mobileMenuBtn' class='mobileMenuIcon hidden-lg hidden-md hidden-sm' />";
         $ret .= '
             <div id="mobileMenu" class="mobileMenu collapse">

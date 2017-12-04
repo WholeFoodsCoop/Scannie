@@ -46,7 +46,7 @@ class search
         }
         return <<<HTML
 <u style="color:grey; text-decoration: none;font-weight: bold;">Search Results</u><br />
-<div style="background: linear-gradient(to right, rgba(255,255,255,0.3), #f8fff7);">{$ret}</div>    
+<div style="background: linear-gradient(to right, rgba(255,255,255,0.7), orange);">{$ret}</div>    
 HTML;
     }
 
