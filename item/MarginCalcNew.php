@@ -41,7 +41,7 @@ class MarginCalcNew extends ScancoordDispatch
     public function body_content()
     {           
     
-        $ret = '';
+        $ret = '<br/>';
         
         include('../config.php');
         include('../common/lib/PriceRounder.php');

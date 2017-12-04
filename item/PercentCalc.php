@@ -39,7 +39,7 @@ class PercentCalc extends ScancoordDispatch
     
     public function body_content()
     {           
-        $ret = '';
+        $ret = '<br/>';
         include('../config.php');
         include('../common/lib/PriceRounder.php');
         $rounder = new PriceRounder();

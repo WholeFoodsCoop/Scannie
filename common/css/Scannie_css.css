@@ -2,9 +2,9 @@
     Globally Used Style
 */
 body {
-    background: linear-gradient(#f7edd2,#f7f3e6);
+    //background: linear-gradient(#f7edd2,#f7f3e6);
     background-size: 1px;
-    background: -moz-repeating-linear-gradient( #f2f0ed, #f5f0eb 5px);
+    //background: -moz-repeating-linear-gradient( #f2f0ed, #f5f0eb 5px);
 }
 .green {
     color: green;
@@ -29,6 +29,24 @@ body {
 /*
     bootstrap -color style additions
 */
+.modal-header {
+    background-color: rgba(36, 41, 46, 1);
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+.navbar-default .navbar-nav > .active{
+    color: #000;
+    background: #d65c14;
+}
+.navbar-default .navbar-nav > .active > a,
+.navbar-default .navbar-nav > .active > a:hover,
+.navbar-default .navbar-nav > .active > a:focus {
+    color: #000;
+    background: #d65c14;
+}
+.navbar {
+    border-radius: 0px;
+}
 .btn-danger {
     background: lightgrey; /* For browsers that do not support gradients */
     background: linear-gradient(#d99696, #d64f4f); /* Standard syntax */
@@ -187,11 +205,12 @@ span.delete-icon {
     Menu Styles
 */
 .menuIcon {
-    padding-top: 14px;
-    padding-right: 0px;
-    padding-bottom: 0px;
-    padding-left: 0px;
     cursor: pointer;
+    border-style: solid;
+    border-width: 0px 0px 0px 0px;
+    background-color: rgb(36, 41, 46); 
+    color: #cacaca;
+    font-weight: bold;
 }
 .fixedCalc {
     position: fixed;
@@ -200,7 +219,7 @@ span.delete-icon {
     height: 300px;
     border: 0.5px solid #cacaca;
     border-radius: 5px;
-    box-shadow: 5px 5px 3px #cacaca;
+    box-shadow: 0 0 10px rgb(36, 41, 46);
     max-width: 300px;
     z-index: 990;
 }
@@ -344,4 +363,104 @@ table.buttonbox {
 .collapsing {
     -webkit-transition: none;
     transition: none;
+}
+/*
+ * Scannie Menu
+ * */
+span.hd.grey {
+    background-color: grey;
+}
+span.hd.green {
+    background-color: green;
+    color: white;
+    font-size: 12px;
+    padding: 2px;
+    font-family: consolas;
+    border-radius: 2px;
+}
+span.hd.blue {
+    background-color: lightblue;
+}
+a.menuNav {
+    width: 160px;
+}
+a.menu-opt {
+    color: red;
+    border: 1px solid white;
+    border-radius: 2px;
+}
+.tinyInput {
+    height: 20px;
+    width: 122px;
+    font-size: 10px;
+    border: 1px solid lightgrey;
+    border-radius: 2px;
+}
+.tooltip1 { position: relative; }
+.tooltip1 a span { display: none; color: #FFFFFF; }
+.tooltip1 a:hover span { display: block; position: absolute; width: 200px; background: #aaa url(images/horses200x50.jpg); height: 50px; left: 100px; top: -10px; color: #FFFFFF; padding: 0 5px; }
+iframe.menu {
+    opacity: 0.92;
+}
+/*
+    Mobile menu
+*/
+.mobilePage {
+    border: 1px solid black;
+    padding: 10px;
+    list-style-type: none;
+    background-color: darkgrey;
+    background: linear-gradient(darkgrey,grey);
+    margin-left: -12px;
+    z-index: 99;
+}
+.aPage {
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px black;
+}
+#mainNav {
+    background-color: rgba(36, 41, 46, 1);
+    //background-color: white;
+    border:none;
+    width: 1400px;
+    //width: 100%;
+    height: 0px;
+}
+div.mainNavBox {
+    background-color: rgba(36, 41, 46, 1);
+}
+#searchbar {
+    background-color: rgba(63, 68, 72, 1);
+    border: 1px transparent;
+    color: #cacaca;
+    margin-left: 15px;
+    margin-top: 8px;
+    width: 150px;
+}
+#searchbar:focus {
+    box-shadow: 0 0 10px grey;
+}
+img.logo {
+    height: 40px;
+    margin-top: 5px;
+    margin-left: 5px;
+    margin-bottom: 5px;
+    margin-right: 5px;
+}
+a.logo {
+    color :#cacaca;
+    font-size: 14px;
+}
+a.logo:hover {
+    text-decoration: none;
+    color: orange;
+}
+p.navText{
+    width: 100px;
+    float: left;
+    margin-top: 5px;
+    margin-left: 130px;
+    left-padding: 10px;
+    font-weight: bold;
 }

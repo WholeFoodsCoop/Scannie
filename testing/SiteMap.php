@@ -71,7 +71,7 @@ class SiteMap extends ScancoordDispatch
                     return false;">[<i>Collapse</i>]</a></strong><br><br>';
                 */
                 if ($i) $ret .= '</div><br><br>';
-                $ret .= '<div style="background: linear-gradient(#f7f7f7,white,#f7f7f7); width: 500px; padding: 15px; border: 1px solid lightgrey;">';
+                $ret .= '<div style="background: linear-gradient(#f7f7f7,white,#f7f7f7); max-width: 500px; padding: 15px; border: 1px solid lightgrey;">';
                 $ret .= '<h4><span style="color:purple">'.substr($v,1,-1).'</span></h4>';
             } 
             $ret .= '<a href="'.$v.$k.'">'.$k.'</a><br>';

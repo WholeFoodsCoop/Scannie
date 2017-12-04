@@ -21,8 +21,9 @@
     
 *********************************************************************************/
 $device = $_SERVER['HTTP_USER_AGENT'];
+include('config.php');
 if (strstr($device,'iPod')) {
-    header('location: http://192.168.1.2/scancoord/misc/mobile.php');
+    header('location: http://'.$SCANROOT_DIR.'/misc/mobile.php');
 } else {
-    header('location: http://192.168.1.2/scancoord/item/TrackChangeNew.php');
+    header('location: http://'.$SCANROOT_DIR.'/item/TrackChangeNew.php');
 }

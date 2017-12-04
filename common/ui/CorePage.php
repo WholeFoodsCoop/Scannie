@@ -58,27 +58,12 @@ class ScancoordDispatch
             include(__DIR__.'/MenuClass.php');
         }
         include(__DIR__.'/../../config.php');
-        print "<br />";
 
         if ($this->ui === TRUE) {
             print '
 <div class="container" style="width:95%;">
-    <div style="font-size:28px;margin-bottom:5px;"  class="primaryColor hidden-sm hidden-xs">
-        <img src="/scancoord/common/src/img/scanner.png" style="width:75px;heigh:75px;float:left">
-        <a href="/scancoord">Scannie</a> | an extension of
-        <a href="http://'.$SCAN_IP.'/git/IS4C/fannie">CORE-POS</a>
-        <!-- this span is for detecting bootstrap screensize -->
-            <span class="device-xs visible-xs"></span>
-            <div style="font-size:20px;" class="secondaryColor" data-toggle="collapse" data-target=".navbar-default" onclick="smartToggle();">
-                IT COREY maintenance &amp; reporting <span style="color: grey;">|</span>  <span style="color: #8c7b70;">'.$this->title.'</span>
-            </div>
-    </div>
-</div>
-';
-            print '
-<div class="container" style="width:95%;">
     <div style="font-size:14px;margin-bottom:5px;" class="primaryColor hidden-lg hidden-md">
-        <a href="/scancoord">Scannie</a> | an extension of
+        <a href="http://'.$SCANDIRNAME.'">Scannie</a> | an extension of
         <a href="http://'.$FANNIEROOT_DIR.'">CORE-POS</a>
             <span class="device-xs visible-xs"></span>
             <div style="font-size:14px;" class="secondaryColor" data-toggle="collapse" data-target=".navbar-default" onclick="smartToggle();">
@@ -87,14 +72,11 @@ class ScancoordDispatch
     </div>
 </div>
 ';
-            print '
-<div class="container" id="" style="min-height: 850px;width:95%;border:1px solid #f5ebd0; padding:5px; background-color: white; border-radius: 5px;">';
             print menu::nav_menu();
         }
-        print $this->body_content();
+        print "<div class='container'>".$this->body_content()."</div>";
         print $this->get_help_content();
         print $this->quick_lookups();
-        print '</div></div></div>';
         print $this->footer();
         print $this->writeJS();
         
@@ -217,9 +199,11 @@ class ScancoordDispatch
 
     private function preflight()
     {
+        /*
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
+        */
         include(__DIR__.'/../../config.php');
 
         if ($this->must_authenticate == TRUE) {
@@ -286,19 +270,15 @@ class ScancoordDispatch
             $logVerb = 'Logout';
             $link = "<a href='http://{$SCANROOT_DIR}/admin/logout.php'>[{$logVerb}]</a><br />";
         }
-        $ret .= '
-            <div class="container" id="" style="width:96%;">
-        ';
-        $ret .= '
+        $footerText = '
             You are logged in as <strong>'.$user.'</strong>.
             '.$link.'
             Current version: 0.0.1-dev<br />
             <a href="http://'.$SCANROOT_DIR.'/testing/SiteMap.php">Site Map</a><br />
-            <br />
        ';
-        $ret .= '
-            </div></body></html>
-        ';
+        //$ret .= "<div class='loginText'>".$footerText."</div>";
+        $ret .= '<br/></body></html>';
+
         return $ret;
     }
     
