@@ -133,6 +133,14 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
         return $ret;
     }
 
+    public function help_content()
+    {
+        return <<<HTML
+<ul><p>{$this->description}</p>
+    <li>In notes, enter dates as YYYY-MM-DD to utlize past-date highlighting.
+</ul>
+HTML;
+    }
 
 }
 
