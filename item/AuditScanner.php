@@ -17,12 +17,12 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *********************************************************************************/
-include('../config.php');
+include(__DIR__.'/../config.php');
 if (!class_exists('ScancoordDispatch')) {
-    include($SCANROOT.'/common/ui/CorePage.php');
+    include(__DIR__.'/../common/ui/CorePage.php');
 }
 if (!class_exists('SQLManager')) {
-    include_once(dirname(dirname(__FILE__)) . '/common/sqlconnect/SQLManager.php');
+    include_once(__DIR__.'/../common/sqlconnect/SQLManager.php');
 }
 class AuditScanner extends ScancoordDispatch
 {
@@ -37,17 +37,17 @@ class AuditScanner extends ScancoordDispatch
     public function preprocess()
     {
 
-        include('../config.php');
+        include(__DIR__.'/../config.php');
 
         $username = scanLib::getUser();
-        $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
+        $dbc = scanLib::getConObj();
         if (isset($_GET['note'])) {
             $note = $_GET['note'];
             $error = $this->notedata_handler($dbc,$note,$username);
             if (!$error) {
-                header('location: http://192.168.1.2/scancoord/item/AuditScanner.php?success=true');
+                header('location: http://'.$SCANROOT_DIR.'/item/AuditScanner.php?success=true');
             } else {
-                header('location: http://12.168.1.2/scancoord/item/AuditScanner.php?success=false');
+                header('location: http://'.$SCANROOT_DIR.'/item/AuditScanner.php?success=false');
             }
         }
 
@@ -111,7 +111,7 @@ HTML;
 
     public function get_scan()
     {
-        return 'hi, this is get_scan()';
+        return 'This function is currently unused.';
     }
 
     public function body_content()
@@ -134,15 +134,11 @@ HTML;
             }
         }
 
-        include('../config.php');
-        include('../common/lib/PriceRounder.php');
+        include(__DIR__.'/../config.php');
+        include(__DIR__.'/../common/lib/PriceRounder.php');
         $rounder = new PriceRounder();
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         $storeID = scanLib::getStoreID();
-        /*$upc = str_pad($_POST['upc'], 13, 0, STR_PAD_LEFT);
-        if (substr($upc,2,1) == '2') {
-            $upc = '002' . substr($upc,3,4) . '000000';
-        }*/
         $upc = scanLib::upcPreparse($_POST['upc']);
 
         $loading .= '
@@ -168,7 +164,8 @@ HTML;
                 INNER JOIN StoreBatchMap AS sbm ON b.batchID=sbm.batchID
             WHERE curdate() BETWEEN b.startDate AND b.endDate
                 AND sbm.storeID = ?
-                AND bl.upc = ?;");
+                AND bl.upc = ?
+                AND b.batchType BETWEEN 1 AND 12;");
         $saleQres = $dbc->execute($saleQuery,$saleQueryArgs);
         //$batchList = array( 'price' => array(), 'batchID' => array(), 'batchName' => array() );
         while ($row = $dbc->fetchRow($saleQres)) {
@@ -194,7 +191,6 @@ HTML;
                 <br />
             ';
         }
-        //echo '<h1>'.$saleInfoStr.'</h1>';
 
         //Gather product information
         $args = array($storeID,$upc);
@@ -267,18 +263,10 @@ HTML;
             }
         }
         if ($dbc->error()) echo $dbc->error();
-
-        /* This was used before $adjcost was introduced.
-        $margin = ($price - $cost) / $price;
-        $rSrp = $cost / (1 - $dMargin);
-        $srp = $rounder->round($rSrp);
-        $sMargin = ($srp - $cost ) / $srp;
-        */
         $margin = ($price - $adjcost) / $price;
         $rSrp = $adjcost / (1 - $dMargin);
         $srp = $rounder->round($rSrp);
         $sMargin = ($srp - $adjcost ) / $srp;
-
 
         $sWarn = 'default';
         if ($srp != $price) {
@@ -437,7 +425,7 @@ HTML;
                             <input type="hidden" name="upc" value="'.$upc.'" />
                         </div>
                         </form>
-                        <div class="col-xs-4  clear "><a class="btn btn-surprise" href="http://192.168.1.2/scancoord/item/AuditScanner.php ">Refresh</a></div>
+                        <div class="col-xs-4  clear "><a class="btn btn-surprise" href="http://'.$SCANROOT_DIR.'/item/AuditScanner.php ">Refresh</a></div>
                         <div class="col-xs-4  clear">
                             <button class="btn btn-danger" data-toggle="collapse" data-target="#notepad"
                                 style="width: 100%;">Note
@@ -572,9 +560,8 @@ HTML;
     {
 
         $ret = '';
-        include('../config.php');
-        $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANALTDB, $SCANUSER, $SCANPASS);
-        //echo '<h1>' . $data['upc'] . '</h1>';
+        include(__DIR__.'/../config.php');
+        $dbc = scanLib::getConObj('SCANALTDB');
         $argsA = array($data['upc'],$username,$storeID);
         $prepA = $dbc->prepare("SELECT * FROM AuditScanner WHERE upc = ? AND username = ? AND store_id = ? LIMIT 1");
         $resA = $dbc->execute($prepA,$argsA);
@@ -608,7 +595,6 @@ HTML;
                 );
             ");
             $dbc->execute($prep,$args);
-            //echo $data[$upc];
             if ($dbc->error()) {
                 return '<div class="alert alert-danger">' . $dbc->error() . '</div>';
             } else {
@@ -621,6 +607,34 @@ HTML;
     public function css_content()
     {
         return '
+                .btn-mobile {
+                    position: fixed;
+                    top: 20px;
+                    right: 5px;
+                    padding: 8px;
+                    border: none;
+                }
+                .btn-mobile-lines {
+                    border: 2px solid #cacaca;
+                    width: 35px;
+                    height: 1px;
+                    border-radius: 5px;
+                }
+                .btn-mobile-sp {
+                    height: 8px;
+                }
+                .btn-keypad {
+                    height: 50px;
+                    width: 50px;
+                    border: 5px solid white;
+                    //border-radius: 2px;
+                    background-color: lightgrey;
+                    text-align: center;
+                    cursor: pointer;
+                }
+                #progressBar {
+                    display: none;
+                }
             #heading {
                 color: grey;
                 font-size: 10px;
@@ -731,47 +745,10 @@ HTML;
     {
         $ret = '';
         $ret .= '
-            <style>
-                .btn-mobile {
-                    position: fixed;
-                    top: 20px;
-                    right: 5px;
-                    padding: 8px;
-                    border: none;
-                }
-                .btn-mobile-lines {
-                    border: 2px solid #cacaca;
-                    width: 35px;
-                    height: 1px;
-                    border-radius: 5px;
-                }
-                .btn-mobile-sp {
-                    height: 8px;
-                }
-                .btn-keypad {
-                    height: 50px;
-                    width: 50px;
-                    border: 5px solid white;
-                    //border-radius: 2px;
-                    background-color: lightgrey;
-                    text-align: center;
-                    cursor: pointer;
-                }
-                #progressBar {
-                    display: none;
-                }
-            </style>
-        ';
-        $ret .= '
             <button class="btn-mobile" data-toggle="modal" data-target="#keypad" id="btn-modal">
-                <img src="http://192.168.1.2/scancoord/common/src/img/numpadIcon.png" 
+                <img src="http://'.$SCANROOT_DIR.'/common/src/img/numpadIcon.png" 
                 class="numbpadMenuIcon">
             </button>';
-        /*   
-        $ret = '<img src="http://192.168.1.2/scancoord/common/src/img/menuIcon.png" 
-            data-toggle="modal" data-target="#keypad" id="btn-modal"
-            class="mobileMenuIcon btn-mobile hidden-lg hidden-md hidden-sm" />';
-        */
         $ret .= '
             <div class="modal" tabindex="-1" role="dialog" id="keypad">
             <br /><br /><br /><br /><br />
