@@ -113,7 +113,7 @@ class admin
                     <label style="width:120px">Password</label>
                         <input type="password" name="pw" class="form-control" style="max-width: 200px;"><br><br><br class="hidden-xs"><br class="hidden-xs">
                         <input type="submit" value="LOG IN" class="btn btn-default btn-login" style="width: 150px; "><br /><br  class="hidden-xs"/><br />
-                    <a class="" href="'.$SCANROOT_DIR.'/misc/mobile.php" style="background: rgba(155,155,155,.9); border: 1px solid grey; padding: 5px;">Mobile Menu</a><br />
+                    <a class="" href="http://'.$SCANROOT_DIR.'/misc/mobile.php" style="background: rgba(155,155,155,.9); border: 1px solid grey; padding: 5px;">Mobile Menu</a><br />
                 </form>
 
             </div>
