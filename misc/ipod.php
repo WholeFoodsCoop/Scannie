@@ -17,22 +17,22 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *********************************************************************************/
-include('../config.php');
+include(__DIR__.'/../config.php');
 if (!class_exists('ScancoordDispatch')) {
-    include($SCANROOT.'/common/ui/CorePage.php');
+    include(__DIR__.'/../common/ui/CorePage.php');
 }
 if (!class_exists('SQLManager')) {
-    include_once(dirname(dirname(__FILE__)) . '/common/sqlconnect/SQLManager.php');
+    include_once(__DIR__.'/../../common/sqlconnect/SQLManager.php');
 }
 class ipod extends ScancoordDispatch
 {
     
     public function body_content()
     {
-        include('../config.php');
+        include(__DIR__.'/../config.php');
         $ret = '';
         
-        $url = "http://192.168.1.2/scancoord/item/AuditScanner.php";
+        $url = "http://'.$SCANROOT_DIR.'/item/AuditScanner.php";
         if ($src = $_GET['changesrc']) {
             $url = $src;
         }
@@ -55,65 +55,58 @@ class ipod extends ScancoordDispatch
     
     public function css_content()
     {
-        return '
-            .ipod {
-                //height: 90vh;
-                height: 600px;
-            }
-            .ipod-container {
-                //background-color: lightblue;
-                //height: 90vh;
-                //height: 600px;
-                width: 290px;
-            }
-            .ipod-inner {
-                //background-color: orange;
-                position: absolute;
-                top: 99px;
-                left: 23px;
-                height: 435px;
-                width: 245px;
-            }
-            iframe {
-                zoom: 0.15;
-                -moz-transform:scale(0.75);
-                -moz-transform-origin: 0 0;
-                height: 580px;
-                width: 328px;
-                overflow-y: hidden;
-                overflow-x: hidden;
-            }
-            body {
-                overflow-y: hidden;
-                overflow-x: hidden;
-            }
-            .homeBtn {
-                //background-color: green; 
-                border-radius: 100%;
-                height: 50px;
-                width: 50px;
-                position: relative;
-                bottom: 75px;
-                left: 120px;
-            }
-            input {
-                width: 100%;
-                border: 1px solid orange;
-                opacity: 0.9;
-                position: absolute;
-                bottom: 5px;
-                background-color: lightorange;
-            }
-            .urlbar {
-                
-            }
-        ';
+        return <<<HTML
+.ipod {
+    height: 600px;
+}
+.ipod-container {
+    width: 290px;
+}
+.ipod-inner {
+    position: absolute;
+    top: 77px;
+    left: 35px;
+    height: 435px;
+    width: 245px;
+}
+iframe {
+    zoom: 0.15;
+    -moz-transform:scale(0.75);
+    -moz-transform-origin: 0 0;
+    height: 580px;
+    width: 328px;
+    overflow-y: hidden;
+    overflow-x: hidden;
+}
+body {
+    overflow-y: hidden;
+    overflow-x: hidden;
+}
+.homeBtn {
+    border-radius: 100%;
+    height: 50px;
+    width: 50px;
+    position: relative;
+    bottom: 75px;
+    left: 120px;
+}
+input {
+    width: 100%;
+    border: 1px solid orange;
+    opacity: 0.9;
+    position: absolute;
+    bottom: 5px;
+    background-color: lightorange;
+}
+.urlbar {
+    
+}
+HTML;
     }
     
     function javascriptContent()
     {
-        ob_start();
-        ?>
+        return <<<HTML
 $(document).ready( function() {
     $('#changesrc').hide();
     homeBtn();
@@ -124,8 +117,7 @@ function homeBtn() {
         $('#changesrc').show();
     });
 }
-        <?php
-        return ob_get_clean();
+HTML;
     }
 
 }
