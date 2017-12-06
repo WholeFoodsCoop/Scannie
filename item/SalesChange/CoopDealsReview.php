@@ -56,12 +56,32 @@ class CoopDealsReview extends ScancoordDispatch
         $start = $_GET['startDate'];
         $upcs = $this->getProdsInBatches($dbc);
         if (isset($start)) {
-            $ret .= $this->getBadPriceItems($dbc);
-            $ret .= $this->getMissingSignText($dbc);
-            $ret .= $this->getBadPrices($dbc);
-            $ret .= $this->getNarrowItems($dbc,$upcs);
-            $lineAlerts = substr_replace($this->getLineSales($dbc),"",-1);
-            echo "$lineAlerts<br/><br/>";
+            $ret .= "
+                <div class='row'>
+                    <div class='col-md-3'>
+                    </div>
+                    <div class='col-md-4'>
+                        {$this->getLineSales($dbc)}
+                    </div>
+                    <div class='col-md-2'>
+                        {$this->getGeneric($dbc,$start)}
+                    </div>
+                    <div class='col-md-2'>
+                        {$this->getNarrowItems($dbc,$upcs)}
+                    </div>
+                </div><br/>
+                <div class='row'>
+                    <div class='col-md-3'>
+                        {$this->getBadPriceItems($dbc)}
+                    </div>
+                    <div class='col-md-5'>
+                        {$this->getMissingSignText($dbc,$start)}
+                    </div>
+                    <div class='col-md-3'>
+                        {$this->getBadPrices($dbc,$upcs)}
+                    </div>
+                </div>
+            ";
         }
 
         return $ret;
@@ -92,30 +112,32 @@ class CoopDealsReview extends ScancoordDispatch
         $prep = $dbc->prepare("SELECT upc FROM NarrowTags WHERE upc IN ({$inStr})");
         $res = $dbc->execute($prep,$args);
         $td = "";
+        $rUpcs = array();
         while ($row = $dbc->fetchRow($res)) {
             $td .= "<tr><td>{$row['upc']}</td></tr>";
+            $rUpcs[] = $row['upc'];
         }
+        $ret = "<p><b>Print as Narrow Signs</b></p>";
+        $ret .= "<textarea class='form-control'>";
+        foreach ($rUpcs as $upc) {
+            $ret .= $upc."\r\n";
+        }
+        $ret .= "</textarea>";
 
-        return <<<HTML
-<div class="panel panel-default mypanel">
-    <legend class="panel-heading small">Print Narrow Signs</legend>
-    <table class="table table-default table-condensed small">
-    {$td}
-    </table>
-</div>
-HTML;
+        return $ret;
     }
 
     private function getLineSales($dbc)
     {
-        $ret = '';
+        $ret = '<p><b>Print as List Signage</b></p>';
         $startDate = $_GET['startDate'];
         $brands = array(
             "%Aura%" => "Aura Cacia Essential Oils",
             "%Life Factory%" => "Life Factory Products",
-            "%Hydro Flase%" => "Hydro Flask Products",
+            "%Hydro Flask%" => "Hydro Flask Products",
             "%Emergen%" => "Emergen-C Products",
             "%Ener%" => "Ener-C Products",
+            "%Klean%" => "Klean Kanteen",
         );
         $rows = array();
         foreach ($brands as $brand => $description) {
@@ -128,12 +150,46 @@ HTML;
             ");
             $result = $dbc->execute($query,$args);
             if ($rows = $dbc->numRows($result)) {
-                $ret .= " <b>" . $description . "</b>: <span class=\"alert-danger\">$rows items counted.</span> |";
+                $ret .= "<li>" . $description . ": <span class=\"alert-danger\">$rows items counted.</span></li>";
             }
         }
 
         return $ret;
+    }
+    
+    private function getGeneric($dbc,$startDate)
+    {
+        $ret = '<p><b>Print as Generic Signs</b></p>';
+        $items = array(
+            '0070059600011', 
+            '0070059600085',
+            '0070059600251',
+            '0085981500287',
+        );
+        list($inStr,$args) = $dbc->safeInClause($items);
+        $query = "SELECT p.upc, p.description, p.size FROM batches AS b
+            LEFT JOIN batchList AS bl ON b.batchID=bl.batchID
+            LEFT JOIN products AS p ON bl.upc=p.upc
+            WHERE startDate = '$startDate'
+            AND p.upc in ($inStr)
+            GROUP BY bl.upc;";
+        $prep = $dbc->prepare($query);
+        $result = $dbc->execute($prep,$args);
+        $upcs = array();
+        while ($row = $dbc->fetchRow($result)) {
+            $upcs[] = $row['upc'];
+        }
+        $ret .= "<textarea class='form-control' cols='5'>";
+        foreach ($upcs as $upc) {
+            $ret .= $upc."\r\n";
+        }
+        $ret .= "</textarea><br/>";
 
+        if ($er = scanLib::getDbcError($dbc)) {
+            return $er; 
+        } else {
+            return $ret;
+        }
     }
 
     private function getBadPrices($dbc)
@@ -215,7 +271,7 @@ HTML;
         ;");
 
         $result = $dbc->execute($query);
-        $ret .= '<table class="table table-default table-condensed small" id="signText">';
+        $ret .= '<div class="table-responsive"><table class="table table-default table-condensed small table-responsive" id="signText">';
         while ($row = $dbc->fetchRow($result)) {
             $ret .= '<tr>';
             $ret .= '<td><a href="http://key/git/fannie/item/ItemEditorPage.php?searchupc=' . $row['upc'] . '&ntype=UPC&searchBtn=" target="_blank">'.$row['upc'].'</a></td>';
@@ -230,7 +286,7 @@ HTML;
             }
             $ret .= '</tr>';
         }
-        $ret .= '</table>';
+        $ret .= '</table></div>';
 
         $ret .= '</div>';
 
@@ -279,16 +335,17 @@ HTML;
 
     private function form_content()
     {
-        $ret = '';
-        $ret .= '
-
-                <strong>Start Date</strong>
-                <form method="get" class="form-inline">
-                    <input type="input" class="form-control" name="startDate">
-                    <button type="submit" class="btn btn-default">Submit</button>
-                </form>
-        ';
-        return $ret;
+        return <<<HTML
+<strong>Start Date</strong>
+<form method="get" class="form-inline">
+    <div class="form-group">
+        <input type="input" class="form-control mainInput" name="startDate">
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-default mainInput">Submit</button>
+    </div>
+</form>
+HTML;
     }
 
     public function javascriptContent()
@@ -321,16 +378,11 @@ function hideKleanKanteen()
 HTML;
     }
 
-    public function cssContent()
+    public function css_content()
     {
         return <<<HTML
-.mypanel {
-}
-@media only screen and (min-width: 1170px) {
-    .mypanel {
-        float: left;
-        margin-left: 5px;
-    }
+.mainInput {
+    border: 2px solid grey;
 }
 HTML;
     }
