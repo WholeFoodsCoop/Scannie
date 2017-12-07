@@ -228,7 +228,9 @@ HTML;
             {$pData[0]}
         </div>
         <div class="col-md-7">
-            {$pData[1]}
+            <div class="table-responsive">
+                {$pData[1]}
+            </div>
         </div>
     </div>
 </div>
