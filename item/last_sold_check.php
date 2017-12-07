@@ -42,10 +42,14 @@ class last_sold_check extends scancoordDispatch
         include(__DIR__.'/../config.php');
         $ret .= '
             <form method="get" class="form-inline">
-                <textarea class="form-control" style="width:170px" name="upcs"></textarea>
+                <div class="input-group" style="width: 100%;">
+                    <textarea class="form-control" name="upcs"></textarea>
+                    <div class="input-group-addon">
+                        <button type="submit" class="btn-xs">Submit a list of UPCs to 
+                            view most recent sales activity.</button>
+                    </div>
+                </div>
                 <input type="hidden" name="paste_list" value="1">
-                <img src="../common/src/img/back.png" height="10px" width="10px">
-                <button type="submit" class="btn btn-default btn-xs">Submit</button>
             </form>
         ';
 
@@ -128,13 +132,14 @@ class last_sold_check extends scancoordDispatch
         include(__DIR__.'/../config.php');
         $dbc = scanlib::getConObj();
 
+        /*
         $ret .= '<div class="container"><h4>Item Last Sold Check</h4>';
         $ret .= self::form_content();
         $ret .= '<a value="back" onClick="history.go(-1);return false;">BACK</a>';
 		$ret .= "<span class='pipe'>&nbsp;|&nbsp;</span>";
 		$upc = scanLib::upcPreparse($_GET['upc']);
         $ret .= '<a href="http://key/scancoord/item/TrackChangeNew.php?upc=' . $upc . '">TRACK CHANGE PAGE</a><br>';
-
+        */
 
         if ($_GET['paste_list']) {
             $ret .= self::last_sold_check_list($dbc);
@@ -294,6 +299,149 @@ class last_sold_check extends scancoordDispatch
         }
 
         return $ret;
+    }
+
+
+    public function getDates()
+    {
+        include(__DIR__.'/../config.php');
+        $ret = '';
+        $item = array ( array() );
+        $curY = date('Y');
+        $curM = date('m');
+        $curD = date('d');
+        $dbc = scanlib::getConObj();
+		$upc = scanLib::upcPreparse($_GET['upc']);
+
+        $data = array();
+        $data['form'] = self::form_content();
+        
+        if ($_GET['paste_list']) {
+            $data['list'] = self::last_sold_check_list($dbc);
+        }
+
+        $args = array($upc);
+        $prep = $dbc->prepare("
+            SELECT last_sold, store_id
+            FROM products
+            WHERE upc = ?
+            ORDER BY store_id
+        ");
+        if(!$_GET['paste_list']){
+            $result = $dbc->execute($prep,$args);
+            $i = 0;
+            while ($row = $dbc->fetchRow($result)) {
+                $year = substr($row['last_sold'], 0, 4);
+                $month = substr($row['last_sold'], 5, 2);
+                $day = substr($row['last_sold'], 8, 2);
+                $class = (($year < $curY) || ($month < ($curM - 2))) ? "red" : "";
+                $data[$row['store_id']] = "<span class='$class'>".substr($row['last_sold'],0,10)."</span>";
+            }
+            $data['error'].= scanLib::getDbcError($dbc);
+        }
+        return $data;
+    }
+
+    public function getPurchase($upc,$dbc)
+    {
+            if(!class_exists('scanLib')) {
+                include(__DIR__.'/../common/scanLib.php;');
+            }
+            $item = array ( array() );
+                $upc = scanLib::upcPreparse($_GET['upc']);
+                $args = array($upc,$upc);
+                $prep = $dbc->prepare("
+                    SELECT *
+                    FROM PurchaseOrderItems
+                    WHERE internalUPC=?
+                        AND receivedDate = (SELECT max(receivedDate) FROM PurchaseOrderItems WHERE internalUPC = ?);
+                ");
+                $result = $dbc->execute($prep,$args);
+                $sku = 0;
+                $purchase = '<h5>Most Recent Purchase Order</h5>';
+                $purchase .= '<table class="table table-small table-condensed">';
+                $purchase .= '<th>SKU</th>';
+                $purchase .= '<th>Case Size</th>';
+                $purchase .= '<th>Received Date</th>';
+                while ($row = $dbc->fetchRow($result)) {
+                    $purchase .= '<tr><td>' . $row['sku'] . '</td>';
+                    $purchase .= '<td>' . $row['caseSize'] . '</td>';
+                    $purchase .= '<td>' . substr($row['receivedDate'], 0, 10) . '</td>';
+                    $sku = $row['sku'];
+                }
+                $purchase .= scanLib::getDbcError($dbc);
+                $purchase .= '</table>';
+
+                $args = array($upc);
+                $prep = $dbc->prepare("
+                    SELECT upc
+                    FROM VendorBreakdowns
+                    WHERE vendorID = 1
+                        AND upc = ?
+                ");
+                if (!$sku && $result = $dbc->execute($prep,$args)) {
+                    $purchase .= '
+                        <span class="alert-danger" align="center">
+                        No purchase orders were found for this item.
+                        </span><br><br>
+                    ';
+                }
+
+                $args = array($upc);
+                $prep = $dbc->prepare("
+                    SELECT
+                        *
+                    FROM vendorItems
+                    WHERE upc = ?
+                        AND vendorID = 1
+                ");
+                $result = $dbc->execute($prep,$args);
+                $vendorItem = '<h5>Vendor Items</h5>';
+                $vendorItem .= '<table class="table table-small table-condensed">';
+                $vendorItem .= '<th>UPC</th>';
+                $vendorItem .= '<th>SKU</th>';
+                $vendorItem .= '<th>Brand</th>';
+                $vendorItem .= '<th>Description</th>';
+                $vendorItem .= '<th>Size</th>';
+                $vendorItem .= '<th>Units</th>';
+                $vendorItem .= '<th>Cost</th>';
+                $vendorItem .= '<th>Modified</th>';
+                while ($row = $dbc->fetchRow($result)) {
+                    if ($row['sku'] == $sku) {
+                        $vendorItem .= '<tr class="success">';
+                    } else {
+                        $vendorItem .= '<tr>';
+                    }
+                    $vendorItem .= '<td><a href="http://key/git/fannie/item/ItemEditorPage.php?searchupc='
+                        . $row['upc'] . '" target="_blank">' . $row['upc'] . '</a></td>';
+                    $vendorItem .= '<td><b>' . $row['sku'] . '</b></td>';
+                    $vendorItem .= '<td>' . $row['brand'] . '</td>';
+                    $vendorItem .= '<td>' . $row['description'] . '</td>';
+                    $vendorItem .= '<td>' . $row['size'] . '</td>';
+                    $vendorItem .= '<td>' . $row['units'] . '</td>';
+                    $vendorItem .= '<td><b>' . $row['cost'] . '</b></td>';
+                    $vendorItem .= '<td>' . substr($row['modified'], 0, 10) . '</td>';
+                }
+                $vendorItem .= scanLib::getDbcError($dbc);
+                $vendorItem .= '</table>';
+                $ret .= '</div>';
+
+                if ($sku) {
+                    $vendorItem.= '
+                        <span class="alert-success">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            Highlighted row related to sku associated with the
+                            most recent purchase order for this product.
+                        <br><br>
+                    ';
+                }
+
+            
+            $data = array($purchase,$vendorItem);
+            return $data; 
+
+        return <<<HTML
+{$purchase}{$vendorItem}
+HTML;
     }
 
     private function form_content()

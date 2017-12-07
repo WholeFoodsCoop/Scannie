@@ -34,12 +34,43 @@ class TrackChangeNew extends ScancoordDispatch
     protected $description = "[Track Change] Track all changes made to an item in POS/OFFICE.";
     protected $ui = TRUE;
 
+    public function css_content()
+    {
+return <<<HTML
+td.min {
+    min-width: 75px;
+}
+td.space {
+    min-width: 25px;
+    text-align: center;
+}
+input {
+    height: 20px;
+}
+HTML;
+    }
+
     public function body_content()
     {
         $ret = '';
         include(__DIR__.'/../config.php');
         $dbc = scanLib::getConObj();
 
+        if (!class_exists(last_sold_check)) {
+            include('last_sold_check.php');
+        }
+        $data = last_sold_check::getDates();
+        $storename = array(1=>'Hillside',2=>'Denfeld');
+        $lastSold = '<h5>Product Last Sold</h5><table class="table table-small table-condensed"><tbody><tr>';
+        foreach ($data as $k => $v) {
+            $pipe = ($k == 1) ? " | " : "";
+            if (is_numeric($k)) {
+                $lastSold .= "<td class='min'>$storename[$k]</td><td>$v</td><td class='space'>$pipe</td>";
+            }
+        }
+        $lastSold .= '</tr></tbody></table>';
+
+        $col1 =  self::form_content();
         $desc = array();
         $salePrice = array();
         $cost = array();
@@ -51,11 +82,8 @@ class TrackChangeNew extends ScancoordDispatch
         $name = array();
         $realName = array();
         $uid = array();
-        $ret .= '<div class="container-fluid">';
-        $ret .=  self::form_content();
         $upc = $_GET['upc'];
         if($upc = scanLib::upcParse($upc)) {
-            //* Create the table if it doesn't exist */
             $args = array($upc);
             $prep = $dbc->prepare("SELECT pu.description,
                         pu.salePrice,
@@ -98,14 +126,14 @@ class TrackChangeNew extends ScancoordDispatch
                 $inUse[] = $row['inUse'];
             }
             $upcLink = "<a href='http://$FANNIEROOT_DIR/item/ItemEditorPage.php?searchupc="
-                    . $upc . "&ntype=UPC&searchBtn=' target='_blank'>{$upc}</a>";
-            $ret .=  "<div>Changes made to " . $upcLink . " <b>" . $desc[max(array_keys($desc))] . "</b></div>";
-            $ret .=  "<div><i>*Changes now being sorted from newest to oldest.*</i></div>
+                    . $upc . "&ntype=UPC&searchBtn=' target='_blank'>{$upc}</a><br/>";
+            $col1 .=  "<div>" . $upcLink . " <b>" . $desc[max(array_keys($desc))] . "</b></div>";
+            $col1 .=  "
               <a value='back' onClick='history.go(-1);return false;'>BACK</a>
 			  <span class='pipe'>&nbsp;|&nbsp;</span>
-              <a href='http://$SCANROOT_DIR/item/last_sold_check.php?upc=" . $upc . "+&id=1'>LAST SOLD PAGE</a>
+              <a href='http://$SCANROOT_DIR/item/last_sold_check.php?paste_list=1'>LAST SOLD PAGE</a>
                 <br>";
-            $ret .= scanLib::getDbcError($dbc);
+            $col1 .= scanLib::getDbcError($dbc);
 
             $ret .=  "<div class='panel panel-default panelScroll table-responsive'>";
             $ret .= '<span class="scrollRightIcon collapse" id="scrollRight"> </span>';
@@ -181,28 +209,49 @@ class TrackChangeNew extends ScancoordDispatch
             }
             $table .=  "</tbody></table>";
             $ret .= $table;
-            $ret .=  "</div></div>";    // <- panel / container
+            $ret .=  "</div>";    // <- panel / container
         }
+
+        $pData = last_sold_check::getPurchase($upc,$dbc);
 
         $this->addScript('../common/javascript/jquery.floatThead.min.js');
         $this->addOnloadCommand("\$('.table-float').floatThead();\n");
 
-        return $ret;
+        return <<<HTML
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2">
+            {$col1}
+            {$lastSold}
+        </div>
+        <div class="col-md-3">
+            {$pData[0]}
+        </div>
+        <div class="col-md-7">
+            {$pData[1]}
+        </div>
+    </div>
+</div>
+{$ret}
+HTML;
     }
 
     private function form_content()
     {
-        return '
-            <h4>Product Change Check</h4>
-                <form class ="form-inline"  method="get" >
-                    <div class="form-group">
-                        <input type="text" class="form-control" name="upc" placeholder="enter plu to track" autofocus>
-                    </div>
-                    <div class="form-group">
-                        <input type="submit" class="btn btn-default" value="submit">
-                    </div>
-                </form>
-        ';
+        return <<<HTML
+<form class ="form-inline"  method="get" >
+    <div class="form-group">
+        <div class="input-group">
+            <input type="text" class="form-control" name="upc" placeholder="enter plu to track" autofocus>
+            <div class="input-group-addon">
+                <input type="submit" class="btn btn-xs" value="go">
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+    </div>
+</form>
+HTML;
     }
 
 }
