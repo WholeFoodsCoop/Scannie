@@ -16,6 +16,8 @@ $curRet = '
         <a href="BatchReviewPageMilk.php'.$curID.'">UNFI-MILK Review</a></li>
     <li class="nav-tabs '.get_active_tab($curPage,'BatchSaleReviewPage.php').'">
         <a href="BatchSaleReviewPage.php'.$curID.'">Sales Batch Review</a></li>
+    <li class="nav-tabs '.get_active_tab($curPage,'WicReviewPage.php').'">
+        <a href="WicReviewPage.php'.$curID.'">Wic Batch Review</a></li>
   </ul>
 </div>
 ';
