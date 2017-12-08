@@ -27,7 +27,7 @@ class menu
     {
         include(__DIR__.'/../../config.php');
         $ret = '';
-        $ret .= '<div id="search-resp"></div>';
+        //$ret .= '<div id="search-resp"></div>';
         $ret .= '<img class="backToTop collapse" id="backToTop" src="http://'.$SCANROOT_DIR.'/common/src/img/upArrow.png" />';
         $calculators = self::calciframes();
         $mobileMenu = self::mobileMenu();
@@ -43,14 +43,14 @@ class menu
         }
         $loginText = '
             <div style="color: #cacaca; margin-left: 25px; margin-top: 5px;">
-            <strong>'.$user.'</strong><br/>
+                <span style="color:#cacaca">&#x2588; '.$user.'</span><br/>
             '.$link.' | <a href="http://'.$SCANROOT_DIR.'/testing/SiteMap.php">Site Map</a>
             </div>
        ';
 
         return <<<HTML
 <div class=""  align="center">
-    <div class="mainNavBox" align="center" style="">
+    <div class="mainNavBox" align="center">
     <div class="navbar navbar-default hidden-xs hidden-sm hidden-print" id="mainNav">
         <ul class="nav navbar-nav">
             <li> 
@@ -60,17 +60,18 @@ class menu
                         <a class="logo" href="http://{$FANNIEROOT_DIR}">CORE-POS</a>
                     </p>
                 </span>
-                <img src="http://{$SCANROOT_DIR}/common/src/img/wfcLogo_smaller.jpg" class="logo">
+                <img src="http://{$SCANROOT_DIR}/common/src/img/wfcLogo_smaller.png" class="logo">
             </li>
 
             <li class="dropdown">
                 <input class="form-control" id="searchbar" name="search" placeholder="search scannie"/></a>
+                <div id="search-resp"></div>
             </li>
 
             <li class="dropdown">
                 <a  class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Item<span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
-                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/last_sold_check.php">Last Sold</a></li>
+                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/last_sold_check.php?paste_list=1">Last Sold</a></li>
                     <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/TrackChangeNew.php">Track Change</a></li>
                     <li><a class="menu-opt" href="" onclick="popitup('http://{$SCANROOT_DIR}/item/MarginCalcNew.php')">Margin Calc</a></li>
                     <li><a class="menu-opt" href="" onclick="popitup('http://{$SCANROOT_DIR}/item/PercentCalc.php')">Percent Calc</a></li>
@@ -126,7 +127,7 @@ class menu
 </div>
 {$ret}
 {$calculators}
-{$mobilemenu}
+{$mobileMenu}
 HTML;
     }
 

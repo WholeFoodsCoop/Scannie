@@ -37,7 +37,7 @@ class search
         $ret = '';
         foreach ($this->data as $name => $path) {
             if ( (strstr($name,$s) || strstr($name,ucwords($s))) && strlen($s) > 2) {
-                $ret .= '<a href="'.$path.$name.'">';
+                $ret .= '<a class="search-resp" href="'.$path.$name.'">';
                 $replace = '<b>'.$s.'</b>';
                 $newstring = str_replace($s,$replace,$name);
                 $ret .= $newstring;
@@ -45,8 +45,8 @@ class search
             }
         }
         return <<<HTML
-<u style="color:grey; text-decoration: none;font-weight: bold;">Search Results</u><br />
-<div style="background: linear-gradient(to right, rgba(255,255,255,0.7), orange);">{$ret}</div>    
+<u style="color: #cacaca; text-decoration: none;font-weight: bold;">Search Results</u><br />
+<div>{$ret}</div>    
 HTML;
     }
 
