@@ -23,14 +23,16 @@ div.switchQContainer {
 .mobileMenu {
     width: 200px;
     top: 41px;
-    left: 15px;
+    left: 10px;
 }
 span.orange {
     color: lightblue;
 }
 span.aPage {
     color: pink;
-    text-align: right;
+}
+div.aPage {
+    text-align:right;
 }
 a.aPage:hover {
     text-decoration: none;
@@ -38,9 +40,9 @@ a.aPage:hover {
 button.switchBtn {
     position: fixed;
     top: 0px;
-    left: 15px;
+    left: 10px;
     opacity: 0.8;
-    width: 215px;
+    width: 70px;
 }
 .minimizeMenuBtn {
     z-index: 999;
@@ -54,9 +56,9 @@ HTML;
         return <<<HTML
 <div class="switchQContainer draggable">
     <button id="switchBtn" class="mobilePage switchBtn draggable" data-toggle="collapse" data-target="#switchQ">
-        <span class="aPage">
-            Qs
-        </span>
+        <div class="aPage">
+            <span class="aPage">Qs<span class="caret"></span>&nbsp;&nbsp;</span>
+        </div>
     </button>
     <form method="get">
         <div id="switchQ" class="mobileMenu collapse draggable">
@@ -265,7 +267,8 @@ HTML;
             echo '</textarea>';
             echo ' | <a href="SalesChangeQueues.php?rmOtherSales=1&queue=0"
                 onclick="return confirm(\'Are you sure?\')">Remove Non Co-op Deals Sale Items from List</a> | ';
-            echo '<a href="#" id="collapseLoc">Show/Hide Locations</a>';
+            echo '<a href="#" id="collapseLoc">Show/Hide Locations</a> | ';
+            echo '<a href="#" onClick="hideUnsold(); return false;">Hide Unsold Items</a>';
         }
         
         if ($_GET['rmOtherSales'] == 1) {
@@ -354,6 +357,14 @@ HTML;
     public function javascriptContent()
     {
         return <<<HTML
+function hideUnsold() {
+    $('tr').each(function() {
+        if ( $(this).find('img').length ) {
+            $(this).closest('tr').hide();
+        }
+    });
+}
+
 function sendToQueue(button, upc, queue_id, session, delQ)
 {
     $.ajax({
@@ -397,7 +408,7 @@ function hideMenu()
         alert("hi");    
     });
     $('#switchBtn').css({
-        'left' : '-190px'
+        //'left' : '-170px'
     });
 }
 
