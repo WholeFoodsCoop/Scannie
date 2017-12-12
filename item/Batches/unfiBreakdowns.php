@@ -1,15 +1,14 @@
 <?php
-include('../../config.php');
+include(__DIR__.'/../../config.php');
 if (!class_exists('ScancoordDispatch')) {
-    include($SCANROOT.'/common/ui/CorePage.php');
+    include(__DIR__.'/../../common/ui/CorePage.php');
 }
 if (!class_exists('SQLManager')) {
-    include_once(dirname(dirname(dirname(__FILE__))) . '/common/sqlconnect/SQLManager.php');
+    include_once(__DIR__.'/../../common/sqlconnect/SQLManager.php');
 }
-
 class unfiBreakdowns extends ScancoordDispatch
 {
-    
+
     protected $title = 'UNFI Breakdowns Page';
     protected $description = '[UNFI Breakdowns] Find break-down products missing in 
         sales batches.';
@@ -17,8 +16,7 @@ class unfiBreakdowns extends ScancoordDispatch
     
     public function body_content()
     {        
-        include('../../config.php');
-        //$rounder = new \COREPOS\Fannie\API\item\PriceRounder();
+        include(__DIR__.'/../../config.php');
         include('../../common/lib/PriceRounder.php');
         $rounder = new PriceRounder();
         
@@ -38,7 +36,7 @@ class unfiBreakdowns extends ScancoordDispatch
             $end = $_GET['start'];
         }
         
-        $dbc = new SQLManager($SCANHOST, 'pdo_mysql', 'woodshed_no_replicate', $SCANUSER, $SCANPASS);
+        $dbc = ScanLib::getConObj('SCANALTDB');
         $prep = $dbc->prepare("
             SELECT parent, child, size
             FROM UnfiBreakdowns AS u 
@@ -86,19 +84,14 @@ class unfiBreakdowns extends ScancoordDispatch
         
         $ret .=  '<table class="table table-striped table-condensed small" style="width:250px;border:2px solid lightgrey">
                     <th></ht><th>upc</th><th>batchID</th><th>saleprice</th>';
-        /*
-        foreach ($batchList as $upc => $salePrice) {
-            echo $upc . ' ' . $salePrice . ' <span style="color: purple">' . $size[$upc] . '</span><br />';
-        }
-        */
-                    
+
         foreach ($batchList as $upc => $salePrice) {
             //  GET Child
             if (in_array($upc,$parents) && !in_array($upc,$child)) {
                 $curSize = $size[$upc];
                 $price = ($salePrice / $curSize);
                 $price = $rounder->round($price);
-                $batch = '<a href="http://192.168.1.2/git/fannie/batches/newbatch/EditBatchPage.php?id=' . $batchIDs[$upc] . '" target="_blank">' . $batchIDs[$upc] . '</a>';
+                $batch = '<a href="http://'.$FANNIEROOT_DIR.'/batches/newbatch/EditBatchPage.php?id=' . $batchIDs[$upc] . '" target="_blank">' . $batchIDs[$upc] . '</a>';
                 if ($curSize > 0.01) {
                     while ($price*$curSize < $salePrice) {
                         $price++;
@@ -120,7 +113,7 @@ class unfiBreakdowns extends ScancoordDispatch
                 $curSize = $size[$parent];
                 $price = ($salePrice * $curSize);
                 $price = $rounder->round($price);
-                $batch = '<a href=http://192.168.1.2/git/fannie/batches/newbatch/EditBatchPage.php?id=' . $batchIDs[$upc] . '" target="_blank">' . $batchIDs[$upc] . '</a>';
+                $batch = '<a href="http://'.$FANNIEROOT_DIR.'/batches/newbatch/EditBatchPage.php?id=' . $batchIDs[$upc] . '" target="_blank">' . $batchIDs[$upc] . '</a>';
                 while ($price > $salePrice*$curSize) {
                     $price--;
                 }
@@ -128,8 +121,6 @@ class unfiBreakdowns extends ScancoordDispatch
                     $ret .=  sprintf('<tr><td>parent</td><td>%s</td><td>%s</td><td>%0.2f</td></tr>',$parent,$batch,$price);
                 }
             }
-            
-            //return "hi!";
             
         }
         $ret .=  '</table>';
@@ -154,6 +145,5 @@ class unfiBreakdowns extends ScancoordDispatch
     }
     
 }
-
 ScancoordDispatch::conditionalExec();
 
