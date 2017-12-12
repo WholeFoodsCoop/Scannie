@@ -37,6 +37,9 @@ class TrackChangeNew extends ScancoordDispatch
     public function css_content()
     {
 return <<<HTML
+.green {
+    color: green;
+}
 td.min {
     min-width: 75px;
 }
@@ -46,6 +49,13 @@ td.space {
 }
 input {
     height: 20px;
+}
+.panel-noborder {
+    border: 0;
+    box-shadow: none;
+}
+h5 {
+    color: slategrey;
 }
 HTML;
     }
@@ -190,7 +200,7 @@ HTML;
                     $table .=  "<td>" . $desc[$i] . "</td>";
                     $table .=  "<td>" . $price[$i] . "</td>";
                     $table .=  "<td>" . $salePrice[$i]  . "</td>";
-                    $table .=  "<td>" . $cost[$i] . "</td>";
+                    $table .=  "<td class='cost'>" . $cost[$i] . "</td>";
                     $table .=  "<td>" . $dept[$i] . "</td>";
                     $table .=  "<td>" . $switch[$tax[$i]] . "</td>";
                     $table .=  "<td>" . $switch[$fs[$i]] . "</td>";
@@ -198,7 +208,7 @@ HTML;
                     $table .=  "<td>" . $switch[$wic[$i]] . "</td>";
                     $table .=  "<td>" . $store_id[$i] . "</td>";
                     $table .=  "<td>" . $switch[$inUse[$i]] . "</td>";
-                    $table .=  "<td>" . $modified[$i] . "</td> ";
+                    $table .=  "<td class='modified'>" . $modified[$i] . "</td> ";
                     if ($realName[$i] == NULL) {
                         $table .=  "<td><i>unknown / scheduled change " . $uid[$i] . "</i></tr>";
                     } else {
@@ -228,8 +238,14 @@ HTML;
             {$pData[0]}
         </div>
         <div class="col-md-7">
-            <div class="table-responsive">
+            <div class="panel panel-noborder table-responsive">
                 {$pData[1]}
+            </div>
+            <div id="costs">
+                <label>OldCost</label>: <span id="oldCost"></span> | 
+                <label>NewCost</label>: <span id="newCost"></span> | 
+                <label>Change</label>: <span id="diffCost"></span> | 
+                <label>On</label>: <span id="dateCost"></span>
             </div>
         </div>
     </div>
@@ -253,6 +269,47 @@ HTML;
     <div class="form-group">
     </div>
 </form>
+HTML;
+    }
+
+    public function javascript_content()
+    {
+        return <<<HTML
+var newCost = 0;
+var oldCost = 0;
+var end = 0; 
+var date = '';
+$(function() {
+    $('tr').find('td').each(function() {
+        if ( $(this).hasClass('cost') && end == 0 ) {
+            var temp = $(this).text();
+            if (newCost == 0 && temp != 0) {
+                newCost = temp;
+                date = $(this).closest('tr').find('td.modified').text();
+            }
+            if (temp != newCost && temp != 0) oldCost = temp;
+            temp = 0;
+            if (newCost != 0 && oldCost != 0) end = 1;
+        }
+    });
+    $('#oldCost').text(oldCost);
+    $('#newCost').text(newCost);
+    var diff = newCost - oldCost;
+    var ori = '';
+    if (diff > 0) {
+        ori = "+";   
+    }
+    $('#diffCost').text(ori+diff.toFixed(2));
+    $('#dateCost').text(date.substr(0,10));
+    var d = new Date();
+    var dd = d.getDate();
+    var mm = d.getMonth()+1;
+    var yyyy = d.getFullYear();
+    var today = yyyy+"-"+mm+"-"+dd;
+     if ( $('#dateCost').text() == today ) {
+         $('#dateCost').addClass('green').append(' *today*');
+     }
+});
 HTML;
     }
 
