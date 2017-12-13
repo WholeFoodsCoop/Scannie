@@ -187,9 +187,9 @@ HTML;
                 )
                 {
                     if ($store_id[$i] == 'Hillside') {
-                        $table .=  "<tr >";
+                        $table .=  "<tr id='tr_$i'>";
                     } else {
-                        $table .=  "<tr class='warning'>";
+                        $table .=  "<tr id='tr_$i' class='warning'>";
                     }
 
                     $switch = array(
@@ -279,19 +279,26 @@ var newCost = 0;
 var oldCost = 0;
 var end = 0; 
 var date = '';
+var dateID = 0;
 $(function() {
     $('tr').find('td').each(function() {
         if ( $(this).hasClass('cost') && end == 0 ) {
             var temp = $(this).text();
             if (newCost == 0 && temp != 0) {
                 newCost = temp;
-                date = $(this).closest('tr').find('td.modified').text();
             }
-            if (temp != newCost && temp != 0) oldCost = temp;
+            if (temp != newCost && temp != 0) {
+                oldCost = temp;
+                dateID = $(this).closest('tr').attr('id');
+                dateID = dateID.substr(3);
+            }
             temp = 0;
             if (newCost != 0 && oldCost != 0) end = 1;
         }
     });
+    var changeID = dateID-1;
+    var fullChangeID = '#tr_'+changeID;
+    date = $(fullChangeID).closest('tr').find('td.modified').text();
     $('#oldCost').text(oldCost);
     $('#newCost').text(newCost);
     var diff = newCost - oldCost;
