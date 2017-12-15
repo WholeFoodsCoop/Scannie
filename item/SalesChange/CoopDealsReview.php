@@ -71,14 +71,18 @@ class CoopDealsReview extends ScancoordDispatch
                     </div>
                 </div><br/>
                 <div class='row'>
-                    <div class='col-md-3'>
-                        {$this->getBadPriceItems($dbc)}
+                    <div class='col-md-4'>
+                        <div class='table-responsive'>
+                            {$this->getBadPriceItems($dbc)}
+                        </div>
                     </div>
-                    <div class='col-md-5'>
+                    <div class='col-md-4'>
                         {$this->getMissingSignText($dbc,$start)}
                     </div>
                     <div class='col-md-3'>
-                        {$this->getBadPrices($dbc,$upcs)}
+                        <div class='table-responsive'>
+                            {$this->getBadPrices($dbc,$upcs)}
+                        </div>
                     </div>
                 </div>
             ";
@@ -109,7 +113,7 @@ class CoopDealsReview extends ScancoordDispatch
 
     private function getNarrowItems($dbc,$upcs) {
         list($inStr, $args) = $dbc->safeInClause($upcs);
-        $prep = $dbc->prepare("SELECT upc FROM NarrowTags WHERE upc IN ({$inStr})");
+        $prep = $dbc->prepare("SELECT upc FROM productUser WHERE upc IN ({$inStr}) AND narrow = 1");
         $res = $dbc->execute($prep,$args);
         $td = "";
         $rUpcs = array();
@@ -220,7 +224,7 @@ class CoopDealsReview extends ScancoordDispatch
 
         $ret .='<div class="panel panel-default mypanel">
             <legend class="panel-heading small">Items with HIGH % Deals</legend>';
-        $ret .= '<table class="table table-default table-condensed small">';
+        $ret .= '<table class="table table-default table-condensed small table-striped">';
         foreach ($discount as $upc => $percent) {
             $batchL = '<a href="http://192.168.1.2/git/fannie/batches/newbatch/EditBatchPage.php?id='
 				. $percent['batchID'] .'" target="_blank">' . $percent['batchID'] . '</a>';
@@ -271,7 +275,7 @@ class CoopDealsReview extends ScancoordDispatch
         ;");
 
         $result = $dbc->execute($query);
-        $ret .= '<div class="table-responsive"><table class="table table-default table-condensed small table-responsive" id="signText">';
+        $ret .= '<div class="table-responsive"><table class="table table-default table-condensed small table-striped" id="signText">';
         while ($row = $dbc->fetchRow($result)) {
             $ret .= '<tr>';
             $ret .= '<td><a href="http://key/git/fannie/item/ItemEditorPage.php?searchupc=' . $row['upc'] . '&ntype=UPC&searchBtn=" target="_blank">'.$row['upc'].'</a></td>';
@@ -311,7 +315,7 @@ class CoopDealsReview extends ScancoordDispatch
         ");
 
         $result = $dbc->execute($query);
-		$ret .= '<table class="table table-default table-condensed small">';
+		$ret .= '<table class="table table-default table-condensed small table-striped">';
         while ($row = $dbc->fetchRow($result)) {
 			$editL = '<a href="http://192.168.1.2/git/fannie/item/ItemEditorPage.php?searchupc=' . $row['upc'] . '" target="_blank">' . $row['upc'] . '</a> ';
             $batchL = '<a href="http://192.168.1.2/git/fannie/batches/newbatch/EditBatchPage.php?id='
@@ -335,11 +339,12 @@ class CoopDealsReview extends ScancoordDispatch
 
     private function form_content()
     {
+        $v = $_GET['startDate'];
         return <<<HTML
 <strong>Start Date</strong>
 <form method="get" class="form-inline">
     <div class="form-group">
-        <input type="input" class="form-control mainInput" name="startDate">
+        <input type="input" class="form-control mainInput" name="startDate" value="{$v}">
     </div>
     <div class="form-group">
         <button type="submit" class="btn btn-default mainInput">Submit</button>
