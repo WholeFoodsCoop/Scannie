@@ -29,15 +29,36 @@ class search
     protected $data = array();
     protected $pagelist = array();
 
+    private function parser($input)
+    {
+        include(__DIR__.'/../../config.php');
+        if (is_numeric($input)) {
+            $pages = array(
+                'Track Change' => 'http://'.$SCANROOT_DIR.'/item/TrackChangeNew.php?upc='.$input,
+                'Item Edit' => 'http://'.$FANNIEROOT_DIR.'/item/ItemEditorPage.php?searchupc='.$input.'&ntype=UPC&searchBtn=',
+                'Batch Edit' => 'http://'.$FANNIEROOT_DIR.'/batches/newbatch/EditBatchPage.php?id='.$input,
+                'Item Batch History' => 'http://'.$FANNIEROOT_DIR.'/reports/ItemBatches/ItemBatchesReport.php?upc='.$input,
+                'Batch % Check' => 'http://'.$SCANROOT_DIR.'/item/Batches/CheckBatchPercent.php?batchID='.$input,
+            );
+            foreach ($pages as $name => $path) {
+                $this->data[$name] = $path;
+            }
+        } else {
+            $this->getList();
+        }
+
+        return $ret;
+    }
+
     public function run()
     {
         $s = $_GET['search'];
-        $this->getList();
+        $ret = $this->parser($s);
 
-        $ret = '';
+        //$ret = '';
         foreach ($this->data as $name => $path) {
-            if ( (strstr($name,$s) || strstr($name,ucwords($s))) && strlen($s) > 2) {
-                $ret .= '<a class="search-resp" href="'.$path.$name.'">';
+            if ( (strstr($name,$s) || strstr($name,ucwords($s))) && strlen($s) > 2 || is_numeric($s) ) {
+                $ret .= (is_numeric($s)) ? '<a class="search-resp" href="'.$path.'">' : '<a class="search-resp" href="'.$path.$name.'">';
                 $replace = '<b>'.$s.'</b>';
                 $newstring = str_replace($s,$replace,$name);
                 $ret .= $newstring;
@@ -46,7 +67,7 @@ class search
         }
         return <<<HTML
 <u style="color: #cacaca; text-decoration: none;font-weight: bold;">Search Results</u><br />
-<div>{$ret}</div>    
+<div>{$ret}</div>
 HTML;
     }
 
