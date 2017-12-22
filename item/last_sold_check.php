@@ -42,12 +42,11 @@ class last_sold_check extends scancoordDispatch
         include(__DIR__.'/../config.php');
         $ret .= '
             <form method="get" class="form-inline">
-                <div class="input-group" style="width: 100%;">
-                    <textarea class="form-control" name="upcs"></textarea>
-                    <div class="input-group-addon">
-                        <button type="submit" class="btn-xs">Submit a list of UPCs to 
-                            view most recent sales activity.</button>
-                    </div>
+                <div class="input-group" style="width: 300px; float: left; float: left;">
+                    <textarea class="form-control" name="upcs" rows="5"></textarea>
+                    <button type="submit" class="sp btn btn-default btn-xs" style="width: 300px">
+                            go
+                    </button>
                 </div>
                 <input type="hidden" name="paste_list" value="1">
             </form>
@@ -65,11 +64,12 @@ class last_sold_check extends scancoordDispatch
         $link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
         $ret .= '
             <div align="right">
-                <button class="btn btn-default btn-xs" id="hideHill">Hide Hillside</button>
-                <button class="btn btn-default btn-xs" id="hideDenf">Hide Denfeld</button>
-                <button id="hideBlue" class="btn btn-info btn-xs">Hide Recent</button>
-                <button id="hideRed" class="btn btn-danger btn-xs">Hide Unsold</button>
-                <button id="showAll" class="btn btn-default btn-xs">Show All</button>
+                <button class="sp btn btn-default btn-xs" id="hideHill">Hide Hillside</button>
+                <button class="sp btn btn-default btn-xs" id="hideDenf">Hide Denfeld</button>
+                <button id="hideBlue" class="sp btn btn-info btn-xs">Hide Recent</button>
+                <button id="hideRed" class="sp btn btn-danger btn-xs">Hide Unsold</button>
+                <button id="showAll" class="sp btn btn-default btn-xs">Show All</button>
+                <a href="TrackChangeNew.php" class="sp">Track Change</a>
             </div><br>
         ';
 
@@ -331,11 +331,13 @@ class last_sold_check extends scancoordDispatch
             $result = $dbc->execute($prep,$args);
             $i = 0;
             while ($row = $dbc->fetchRow($result)) {
+                $last_sold = (is_null($row['last_sold'])) 
+                    ? "<span class='text-danger'>n/a</span>" : substr($row['last_sold'],0,10);
                 $year = substr($row['last_sold'], 0, 4);
                 $month = substr($row['last_sold'], 5, 2);
                 $day = substr($row['last_sold'], 8, 2);
                 $class = (($year < $curY) || ($month < ($curM - 2))) ? "red" : "";
-                $data[$row['store_id']] = "<span class='$class'>".substr($row['last_sold'],0,10)."</span>";
+                $data[$row['store_id']] = "<span class='$class'>$last_sold</span>";
             }
             $data['error'].= scanLib::getDbcError($dbc);
         }
@@ -398,7 +400,6 @@ class last_sold_check extends scancoordDispatch
                 $result = $dbc->execute($prep,$args);
                 $vendorItem = '<h5>Vendor Items</h5>';
                 $vendorItem .= '<table class="table table-small table-condensed">';
-                $vendorItem .= '<th>UPC</th>';
                 $vendorItem .= '<th>SKU</th>';
                 $vendorItem .= '<th>Brand</th>';
                 $vendorItem .= '<th>Description</th>';
@@ -412,8 +413,6 @@ class last_sold_check extends scancoordDispatch
                     } else {
                         $vendorItem .= '<tr>';
                     }
-                    $vendorItem .= '<td><a href="http://key/git/fannie/item/ItemEditorPage.php?searchupc='
-                        . $row['upc'] . '" target="_blank">' . $row['upc'] . '</a></td>';
                     $vendorItem .= '<td><b>' . $row['sku'] . '</b></td>';
                     $vendorItem .= '<td>' . $row['brand'] . '</td>';
                     $vendorItem .= '<td>' . $row['description'] . '</td>';
@@ -429,8 +428,7 @@ class last_sold_check extends scancoordDispatch
                 if ($sku) {
                     $vendorItem.= '
                         <span class="alert-success">&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                            Highlighted row related to sku associated with the
-                            most recent purchase order for this product.
+                            Highlighted row is related to the sku most recently purchased.
                         <br><br>
                     ';
                 }
@@ -501,7 +499,7 @@ $(document).ready(function() {
 HTML;
     }
 
-    public function cssContent()
+    public function css_content()
     {
         return <<<HTML
 #hideHill {
@@ -509,6 +507,10 @@ HTML;
 }
 #hideDenf {
     border: 2px solid lightblue;
+}
+.sp {
+    margin-top: 2.5px;
+    margin-bottom: 2.5px;
 }
 HTML;
     }
