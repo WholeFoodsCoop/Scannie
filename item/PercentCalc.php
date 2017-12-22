@@ -86,29 +86,27 @@ class PercentCalc extends ScancoordDispatch
 public function css_content()
     {
         return '
+td {
+    min-width: 120px;
+}
+.input-group-addon{
+    min-width: 100px;
+}
 body {
     overflow: -moz-scrollbars-horizontal;
     overflow-x: hidden;
     overflow-y: hidden;
 }
-input {
-    //background-color: black;
-}
 .form-control {
-    border: 2px solid white;;
-    background: linear-gradient(#fffcf7,#fff5e8);
+    background-color: rgba(255,255,255,0.9);
 }
 .input-group-addon {
-    border: 2px solid white;;
     width: 50px;
-    background: linear-gradient(#fcf0cc,#ffe9ab);
 }
 .btn {
-    background: linear-gradient(#fcf0cc,#ffe9ab);
 }
 table td,th {                   
   border-top: none !important;
-  padding: 15px;
 }                               
 body {
   //color: #cacaca;
@@ -154,9 +152,6 @@ textarea {
 }
 fieldset {
     border: 1px dotted grey;
-}
-.input-group-addon {
-    width: 100px;
 }
         ';
     }

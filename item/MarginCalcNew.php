@@ -21,12 +21,12 @@
     
 *********************************************************************************/
 
-include('../config.php');
+include(__DIR__.'/../config.php');
 if (!class_exists('ScancoordDispatch')) {
-    include($SCANROOT.'/common/ui/CorePage.php');
+    include(__DIR__.'/../common/ui/CorePage.php');
 }
 if (!class_exists('SQLManager')) {
-    include_once(dirname(dirname(__FILE__)) . '/common/sqlconnect/SQLManager.php');
+    include_once(__DIR__.'/../common/sqlconnect/SQLManager.php');
 }
 
 class MarginCalcNew extends ScancoordDispatch
@@ -35,16 +35,14 @@ class MarginCalcNew extends ScancoordDispatch
     protected $title = "Margin Calculator";
     protected $description = "[] ";
     protected $ui = FALSE;
-    protected $add_javascript_content = TRUE;
-    protected $add_css_content = TRUE;
     
     public function body_content()
     {           
     
         $ret = '<br/>';
         
-        include('../config.php');
-        include('../common/lib/PriceRounder.php');
+        include(__DIR__.'/../config.php');
+        include(__DIR__.'/../common/lib/PriceRounder.php');
         $rounder = new PriceRounder();
         
         $actualMargin = 0;
@@ -127,20 +125,13 @@ body {
     overflow-x: hidden;
     overflow-y: hidden;
 }
-input {
-    background-color: black;
-}
 .form-control {
-    border: 2px solid white;;
-    background: linear-gradient(#fffcf7,#fff5e8);
+    background-color: rgba(255,255,255,0.9);
 }
 .input-group-addon {
-    border: 2px solid white;;
     width: 50px;
-    background: linear-gradient(#fcf0cc,#ffe9ab);
 }
 .btn {
-    background: linear-gradient(#fcf0cc,#ffe9ab);
 }
 table td,th {                   
   border-top: none !important;
