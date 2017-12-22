@@ -70,6 +70,7 @@ if($_GET['store_id'] > 0 && $_GET['session_name'] != NULL) {
                 AND p.upc != 0000000004792
                 AND p.inUse = 1
                 AND b.discountType <> 0 
+                AND b.batchType BETWEEN 1 AND 12
             ;";
         $result = mysql_query($query, $dbc);
         while ($row = mysql_fetch_assoc($result)) {
