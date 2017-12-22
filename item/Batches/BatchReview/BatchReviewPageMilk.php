@@ -21,12 +21,12 @@
     
 *********************************************************************************/
 
-include('../../../config.php');
+include(__DIR__.'/../../../config.php');
 if (!class_exists('ScancoordDispatch')) {
-    include($SCANROOT.'/common/ui/CorePage.php');
+    include(__DIR__.'/../../../common/ui/CorePage.php');
 }
 if (!class_exists('SQLManager')) {
-    include_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/common/sqlconnect/SQLManager.php');
+    include_once(__DIR__.'/../../../common/sqlconnect/SQLManager.php');
 }
 
 class BatchReviewPageMilk extends scancoordDispatch 
@@ -40,9 +40,11 @@ class BatchReviewPageMilk extends scancoordDispatch
     public function body_content() 
     {
         
-        include('../../../config.php');
+        include(__DIR__.'/../../../config.php');
+        include(__DIR__.'/../../../common/lib/PriceRounder.php');
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         $curPage = basename($_SERVER['PHP_SELF']);
+        $rounder = new PriceRounder();
         
         $id = $_GET['id'];
         $ret = '';
@@ -65,7 +67,7 @@ class BatchReviewPageMilk extends scancoordDispatch
                     p.department AS pdept,
                     d.dept_name,
                     p.cost,
-                    bl.salePrice AS price,
+                    p.normal_price AS price,
                     vd.margin AS unfiMarg,
                     vd.posDeptID,
                     vd.name AS vendorDeptName,
@@ -82,36 +84,55 @@ class BatchReviewPageMilk extends scancoordDispatch
                 ;');
             $result = $dbc->execute($query);
             $ret .= '
-                <div class="panel panel-default"><table class="table table-striped table-condensed small">
+                <div class="panel panel-default"><table class="table table-bordered table-condensed small">
                     <th>UPC</th>
                     <th>Description</th>
                     <th>POS Dept.</th>
+                    <th>Cur Marg</th>
+                    <th>New Marg | NM - 25.5%</th>
                     <th>Cost</th>
                     <th>Price</th>
-                    <th>New Marg.</th>
-                    <th>Desired Marg.</th>
+                    <th>SRP</th>
                     <th>Diff.</th>
             ';
             while ($row = $dbc->fetch_row($result)) {
-                $newMargin = ($row['price'] - $row['cost']) / $row['price'];
-                $newMargin  = sprintf('%0.2f', $newMargin);
                 $upc = '<a href="http://key/git/fannie/item/ItemEditorPage.php?searchupc=' . $row['upc'] . '" target="_blank">' . $row['upc'] . '</a>';
                 $margin = .2550;
-                $diff = $newMargin - $margin;
-                $diff = sprintf('%0.2f', $diff);
+                $c = $row['cost'];
+                $p = $row['price'];
+                $srp = $c / (1 - $margin); 
+                $srp = $rounder->round($srp);
+                $diff = $srp - $p; 
+
+                $curMargin = ($p - $c) / $p;
+                $curMargin = sprintf('%0.2f', $curMargin);
+                $adj = $margin - $curMargin;
+                $adjClassA = ($adj > 0.05 || $adj < -0.05) ? 'red' : 'blue';
+                $adjSpanA = '<span class="adj '.$adjClassA.'">'.$adj.'</span>';
+
+                $newMargin = ($srp - $c) / $srp;
+                $newMargin  = sprintf('%0.2f', $newMargin);
+                $adj = $margin - $newMargin;
+                $adjClassB = ($adj > 0.05 || $adj < -0.05) ? 'red' : 'blue';
+                $adjSpanB = '<span class="adj '.$adjClassB.'">'.$adj.'</span>';
+
+                $pipe = '<span style="color: lightgrey"> | </span>';
+                $curMargin = sprintf('%s %s %s',$curMargin,$pipe,$adjSpanA);
+                $newMargin = sprintf('%s %s %s',$newMargin,$pipe,$adjSpanB);
                 
                 $ret .= '<tr><td>' . $upc . '</td>';
                 $ret .= '<td>' . $row['description'] . '</td>';
                 $ret .= '<td>' . $row['pdept'] . ' - ' . $row['dept_name'] . '</td>';
+                $ret .= "<td>$curMargin</td>";
+                $ret .= "<td>$newMargin</td>";
                 $ret .= '<td>' . $row['cost'] . '</td>';
                 $ret .= '<td>' . $row['price'] . '</td>';
-                $ret .= '<td>' . $newMargin . '</td>';
-                $ret .= '<td>' . $margin . '</td>';
+                $ret .= '<td class="srp-col">' . $srp. '</td>';
                 
                 if ($diff < -0.08 | $diff > 0.08) {
-                    $ret .= '<td class="redText">' . $diff . '</td>';
+                    $ret .= '<td class="redText diff-col">' . $diff . '</td>';
                 } else {
-                    $ret .= '<td>' . $diff . '</td>';
+                    $ret .= '<td class="diff-col">' . $diff . '</td>';
                 }
                 
             }
@@ -137,11 +158,42 @@ class BatchReviewPageMilk extends scancoordDispatch
         $ret .= '
             <form method="get" class="form-inline">
                 <input type="text" class="form-control" name="id" placeholder="Enter Batch  ID" autofocus>
-				<button class="btn btn-default" type="submit">Submit</button>
+				<button class="btn btn-default" type="submit">Submit</button> | 
+				<a class="" href="#" onClick="hideZero(); return false;">Hide No-Change Rows</a>
             </form>
         ';
         
         return $ret;
+    }
+
+    protected function javascriptContent()
+    {
+        return <<<HTML
+$(function(){
+});
+
+function hideZero()
+{
+    $('td').each(function(){
+        var diffcol= $(this).hasClass('diff-col');
+        if (diffcol) {
+            var value = $(this).text();
+            if (value == 0) {
+                $(this).closest('tr').hide();
+            }
+        }
+    });
+}
+HTML;
+    }
+
+    public function css_content()
+    {
+        return <<<HTML
+.blue {
+    color: lightblue;
+}
+HTML;
     }
     
     public function help_content()
