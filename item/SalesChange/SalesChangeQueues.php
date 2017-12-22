@@ -16,6 +16,15 @@ class SalesChangeQueues extends scancoordDispatch
     public function css_content()
     {
         return <<<HTML
+#addUpcForm {
+    display: none;
+}
+#loading {
+    background-color: purple;
+    color: white;
+    font-weight: bold;
+    padding: 25px;
+}
 div.switchQContainer {
     padding: 20px;
     max-width: 500px;
@@ -138,8 +147,34 @@ HTML;
         return $queueNames;
     }
 
+    private function addUpc($dbc)
+    {
+
+        /*
+        $queue = $_POST['curQueue'];
+        $upc = ScanLib::upcParse($_POST['addUpc']);
+        $store_id = $_POST['curStoreID'];
+        $session = $_POST['curSession'];
+
+        $args = array($queue, $upc, $store_id, $session);
+        $prep = $dbc->prepare("INSERT INTO SaleChangeQueues (
+            queue, upc, store_id, session, type
+        ) values (
+            ?, ?, ?, ?, 1 
+        );");
+        $dbc->execute($prep,$args);
+        $error = ($er = $dbc->error()) ? $er : '';
+        echo "<div class='alert alert-danger'>$error</div>";
+        */
+
+        return false;
+    }
+
     private function draw_table($dbc)
     {
+        if ($_POST['addUpc']) {
+            $this->addUpc($dbc);
+        }
         $curQueue = $_GET['queue'];
         $queueNames = array();
         $queueNames = $this->get_queue_name($dbc);
@@ -174,7 +209,7 @@ HTML;
             SELECT q.queue, 
                     CASE WHEN u.brand IS NULL OR u.brand='' THEN p.brand ELSE u.brand END AS brand, 
                     CASE WHEN u.description IS NULL OR u.description='' THEN p.description ELSE u.description END as description,
-                    u.upc, p.size, p.normal_price, ba.batchName,
+                    q.upc, p.size, p.normal_price, ba.batchName,
                     p.special_price as price, ba.batchID, q.notes,
                     p.last_sold,
                     f.floorSectionID,
@@ -238,6 +273,7 @@ HTML;
         if ($dbc->error()) {
             echo $dbc->error(). "<br>";
         }
+        echo "<div id='loading' align='center'><i>Please wait while this page is loading<span id='animate-load'>...</span></i></div>";
         
         echo "<h1 align='center'>".ucwords($queueNames[$curQueue])."</h1>";
         if (!isset($curQueue)) echo "<h1 align='center'>Home Page (No Queue Selected)</h1>";
@@ -250,43 +286,59 @@ HTML;
         }
         echo "<span style='color:purple'>" . $_SESSION['session'] . "</span>";
         echo "</div>";
-        echo "<p align='center'>" . count($upcs) . " tags in this queue</p>";
+        echo "<p align='center'><span id='countUpcs'>" . count($upcs) . "</span> tags in this queue</p>";
         if ($curQueue == 0) {
             echo '
-                <form method="post">
+                <form method="post" id="addUpcForm">
                   <input type="hidden" name="queue" value="0">
                   <input type="hidden" name="rmDisco" value="1">
                 </form>
             ';
         }
 
-        if (count($upcs) > 0) {
-            echo '<a href="" onclick="$(\'#cparea\').show(); return false;">Copy/paste</a>';
-            echo '<textarea id="cparea" class="collapse">';
-            echo implode("\n", $upcs);
-            echo '</textarea>';
-            echo ' | <a href="SalesChangeQueues.php?rmOtherSales=1&queue=0"
-                onclick="return confirm(\'Are you sure?\')">Remove Non Co-op Deals Sale Items from List</a> | ';
-            echo '<a href="#" id="collapseLoc">Show/Hide Locations</a> | ';
-            echo '<a href="#" onClick="hideUnsold(); return false;">Hide Unsold Items</a>';
-        }
+        echo '<a href="" onclick="$(\'#cparea\').show(); return false;">Copy/paste</a>';
+        echo '<textarea id="cparea" class="collapse">';
+        echo implode("\n", $upcs);
+        echo '</textarea>';
+        echo ' | <a href="SalesChangeQueues.php?rmOtherSales=1&queue=0"
+            onclick="return confirm(\'Are you sure?\')">Remove Non Co-op Deals Sale Items from List</a> | ';
+        echo '<a href="#" id="collapseLoc">Show/Hide Locations</a> | ';
+        echo '<a href="#" onClick="hideUnsold(); return false;">Hide Unsold Items</a> | ';
+        echo '<span id="clickToShowForm"><button onClick="addUpcForm(); return false;">+</button> Add Item To <b>'.$queueNames[$curQueue].'</b></span>';
+            //echo '<span id="addNoteText"><button onClick="addNote(); return false;">+</button> Add Note To <b>'.$queueNames[$curQueue].'</b></span>';
+        $btn = ($curQueue == 2) 
+            ? '<span id="addNoteText"><button onClick="addNote(); return false;">+</button> Add Note To <b>'.$queueNames[$curQueue].'</b></span>'
+            : "<button onClick='submitAddUpc()' class=' btn btn-default' href='#'>+</button>";
+        echo "
+            <span id='addUpcForm'>
+                <input class='' type='text' name='addUpc' id='addUpcUpc' value=''>
+                <input class='form-control' type='hidden' name='curQueue' id='addUpcQueue' value='$curQueue'>
+                <input class='form-control' type='hidden' name='curSession' id='addUpcSession' value='".$_SESSION['session']."'>
+                <input class='form-control' type='hidden' name='curStoreID' id='addUpcStoreID' value='".$_SESSION['store_id']."'>
+                $btn
+            </span>
+        ";
         
         if ($_GET['rmOtherSales'] == 1) {
             $this->removeAddBatches($dbc,$batchTypes);
+            echo "
+<script type='text/javascript'>window.location.reload(); return false; </script>
+            ";
         }
 
         $curY = date('Y');
         $curM = date('m');
         $curD = date('d');
         echo "<table class=\"table table-striped\">";
-        echo "<th>Brand</th>
+        echo "<thead style='display: hidden'>
+              <th>Brand</th>
               <th>Name</th>
               <th>Size</th>
               <th>Price</th>
               <th>UPC</th>
               <th>Batch</th>
               <th class='loc' id='locTh'>Location</th>
-              <th></th><th></th><th></th>";
+              <th></th><th></th><th></th></thead>";
         foreach ($upcs as $upc => $v) {
             if ($upc >= 0) {
                 echo "<tr><td>" . $brand[$upc] . "</td>"; 
@@ -357,6 +409,69 @@ HTML;
     public function javascriptContent()
     {
         return <<<HTML
+$(function(){
+    $('#loading').hide();
+});
+
+function addUpcForm() {
+    $('#clickToShowForm').hide();
+    $('#addUpcForm').show();
+    $('#addUpcForm').css('display','inline-block');
+}
+
+function addNote()
+{
+    var notes = $('#addUpcUpc').val();
+    var count = $('#countUpcs').text();
+    var upc =  parseInt(count) + 1; 
+    upc = ''+upc+'';
+    upc = padUpc(upc);
+    var queue = $('#addUpcQueue').val();
+    var session = $('#addUpcSession').val();
+    var storeID = $('#addUpcStoreID').val();
+
+    $.ajax({
+        url: 'salesChangeAjax2.php',
+        data: 'upc='+upc+'&queue='+queue+'&session='+session+'&storeID='+storeID+'&notes='+notes,
+        success: function(response)
+        {
+            //$('#ajax-resp').html('AJAX call returned: ' + response);
+            window.location.reload();
+        }
+    });
+
+}
+
+function padUpc(upc)
+{
+    var length = upc.length;
+    var pad = 13 - length;
+    for (var i=0; i<pad; i++) {
+        upc = '0'+upc;
+    }
+
+    return upc;
+
+}
+
+function submitAddUpc()
+{
+    var upc = $('#addUpcUpc').val();
+    upc = padUpc(upc);
+    var queue = $('#addUpcQueue').val();
+    var session = $('#addUpcSession').val();
+    var storeID = $('#addUpcStoreID').val();
+    $.ajax({
+        url: 'salesChangeAjax2.php',
+        data: 'upc='+upc+'&queue='+queue+'&session='+session+'&storeID='+storeID,
+        success: function(response)
+        {
+            //$('#ajax-resp').html('AJAX call returned: ' + response);
+            window.location.reload();
+        }
+    });
+}
+
 function hideUnsold() {
     $('tr').each(function() {
         if ( $(this).find('img').length ) {
@@ -367,13 +482,13 @@ function hideUnsold() {
 
 function sendToQueue(button, upc, queue_id, session, delQ)
 {
+    $(button).closest('tr').hide();
     $.ajax({
         url: 'salesChangeAjax2.php',
         data: 'upc='+upc+'&queue='+queue_id+'&session='+session+'&delQ='+delQ,
         success: function(response)
         {
             $('#ajax-resp').html('AJAX call returned: ' + response);
-            $(button).closest('tr').hide();
         }
     });
 }
