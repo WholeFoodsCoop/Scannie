@@ -148,8 +148,11 @@ HTML;
                 </div>
             </div> 
         ';
-
         
+        $uid = '<span class="userSymbol"><b>'.strtoupper(substr($username,0,1)).
+            '&nbsp;&nbsp;'.$username.'</b></span>';
+        
+        $ret .= $uid;
         $ret .= $this->mobile_menu($upc);
         $ret .= $loading;
         $ret .= '<div align="center"><h4 id="heading">AUDIE: THE AUDIT SCANNER</h4></div>';
@@ -437,6 +440,7 @@ HTML;
                             <a class="text-info" href="AuditScannerReport.php ">View Report</a>
                         </div>
                         <div class="col-xs-4">
+                            <a class="text-info" href="http://'.$SCANROOT_DIR.'/admin/logout.php">Logout</a>
                         </div>
                         <div class="col-xs-4">
                         </div>
@@ -607,6 +611,16 @@ HTML;
     public function css_content()
     {
         return '
+                body {
+                    //background: -webkit-radial-gradient(30% 30%, circle closest-corner, white, #4FBDF0);
+                    //background-color: lightgrey;
+                    background-color: rgba(36, 41, 46, 1);
+                    background-image: repeating-linear-gradient(to bottom,
+                        #dddddd 7%,
+                        #edd7d0 10%,
+                        #dddddd 15%);
+                    background-size: 2px;
+                }
                 .btn-mobile {
                     position: fixed;
                     top: 20px;
@@ -728,6 +742,13 @@ HTML;
                 height: 25;
                 font-size: 40;
                 font-weigth: bold;
+                opacity: 0.5;
+            }
+            .userSymbol {
+                position: absolute;
+                top: 55;
+                left: 8;
+                padding-left: 5px;
                 opacity: 0.5;
             }
             #pBar {
