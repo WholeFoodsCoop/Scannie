@@ -1,10 +1,10 @@
 <?php 
-include('../../config.php');
+include(__DIR__.'/../../config.php');
 if (!class_exists('ScancoordDispatch')) {
-        include($SCANROOT.'/common/ui/CorePage.php');
+        include(__DIR__.'/../../common/ui/CorePage.php');
 }
 if (!class_exists('SQLManager')) {
-        include_once(dirname(dirname(dirname(__FILE__))) . '/common/sqlconnect/SQLManager.php');
+        include_once(__DIR__.'/../../common/sqlconnect/SQLManager.php');
 }
 
 class SalesChangeQueues extends scancoordDispatch 
@@ -98,16 +98,18 @@ HTML;
 
     public function body_content()
     {
-        include('../../config.php');
+        include(__DIR__.'/../../config.php');
 
         $ret = "";
         $ret .= $this->switchQueue();
+        $hillClass = ($_SESSION['store_id'] == 1) ? 'active' : '';
+        $denClass = ($_SESSION['store_id'] == 2) ? 'active' : '';
         $ret .= "
             <div align=\"right\"><br/>
-                <button class=\"btn btn-default\" type=\"button\" 
+                <button class=\"btn btn-default $hillClass\" type=\"button\" 
                     onclick=\"changeStoreID(this, 1); 
                     return false; window.location.reload();\">Hillside</button>
-                <button class=\"btn btn-default\" type=\"button\" 
+                <button class=\"btn btn-default $denClass\" type=\"button\" 
                     onclick=\"changeStoreID(this, 2); 
                     return false; window.location.reload();\">Denfeld</button>
             </div>
@@ -132,6 +134,7 @@ HTML;
         $this->addScript("/git/fannie/src/javascript/linea/cordova-2.2.0.js");
         $this->addScript("/git/fannie/src/javascript/linea/ScannerLib-Linea-2.0.0.js");
         $this->addScript("scanner.js");
+        $this->addScript("SalesChangeQueues.js");
 
     }
 
@@ -172,6 +175,7 @@ HTML;
 
     private function draw_table($dbc)
     {
+        include(__DIR__.'/../../config.php');
         if ($_POST['addUpc']) {
             $this->addUpc($dbc);
         }
@@ -238,7 +242,7 @@ HTML;
             $price[$upc] = $row['price'];
             $notes[$upc] = $row['notes'];
             $last_sold[$upc] = $row['last_sold'];
-            $upcLink[$upc] = "<a href='http://key/git/fannie/item/ItemEditorPage.php?searchupc=" 
+            $upcLink[$upc] = "<a href='http://$FANNIEROOT_DIR/item/ItemEditorPage.php?searchupc=" 
                         . $row['upc'] 
                         . "&ntype=UPC&searchBtn=' class='blue' target='_blank'>{$row['upc']}
                         </a>";
@@ -266,7 +270,7 @@ HTML;
             while ($row = $dbc->fetch_row($res)) {
                 $batchName[$upc] = $row['batchName'];
                 $batchTypes[$upc] = $row['batchType'];
-                $batch[$upc] = "<a href='http://key/git/fannie/batches/newbatch/EditBatchPage.php?id="
+                $batch[$upc] = "<a href='http://$FANNIEROOT_DIR/batches/newbatch/EditBatchPage.php?id="
                 . $row['batchID'] . "' target='_blank'>" . $row['batchName'] . "</a>";
             }
         }
@@ -326,9 +330,6 @@ HTML;
             ";
         }
 
-        $curY = date('Y');
-        $curM = date('m');
-        $curD = date('d');
         echo "<table class=\"table table-striped\">";
         echo "<thead style='display: hidden'>
               <th>Brand</th>
@@ -341,29 +342,29 @@ HTML;
               <th></th><th></th><th></th></thead>";
         foreach ($upcs as $upc => $v) {
             if ($upc >= 0) {
-                echo "<tr><td>" . $brand[$upc] . "</td>"; 
+                echo "<tr id='id$upc'><td>" . $brand[$upc] . "</td>"; 
                 echo "<td>" . $desc[$upc] . "</td>"; 
                 echo "<td>" . $size[$upc] . "</td>"; 
                 echo "<td>" . $price[$upc] . "</td>"; 
                 echo "<td>" . $upcLink[$upc] . "</td>"; 
                 echo "<td>" . $batch[$upc] . "</td>";
-                echo "<td class='loc'>".$floorSectionName[$upc]."</td>";
+                echo "<td class='loc'>".$floorSectionName[$upc]."</td><td class='loc-input'></td>";
                 if ($curQueue == 2) echo "<td><strong>" . $notes[$upc] . "</strong></td>";
                 if ($curQueue == 0) {
-                    $year = substr($last_sold[$upc], 0, 4);
-                    $month = substr($last_sold[$upc], 5, 2);
-                    $day = substr($last_sold[$upc], 8, 2);
+                    $lastsold = $last_sold[$upc];
+                    $dateDiff = scanLib::dateDistance($lastsold);
+                    $class = ($dateDiff >= 31 || !$lastsold) ? "red" : "";
+
                     $wIcon = '<img src="../../common/src/img/warningIcon.png">';
-                    if (($year < $curY) or ($month < ($curM - 1)) or ($month < $curM && $day < $curD)) {
-                        echo "<td style='color:red'>" . $wIcon . ' ' . substr($last_sold[$upc],0,10) . "</td>";
-                    } else {
-                        echo "<td>" . substr($last_sold[$upc],0,10) . "</td>";
-                    }
+                    $lastsold = substr($lastsold,0,10);
+                    echo ($lastsold) ? "<td class='$class'>$lastsold</td>" 
+                        : "<td class='$class'><i>no sales</i></td>";
+
                 }        
                 
                 if ($curQueue == 7) {
                     echo "<td><a class=\"btn btn-default\" 
-                         href=\"http://192.168.1.2/git/fannie/item/handheld/ItemStatusPage.php?id={$upc}\" target=\"_blank\">status check</a></tr>";  
+                         href=\"http://$FANNIEROOT_DIR/item/handheld/ItemStatusPage.php?id={$upc}\" target=\"_blank\">status check</a></tr>";  
                 } else {
                     echo "<td><button class=\"btn btn-default\" type=\"button\" 
                         onclick=\"sendToQueue(this, '{$upc}', 1, '{$_SESSION['session']}', '{$curQueue}'); return false;\">Good</button></td>";    
@@ -406,153 +407,5 @@ HTML;
         
     }
 
-    public function javascriptContent()
-    {
-        return <<<HTML
-$(function(){
-    $('#loading').hide();
-});
-
-function addUpcForm() {
-    $('#clickToShowForm').hide();
-    $('#addUpcForm').show();
-    $('#addUpcForm').css('display','inline-block');
-}
-
-function addNote()
-{
-    var notes = $('#addUpcUpc').val();
-    var count = $('#countUpcs').text();
-    var upc =  parseInt(count) + 1; 
-    upc = ''+upc+'';
-    upc = padUpc(upc);
-    var queue = $('#addUpcQueue').val();
-    var session = $('#addUpcSession').val();
-    var storeID = $('#addUpcStoreID').val();
-
-    $.ajax({
-        url: 'salesChangeAjax2.php',
-        data: 'upc='+upc+'&queue='+queue+'&session='+session+'&storeID='+storeID+'&notes='+notes,
-        success: function(response)
-        {
-            //$('#ajax-resp').html('AJAX call returned: ' + response);
-            window.location.reload();
-        }
-    });
-
-}
-
-function padUpc(upc)
-{
-    var length = upc.length;
-    var pad = 13 - length;
-    for (var i=0; i<pad; i++) {
-        upc = '0'+upc;
-    }
-
-    return upc;
-
-}
-
-function submitAddUpc()
-{
-    var upc = $('#addUpcUpc').val();
-    upc = padUpc(upc);
-    var queue = $('#addUpcQueue').val();
-    var session = $('#addUpcSession').val();
-    var storeID = $('#addUpcStoreID').val();
-    $.ajax({
-        url: 'salesChangeAjax2.php',
-        data: 'upc='+upc+'&queue='+queue+'&session='+session+'&storeID='+storeID,
-        success: function(response)
-        {
-            //$('#ajax-resp').html('AJAX call returned: ' + response);
-            window.location.reload();
-        }
-    });
-}
-
-function hideUnsold() {
-    $('tr').each(function() {
-        if ( $(this).find('img').length ) {
-            $(this).closest('tr').hide();
-        }
-    });
-}
-
-function sendToQueue(button, upc, queue_id, session, delQ)
-{
-    $(button).closest('tr').hide();
-    $.ajax({
-        url: 'salesChangeAjax2.php',
-        data: 'upc='+upc+'&queue='+queue_id+'&session='+session+'&delQ='+delQ,
-        success: function(response)
-        {
-            $('#ajax-resp').html('AJAX call returned: ' + response);
-        }
-    });
-}
-function changeStoreID(button, store_id)
-{
-    $.ajax({
-        
-        url: 'salesChangeAjax3.php',
-        data: 'store_id='+store_id,
-        success: function(response)
-        {
-            $('#ajax-resp').html(response);
-            window.location.reload();
-        }
-    });
-}
-$(document).ready( function() {
-    hideLoc();
-    $('#collapseLoc').click( function() {
-        if ( $('#locTh').css('display') == 'none' ) {
-            showLoc();        
-        } else {
-            hideLoc();
-        }
-    });
-    hideMenu();
-});
-
-function hideMenu()
-{
-    $('.switchQ').on('collapse', function () {
-        alert("hi");    
-    });
-    $('#switchBtn').css({
-        //'left' : '-170px'
-    });
-}
-
-function hideLoc() {
-    $('td').each( function() {
-         if ( $(this).hasClass('loc') ) {
-            $(this).hide();
-        }
-    });
-    $('th').each( function() {
-        if ( $(this).hasClass('loc') ) {
-            $(this).hide();
-        }
-    });
-}
-function showLoc() {
-    $('td').each( function() {
-         if ( $(this).hasClass('loc') ) {
-            $(this).show();
-        }
-    });
-    $('th').each( function() {
-        if ( $(this).hasClass('loc') ) {
-            $(this).show();
-        }
-    });
-
-}
-HTML;
-    }
 }
 scancoordDispatch::conditionalExec();
