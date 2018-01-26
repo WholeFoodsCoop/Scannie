@@ -30,6 +30,8 @@ class ScancoordDispatch
     protected $must_authenticate = false;
     protected $current_user = false;
     protected $auth_classes = array();
+    protected $enable_linea = false;
+    protected $ui = true;
 
     public function help_content() {
         return $this->description;
@@ -74,7 +76,7 @@ class ScancoordDispatch
 ';
             print menu::nav_menu();
         }
-        print "<div class='container'>".$this->body_content()."</div>";
+        print "<div class='container-fluid'>".$this->body_content()."</div>";
         print $this->get_help_content();
         print $this->quick_lookups();
         print $this->footer();
@@ -199,11 +201,9 @@ class ScancoordDispatch
 
     private function preflight()
     {
-        /*
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
-        */
         include(__DIR__.'/../../config.php');
 
         if ($this->must_authenticate == TRUE) {
@@ -212,6 +212,7 @@ class ScancoordDispatch
                 header("Location: http://{$SCANROOT_DIR}/admin/login.php");
             }
         }
+
     }
 
     private function jsRedirect()
@@ -224,9 +225,9 @@ class ScancoordDispatch
 
     private function header($class)
     {
-        include(__DIR__.'/../../config.php');
         $ret = '';
         $ret .= $this->preprocess();
+        include(__DIR__.'/../../config.php');
         $ret .= '
 <html>
 <head>
@@ -252,6 +253,13 @@ class ScancoordDispatch
 </head>
 <body>
         ';
+
+        if ($this->enable_linea) {
+            $this->addScript("http://{$SCANROOT_DIR}/common/javascript/linea/cordova-2.2.0.js");
+            $this->addScript("http://{$SCANROOT_DIR}/common/javascript/linea/ScannerLib-Linea-2.0.0.js");
+            $this->addScript("http://{$SCANROOT_DIR}/common/javascript/linea/WebHub.js");
+            $this->addScript("http://{$SCANROOT_DIR}/common/javascript/linea/core.js");
+        }
 
         return $ret;
     }
