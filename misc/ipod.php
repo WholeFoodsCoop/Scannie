@@ -27,6 +27,8 @@ if (!class_exists('SQLManager')) {
 class ipod extends ScancoordDispatch
 {
     
+    public $ui = false;
+
     public function body_content()
     {
         include(__DIR__.'/../config.php');

@@ -31,29 +31,30 @@ class CoopDealsSearchPage extends ScancoordDispatch
     protected $description = "[Search Coop Deals] Look through Co-op Deals commitmend worksheet.";
     protected $ui = TRUE;
     
-    private function js()
+    public function javascriptContent()
     {
-        ob_start();
-        ?>
-            <script type="text/javascript">
-            $(document).ready(function() {
-                $('.rowz').click(function() {
-                    if ( $(this).hasClass('click-highlight') ) {
-                        $(this).removeClass('click-highlight');
-                    } else {
-                        $(this).addClass('click-highlight'); 
-                    }
-                });
-            });
-            </script>
-        <?php
-        return ob_get_clean();
+        return <<<HTML
+$(document).ready(function() {
+    $('.rowz').click(function() {
+        if ( $(this).hasClass('click-highlight') ) {
+            $(this).removeClass('click-highlight');
+        } else {
+            $(this).addClass('click-highlight'); 
+        }
+    });
+});
+    $('#dealSet').on('change', function(){
+        document.forms['dealSet'].submit();
+    });
+    $('#brandselect').on('change', function(){
+        document.forms['brandform'].submit();
+    });
+HTML;
     }
 
     public function body_content()
     {
         $ret = '';
-        $ret .= $this->js();
         $dbc = ScanLib::getConObj();
         $ret .= $this->form_content();
 
@@ -179,20 +180,24 @@ class CoopDealsSearchPage extends ScancoordDispatch
     {
         $dbc = ScanLib::getConObj();
         $dealSets = "";
+        $sets = array();
         $prep = $dbc->prepare("SELECT dealSet FROM is4c_op.CoopDealsItems
             GROUP BY dealSet");
         $res = $dbc->execute($prep);
         while ($row = $dbc->fetchRow($res)) {
-            $dealSets .= "<option value='{$row['dealSet']}'>{$row['dealSet']}</option>";
+            $sets[] = $row['dealSet'];
+        }
+        foreach ($sets as $set) {
+            $dealSets .= "<option value='{$set}'>{$set}</option>";
         }
 
         return <<<HTML
-<form class ="form-inline"  method="get" >
-    <select name="dealSet" class="form-control">
+<form class ="form-inline" name="dealSet" method="get" >
+    <select name="dealSet" id="dealSet" class="form-control">
         <option value="">Select A Month</option>
         {$dealSets}
     </select>&nbsp;
-    <button class="btn btn-default">Submit</button><br>
+    <button class="btn btn-default hidden-lg hidden-md">Submit</button><br>
 </form>
 HTML;
     }
@@ -217,10 +222,10 @@ HTML;
         $ret .= '
         <br><br>
         <div style="width:500px">
-                <form class="form-inline" method="get">
+                <form class="form-inline" name="brandform" method="get">
                     &nbsp;<div class="input-group">
                         <span class="input-group-addon">Brand</span>
-                        <select class="form-control" name="brand">
+                        <select class="form-control" name="brand" id="brandselect">
                             <option value=""></option>';
 
         foreach ($brands as $brand) $ret .= '<option value="'.$brand.'">'.$brand.'</option>';
@@ -230,8 +235,8 @@ HTML;
                     </div>
 
 					<input type="hidden" name="dealSet" value="'.$dealSet.'">
-                    <br><br>&nbsp;<button class="btn btn-default btn-sm">Narrow Search</button> &nbsp;&nbsp;
-          			<a class="btn btn-default btn-sm" href="http://key/scancoord/item/Batches/CoopDealsSearchPage.php?dealSet='.$dealSet.'">Clear Search</a>
+                    <br><br>&nbsp;<button class="btn btn-default btn-sm hidden-lg hidden-md">Filter by Brand</button>
+          			<a class="btn btn-default btn-sm" href="http://key/scancoord/item/Batches/CoopDealsSearchPage.php?dealSet='.$dealSet.'">Show All Brands</a>
                 </form>
         </div>
         ';

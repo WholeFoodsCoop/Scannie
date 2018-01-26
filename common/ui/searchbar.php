@@ -66,7 +66,9 @@ class search
             }
         }
         return <<<HTML
-<u style="color: #cacaca; text-decoration: none;font-weight: bold;">Search Results</u><br />
+<u style="color: #cacaca; text-decoration: none;font-weight: bold;">
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    Search Results</u><br />
 <div>{$ret}</div>
 HTML;
     }

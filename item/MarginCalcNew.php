@@ -82,7 +82,7 @@ class MarginCalcNew extends ScancoordDispatch
             $dept_marg *= .01;
             $srp = $cost / (1 - $dept_marg);
             $round_srp = $rounder->round($srp);
-            $ret .= "<tr><td>Raw SRP</td><td>" . sprintf('%.4f', $srp) . "</tr>";
+            $ret .= "<tr><td>Raw SRP</td><td>" . sprintf('%.3f', $srp) . "</tr>";
             $ret .= "<tr><td>Rounded SRP</td><td><strong class='success'>" . $round_srp . "</strong></tr>";
         }
 
@@ -91,7 +91,7 @@ class MarginCalcNew extends ScancoordDispatch
             $actualMargin = ($price - $cost) / $price;
             $ret .= "<tr><td style='width:180px;'>Actual Margin</td><td>" . sprintf('%.4f', $actualMargin) . "</tr>";
         } elseif ($round_srp) {
-            $ret .= "<tr><td style='width:180px;'>Marg @ round srp </td><td><strong>" . sprintf('%.4f', ($round_srp - $cost) / $round_srp) . "</strong></tr>";
+            $ret .= "<tr><td style='width:180px;'>Marg @ round srp </td><td><strong>" . sprintf('%.2f%%', 100*($round_srp - $cost) / $round_srp) . "</strong></tr>";
         }
 
         //  Find Cost

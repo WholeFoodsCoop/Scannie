@@ -42,6 +42,7 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
         include(__DIR__.'/../config.php');
         $dbc = scanLib::getConObj();
 
+        $ret .= "<button id='hideProduce'>hide produce</button>";
         if ($_GET['upcs']) {
             $upcs = $_GET['upcs'];
             $plus = array();
@@ -141,14 +142,14 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
         $headers = array('Hill Desc','Den Desc','Hill Cost','Den Cost');
         $ret .= '<div class="table-responsive">';
         $ret .= '<table class="table table-condensed table-bordered small table-responsive">';
-        $ret .= '<thead><th>upc</th><th>chg</th><th>sup_dept</th>';
+        $ret .= '<thead><tr><th>upc</th><th>chg</th><th>sup_dept</th>';
         foreach ($fields as $field) {
             if ($field != 'super_name') {
                 $ret .= '<th><b>[H]</b>'.$field.'</th><th><b>[D]</b>'.$field.'</th>';
             }
         }
 
-        $ret .= '</thead><tbody>';
+        $ret .= '</tr></thead><tbody>';
         foreach ($itemH as $upc => $row) {
             $ret .= '<tr>';
             $ret .= '<td class="okay">
@@ -181,6 +182,24 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
         $ret .= '</tbody></table></div>';
 
         return $ret;
+    }
+
+    public function javascriptContent()
+    {
+        return <<<HTML
+$(function(){
+    $('tr').each(function(){
+    });
+});
+$('#hideProduce').click(function(){
+    $('tr').each(function(){
+        var td = $(this).text();
+        if (td.indexOf("PRODUCE")) {
+            $(this).closest('tr').hide();
+        }
+    });
+});
+HTML;
     }
 
     public function css_content()

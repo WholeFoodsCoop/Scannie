@@ -32,6 +32,16 @@ body {
 /*
     bootstrap -color style additions
 */
+.close {
+    color: rgb(140, 123, 112);
+    text-shadow: 1.5px 1.5px rgb(86, 75, 70);
+    opacity: 1;
+}
+.close:hover {
+    color: rgb(160, 140, 130);
+    text-shadow: 1px 1px grey;
+    opacity: 1;
+}
 .modal-header {
     background-color: rgba(36, 41, 46, 1);
     border-top-left-radius: 5px;
@@ -51,7 +61,7 @@ body {
     border-radius: 0px;
 }
 .btn-danger {
-    background: lightgrey; /* For browsers that do not support gradients */
+    background-color: red; /* For browsers that do not support gradients */
     background: linear-gradient(#d99696, #d64f4f); /* Standard syntax */
 }
 .text-danger {
@@ -61,6 +71,7 @@ body {
     background-color: blue;
 }
 .btn-warning {
+    background-color: yellow;
     background: #ffa72b; /* For browsers that do not support gradients */
     background: linear-gradient(#ffca80,#ffa72b); /* Standard syntax */
 }
@@ -68,6 +79,7 @@ body {
     color: #ffa72b;
 }
 .btn-success {
+    background-color: green;
     background: #71c98a; /* For browsers that do not support gradients */
     background: linear-gradient(#abdeb9,#71c98a); /* Standard syntax */
 }
@@ -75,6 +87,7 @@ body {
     color: #71c98a;
 }
 .btn-surprise {
+    background-color: purple;
     background: #c674cc; /* For browsers that do not support gradients */
     background: linear-gradient(#d9b2db,#c674cc); /* Standard syntax */
     color: white;
@@ -84,11 +97,13 @@ body {
     color: #c674cc;
 }
 .btn-inverse {
+    background-color: black;
     background: #c674cc; /* For browsers that do not support gradients */
     background: linear-gradient(#545454,#323632); /* Standard syntax */
     color: white;
 }
 .btn-info {
+    background-color: lightblue;
     background: #c674cc; /* For browsers that do not support gradients */
     background: linear-gradient(#88caeb,#5ebceb); /* Standard syntax */
     color: white;
@@ -98,18 +113,20 @@ body {
     font-weight: bold;
 }
 .alert-inverse {
+    background-color: black;
     background: #c674cc; /* For browsers that do not support gradients */
     background: linear-gradient(#545454,#323632); /* Standard syntax */
     color: white;
 }
 .alert-surprise {
+    background-color: purple;
     background: #c674cc; /* For browsers that do not support gradients */
     background: linear-gradient(#d9b2db,#c674cc); /* Standard syntax */
     color: #6a356e;
 }
 .scan-xs-btn {
     border-style: outset;
-    border-width: 2px; 
+    border-width: 2px;
     padding: 3;
 }
 .scan-xs-btn:hover {
@@ -217,7 +234,7 @@ span.delete-icon {
     cursor: pointer;
     border-style: solid;
     border-width: 0px 0px 0px 0px;
-    background-color: rgb(36, 41, 46); 
+    background-color: rgb(36, 41, 46);
     color: #cacaca;
     font-weight: bold;
 }
@@ -242,7 +259,7 @@ span.delete-icon {
     text-shadow: 1px 1px lightgrey;
 }
 .menuCalcCloseBtn:hover {
-    cursor: pointer; 
+    cursor: pointer;
     color: lightblue;
 }
 .backToTop {
@@ -274,11 +291,9 @@ span.delete-icon {
 .mobileMenu {
     position: fixed;
     top: 0px;
-    left: 15px;
     background-color: black;
     color: #cacaca;
     width: 100%;
-    border-bottom-left-radius: 5px;
     opacity: 0.9;
     z-index: 999;
 }
@@ -293,7 +308,9 @@ span.delete-icon {
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
     text-align: right;
-    position: absolute; 
+    padding-right: 5px;
+    padding-left: 5px;
+    position: absolute;
     top: 0;
     right: 0px;
     margin-top: 50px;
@@ -304,6 +321,12 @@ span.delete-icon {
 }
 a.search-resp {
     color: white;
+}
+a.search-resp:focus {
+    background-color: grey; 
+    background-color: rgba(46, 62, 56, 0.9);
+    outline: 0;
+    text-decoration: none;
 }
 /*
     Panels
@@ -417,7 +440,7 @@ a.menu-opt {
 .tooltip1 a span { display: none; color: #FFFFFF; }
 .tooltip1 a:hover span { display: block; position: absolute; width: 200px; background: #aaa url(images/horses200x50.jpg); height: 50px; left: 100px; top: -10px; color: #FFFFFF; padding: 0 5px; }
 iframe.menu {
-    opacity: 0.92;
+    opacity: 0.95;
 }
 /*
     Mobile menu
@@ -440,6 +463,10 @@ iframe.menu {
     background-color: rgba(36, 41, 46, 1);
     //background-color: white;
     background-image: repeating-linear-gradient(to bottom,
+        rgb(36, 41, 46) 7%,
+        rgb(63, 68, 72) 10%,
+        rgb(36, 41, 46) 15%);
+    background-image: -webkit-repeating-linear-gradient(to bottom,
         rgb(36, 41, 46) 7%,
         rgb(63, 68, 72) 10%,
         rgb(36, 41, 46) 15%);
@@ -494,6 +521,14 @@ p.navText{
     margin-left: 0px;
     left-padding: 10px;
     font-weight: bold;
+}
+.userSymbol {
+    height: 20px;
+    width: 20px;
+    background-color: grey;
+    color: #cacaca;
+    display: inline-block;
+    border: 1px solid rgb(36, 41, 46),
 }
 @media only screen and (min-width: 1170px) {
     p.navText{

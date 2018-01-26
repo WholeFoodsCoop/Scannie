@@ -27,12 +27,12 @@ class menu
     {
         include(__DIR__.'/../../config.php');
         $ret = '';
-        //$ret .= '<div id="search-resp"></div>';
         $ret .= '<img class="backToTop collapse" id="backToTop" src="http://'.$SCANROOT_DIR.'/common/src/img/upArrow.png" />';
         $calculators = self::calciframes();
         $mobileMenu = self::mobileMenu();
 
         $user = $_SESSION['user_name'];
+        $ud = '<span class="userSymbol"><b>'.strtoupper(substr($user,0,1)).'</b></span>';
         if (empty($user)) {
             $user = 'Generic User';
             $logVerb = 'Login';
@@ -43,7 +43,7 @@ class menu
         }
         $loginText = '
             <div style="color: #cacaca; margin-left: 25px; margin-top: 5px;">
-                <span style="color:#cacaca">&#x2588; '.$user.'</span><br/>
+                <span style="color:#cacaca">'.$ud.'&nbsp;'.$user.'</span><br/>
             '.$link.' | <a href="http://'.$SCANROOT_DIR.'/testing/SiteMap.php">Site Map</a>
             </div>
        ';
@@ -64,7 +64,7 @@ class menu
             </li>
 
             <li class="dropdown">
-                <input class="form-control" id="searchbar" name="search" placeholder="search scannie"/></a>
+                <input class="form-control" id="searchbar" name="search" autocomplete="off" placeholder="search scannie"/></a>
                 <div id="search-resp"></div>
             </li>
 
@@ -87,7 +87,7 @@ class menu
                 <li class="divider"></li><!-- divider with no header -->
                 <li class="dropdown-header">UNFI Sales Change</li>
                     <li class="test"><a href="http://{$SCANROOT_DIR}/item/SalesChange/SalesChangeIndex.php" style="color: green"> Batch Check </a></li>
-                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/SalesChange/CoopDealsReview.php">Quality Assurance</a></li>
+                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/SalesChange/CoopDealsReview.php">QA</a></li>
                     <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/Batches/unfiBreakdowns.php">Breakdowns</a></li>
                     <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/Batches/prodBatchHistory.php">Item Batch History</a></li>
                     <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/Batches/CoopDealsSearchPage.php">Coop+Deals File</a></li>
@@ -187,11 +187,18 @@ HTML;
             }
         }
         $ret .= '
-        <ul class="mobileHeader"  href="" data-toggle="modal" data-target="#help">Help</ul>
+        <ul class="mobileHeader" href="" data-toggle="modal" data-target="#help">Help</ul>
+        <ul class="mobileHeader"><a href="http://'.$SCANROOT_DIR.'/admin/logout.php">Logout</a></ul>
                 </ul>
                 
                 <div align="center"><span style="cursor: pointer; font-size: 18px;" 
-                    id="closeMenu"><br />^<br /><br /></span></div>
+                    id="closeMenu"><br />
+                    
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                style="position: absolute; bottom: 20;">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                    <br /><br /></span></div>
             </div>
         ';
         
