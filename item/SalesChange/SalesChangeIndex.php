@@ -42,20 +42,25 @@ class SalesChangeIndex extends ScancoordDispatch
     public function body_content()
     {           
         
-        return '
-                <div class="container" align="center">
-                <div class="panel panel-default" style="max-width:300px;">
-                <div class="panel-heading">Batch Check</div>
-                <table class="table">
-                    <tr><td class="highlight"><a class="btn" href="ListGen.php"> Generate List </a>&nbsp;|&nbsp;
-                        <a class="btn" href="ListRemove.php"> Delete List </a></td></tr>                                   
-                    <tr><td class="highlight"><a class="btn" href="SalesChangeQueues.php"> Review Scan Data  </a></td></tr>        
-                    <tr><td class="highlight"><a class="btn" href="SCScanner.php"> Scanner </a></td></tr>                               
-                    <tr><td class="highlight"><a class="btn" href="../SignInfoHelper.php"> Sale Item Report <i>info in POS</i></a></td></tr>                                
-                    <tr><td class="highlight"><a class="btn" href="http://192.168.1.2/git/fannie/item/CoopDealsLookupPage.php"> Coop Deals Check <i>by item</i> </a></td></tr>                                
-                    <tr><td class="highlight"><a class="btn" href="http://192.168.1.2/scancoord/item/Batches/CoopDealsSearchPage.php"> Coop Deals Check <i>complete list</i> </a></td></tr>                                
-                </table></div></div></div>
-        ';
+        return <<<HTML
+<div class="container" align="center">
+<div class="panel panel-default" style="max-width:300px;">
+<div class="panel-heading">Batch Check</div>
+<table class="table">
+    <tr><td class="highlight"><a class="btn" href="ListGen.php"> Generate List </a>&nbsp;|&nbsp;
+        <a class="btn" href="ListRemove.php"> Delete List </a></td></tr>                                   
+    <tr><td class="highlight"><a class="btn" href="SalesChangeQueues.php"> Review Scan Data  </a></td></tr>        
+    <tr><td class="highlight"><a class="btn" href="SCScanner.php"> Scanner </a></td></tr>                               
+    <tr><td class="highlight"><a class="btn" href="../SignInfoHelper.php"> Sale Item Report <i>info in POS</i></a></td></tr>
+    <tr><td class="highlight"><a class="btn" href="http://192.168.1.2/git/fannie/item/CoopDealsLookupPage.php"> Coop Deals Check <i>by item</i> </a></td></tr>                                
+    <tr><td class="highlight"><a class="btn" href="http://192.168.1.2/scancoord/item/Batches/CoopDealsSearchPage.php"> Coop Deals Check <i>complete list</i> </a></td></tr>                                
+    <tr><td class="highlight">
+        <a class="btn" href="http://192.168.1.2/scancoord/item/AuditScanner.php">
+            Audie: The Audit Scanner
+        </a></td>
+    </tr>
+</table></div></div></div>
+HTML;
         
     }
     

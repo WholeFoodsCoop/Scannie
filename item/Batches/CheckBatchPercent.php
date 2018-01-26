@@ -101,23 +101,13 @@ if ($batchID = $_GET['batchID']) {
         $downDiff = abs($percent - $downPer);
         if ($roundPer >= $percent + 4) {
             //  Price Increase
-            echo '<b>Round Price: </b>' . str_pad($roundPrice, 5, '0', STR_PAD_LEFT) . '&nbsp;&nbsp;&nbsp;&nbsp;<b>Round %:</b> <span class="warning">' . $roundPer .'</span>';
-            if ($upPer < $downPer) {
-                echo '&nbsp;&nbsp;&nbsp;&nbsp;<b>Round uper:</b> ' . str_pad($up, 5, '0', STR_PAD_LEFT) . '&nbsp;&nbsp;&nbsp;&nbsp;<b>uper %:</b> <span class="success">' . $upPer .'</span>';
-            } else {
-                echo '&nbsp;&nbsp;&nbsp;&nbsp;<b>Round uper:</b> ' . str_pad($up, 5, '0', STR_PAD_LEFT) . '&nbsp;&nbsp;&nbsp;&nbsp;<b>uper %:</b> ' . $upPer;
-            }
+            echo '<b>Round Price: </b>' . str_pad($roundPrice, 5, '0', STR_PAD_LEFT) . '&nbsp;&nbsp;&nbsp;&nbsp;<b>Sale %:</b> <span class="warning">' . $roundPer .'</span>';
             
         } elseif ($roundPer <= $percent - 2) {
             //  Price Decrease
-            echo '<b>Round Price: </b>' . str_pad($roundPrice, 5, '0', STR_PAD_LEFT) . '&nbsp;&nbsp;&nbsp;&nbsp;<b>Round %:</b> <span class="warning">' . $roundPer .'</span>';
-            if ($downPer < $up) {
-                echo '&nbsp;&nbsp;&nbsp;&nbsp;<b>Round uper:</b> ' . str_pad($up, 5, '0', STR_PAD_LEFT) . '&nbsp;&nbsp;&nbsp;&nbsp;<b>uper %:</b> <span class="success">' . $downPer .'</span>';
-            } else {
-                echo '&nbsp;&nbsp;&nbsp;&nbsp;<b>Round down:</b> ' . str_pad($down, 5, '0', STR_PAD_LEFT) . '&nbsp;&nbsp;&nbsp;&nbsp;<b>down %:</b> ' . $downPer;
-            }
+            echo '<b>Round Price: </b>' . str_pad($roundPrice, 5, '0', STR_PAD_LEFT) . '&nbsp;&nbsp;&nbsp;&nbsp;<b>Sale %:</b> <span class="warning">' . $roundPer .'</span>';
         } else {
-            echo '<b>Round Price: </b>' . str_pad($roundPrice, 5, '0', STR_PAD_LEFT) . '&nbsp;&nbsp;&nbsp;&nbsp;<b>Round %:</b> ' . $roundPer;
+            echo '<b>Round Price: </b>' . str_pad($roundPrice, 5, '0', STR_PAD_LEFT) . '&nbsp;&nbsp;&nbsp;&nbsp;<b>Sale %:</b> ' . $roundPer;
         }
         echo '<br>';
     }

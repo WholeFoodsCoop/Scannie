@@ -389,6 +389,9 @@ HTML;
 .mainInput {
     border: 2px solid grey;
 }
+body {
+    overflow-x: hidden;
+}
 HTML;
     }
 
