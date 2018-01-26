@@ -95,12 +95,13 @@ class CashlessCheckPage extends ScancoordDispatch
                         </div><!-- column 2 -->
         ';
         $ret .= '</div></div></div>';
-        
+        $hillActive = ($_SESSION['store_id'] == 1) ? 'active' : '';
+        $denActive = ($_SESSION['store_id'] == 2) ? 'active' : '';
         $ret .= '
             <form method="get" id="tabs">
                 <div align="center"><div class="container">
-                    <button class="btn btn-default btn-xs" name="store_id" value="1" >Hillside</button>
-                    <button class="btn btn-default btn-xs" name="store_id" value="2" >Denfeld</button>
+                    <button class="btn btn-default btn-xs '.$hillActive.'" name="store_id" value="1" >Hillside</button>
+                    <button class="btn btn-default btn-xs '.$denActive.'" name="store_id" value="2" >Denfeld</button>
                     <button class="btn btn-default btn-xs" name="store_id" value="*" >ALL Stores</button>
                     <button class="btn btn-warning btn-xs" name="inProcess" value="1">SCAN: Yesterday</button>
                     <br /><br />
