@@ -1,5 +1,7 @@
 $(document).ready(function(){
-    enableLinea('#upc', function(){$('#my-form').submit();});
+    enableLinea('#upc', function(){
+        $('#my-form').append('<input type=hidden name=linea value=1 />').submit();
+    });
 });
 
 function queue(store_id)
