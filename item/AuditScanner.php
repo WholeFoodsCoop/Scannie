@@ -30,9 +30,10 @@ class AuditScanner extends ScancoordDispatch
     protected $title = "Audit Scanner";
     protected $description = "[Audit Scanner] is a light-weight, all around product
         scanner for use with iUnfi iPod Touch scanners.";
-    protected $ui = FALSE;
+    protected $ui = false;
     protected $use_preprocess = TRUE;
     protected $must_authenticate = TRUE;
+    protected $enable_linea = true;
 
     public function preprocess()
     {
@@ -88,7 +89,8 @@ HTML;
     private function notedata_handler($dbc,$note,$username)
     {
         $ret = '';
-        $upc = $_GET['upc'];
+        $upc = ScanLib::upcParse($_GET['upc']);
+        echo $upc;
         $args = array($note,$upc,$username);
         $query = $dbc->prepare("UPDATE woodshed_no_replicate.AuditScanner
             SET notes = ? WHERE upc = ? AND username = ?;");
@@ -107,11 +109,6 @@ HTML;
 
         return $error;
 
-    }
-
-    public function get_scan()
-    {
-        return 'This function is currently unused.';
     }
 
     public function body_content()
@@ -139,7 +136,7 @@ HTML;
         $rounder = new PriceRounder();
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         $storeID = scanLib::getStoreID();
-        $upc = scanLib::upcPreparse($_POST['upc']);
+        $upc = scanLib::upcParse($_POST['upc']);
 
         $loading .= '
             <div class="progress" id="progressBar">
@@ -190,7 +187,7 @@ HTML;
                 <span class="sm-label">ID: </span>'.$batchList['batchID'][$k].'<br />
                 <span class="sm-label">BATCH: </span>'.$batchList['batchName'][$k].'
                 <br /><br />
-                <div style="border: 1px solid lightgrey; width: 20vw"></div>
+                <div style="border: 1px solid lightrgba(255,255,255,0.6); width: 20vw"></div>
                 <br />
             ';
         }
@@ -325,7 +322,7 @@ HTML;
         }
 
         if ($adjcost != $cost) {
-            $adjCostStr = '<span class="text-tiny">adj cost: </span><span style="color: grey; text-shadow: 0px  0px 1px white">'.sprintf('%0.2f',$adjcost).'</span>';
+            $adjCostStr = '<span class="text-tiny">adj cost: </span><span style="color: rgba(255,255,255,0.6); text-shadow: 0px  0px 1px white">'.sprintf('%0.2f',$adjcost).'</span>';
         } else {
             $adjCostStr = '&nbsp;';
         }
@@ -334,29 +331,29 @@ HTML;
                 <div class="container">
                     <div class="row">
                         <div class="col-xs-4 info" >
-                            <div style="float: left; color: grey">cost</div><br />'.$cost.'<br />
+                            <div style="float: left; color: rgba(255,255,255,0.6)">cost</div><br />'.$cost.'<br />
                                 '.$adjCostStr.'
                         </div>
                         <div class="col-xs-4 info" >
-                            <div style="float: left; color: grey">price</div><br />
+                            <div style="float: left; color: rgba(255,255,255,0.6)">price</div><br />
                                 <span class="text-'.$warning['price'].'" style="font-weight: bold; ">
                                     '.$price.'</span>
                                     '.$price_rule.'<br />&nbsp;
                         </div>
                         <div class="col-xs-4 info" >
-                            <div style="float: left; color: grey">margin</div><br /><span class="text-'.$warning['margin'].'">'.sprintf('%0.2f%%',$margin*100).'</span>
-                                <br /> <span class="text-tiny">target: </span><span style="color: grey; text-shadow: 0px  0px 1px white">'.($dMargin*100).'%</span>
+                            <div style="float: left; color: rgba(255,255,255,0.6)">margin</div><br /><span class="text-'.$warning['margin'].'">'.sprintf('%0.2f%%',$margin*100).'</span>
+                                <br /> <span class="text-tiny">target: </span><span style="color: rgba(255,255,255,0.6); text-shadow: 0px  0px 1px white">'.($dMargin*100).'%</span>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-xs-4 info" >
-                            <div style="float: left; color: grey"> raw </div><br />'.sprintf('%0.2f',$rSrp).'
+                            <div style="float: left; color: rgba(255,255,255,0.6)"> raw </div><br />'.sprintf('%0.2f',$rSrp).'
                         </div>
                         <div class="col-xs-4 info" >
-                            <div style="float: left; color: grey" class="text-'.$sWarn.'">srp</div><br />'.$srp.'
+                            <div style="float: left; color: rgba(255,255,255,0.6)" class="text-'.$sWarn.'">srp</div><br />'.$srp.'
                         </div>
                         <div class="col-xs-4 info" >
-                            <div style="float: left; color: grey">newMarg</div><br />'.sprintf('%0.2f%%',$sMargin*100).'
+                            <div style="float: left; color: rgba(255,255,255,0.6)">newMarg</div><br />'.sprintf('%0.2f%%',$sMargin*100).'
                         </div>
                     </div>
                     <br />
@@ -428,11 +425,11 @@ HTML;
                             <input type="hidden" name="upc" value="'.$upc.'" />
                         </div>
                         </form>
-                        <div class="col-xs-4  clear "><a class="btn btn-surprise" href="http://'.$SCANROOT_DIR.'/item/AuditScanner.php ">Refresh</a></div>
                         <div class="col-xs-4  clear">
                             <button class="btn btn-danger" data-toggle="collapse" data-target="#notepad"
                                 style="width: 100%;">Note
                             </button></div>
+                        <div class="col-xs-4  clear "><a class="btn btn-success text-xs" href="http://'.$SCANROOT_DIR.'/item/SalesChange/SalesChangeIndex.php ">Batch Check</a></div>
                     </div>
                     <br /><br />
                     <div class="row">
@@ -519,11 +516,6 @@ HTML;
 
         $ret .= '<br /><br /><br /><br /><br /><br />';
         $this->addOnloadCommand("$('#progressBar').hide();");
-        
-        $this->addScript('/git/fannie/src/javascript/jquery.js');
-        $this->addScript('/git/fannie/src/javascript/linea/cordova-2.2.0.js');
-        $this->addScript('/git/fannie/src/javascript/linea/ScannerLib-Linea-2.0.0.js');
-        $this->addScript('../item/SalesChange/scanner.js');
         $this->addScript('AuditScanner.js');
 
         return $ret;
@@ -542,7 +534,7 @@ HTML;
     private function form_content($dbc)
     {
 
-        $upc = str_pad($_POST['upc'], 13, 0, STR_PAD_LEFT);
+        $upc = ScanLib::upcParse($_POST['upc']);
         $ret .= '';
         $ret .= '
             <div align="center">
@@ -611,15 +603,25 @@ HTML;
     public function css_content()
     {
         return '
+                .text-xs {
+                    font-size: 8px;
+                    padding: 10px;
+                }
                 body {
-                    //background: -webkit-radial-gradient(30% 30%, circle closest-corner, white, #4FBDF0);
-                    //background-color: lightgrey;
-                    background-color: rgba(36, 41, 46, 1);
-                    background-image: repeating-linear-gradient(to bottom,
-                        #dddddd 7%,
-                        #edd7d0 10%,
-                        #dddddd 15%);
-                    background-size: 2px;
+                    //background: -webkit-radial-gradient(30% 30%, circle closest-corner, #FFCCFF, #FFCCCC);
+                    //background: linear-gradient(130deg, #4FBDF0, 0%, #1F3244 100%);
+
+
+                background: red; /* For browsers that do not support gradients */
+                background: -webkit-linear-gradient(left top, lightblue, white); /* For Safari 5.1 to 6.0 */
+                background: -o-linear-gradient(bottom right, lightblue, white); /* For Opera 11.1 to 12.0 */
+                background: -moz-linear-gradient(bottom lightblue, white); /* For Firefox 3.6 to 15 */
+                background: linear-gradient(130deg, #4FBDF0 0%, #1F3244 100%); /* Standard syntax */
+                -webkit-background-size: cover;
+                    -moz-background-size: cover;
+                    -o-background-size: cover;
+                    background-size: cover;
+                    //background-color: lightrgba(255,255,255,0.6);
                 }
                 .btn-mobile {
                     position: fixed;
@@ -642,7 +644,7 @@ HTML;
                     width: 50px;
                     border: 5px solid white;
                     //border-radius: 2px;
-                    background-color: lightgrey;
+                    background-color: lightgrey; 
                     text-align: center;
                     cursor: pointer;
                 }
@@ -650,7 +652,7 @@ HTML;
                     display: none;
                 }
             #heading {
-                color: grey;
+                color: rgba(255,255,255,0.6);
                 font-size: 10px;
             }
             .info {
@@ -717,14 +719,14 @@ HTML;
             }
             .sm-label {
                 font-size: 10px;
-                color: #6f6f80;
+                color: rgba(255,255,255,0.6); 
             }
             .text-tiny {
                 font-size: 8px;
                 color: #6f6f80;
             }
             .text-sale {
-                color: green;
+                color: lightgreen;
                 font-weight: bold;
             }
             .btn-msg {
@@ -764,6 +766,7 @@ HTML;
 
     private function mobile_menu($upc)
     {
+        include(__DIR__.'/../config.php');
         $ret = '';
         $ret .= '
             <button class="btn-mobile" data-toggle="modal" data-target="#keypad" id="btn-modal">

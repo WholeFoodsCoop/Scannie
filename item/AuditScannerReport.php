@@ -18,12 +18,12 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     
 *********************************************************************************/
-include('../config.php');
+include(__DIR__.'/../config.php');
 if (!class_exists('ScancoordDispatch')) {
-    include($SCANROOT.'/common/ui/CorePage.php');
+    include(__DIR__.'/../common/ui/CorePage.php');
 }
 if (!class_exists('SQLManager')) {
-    include_once(dirname(dirname(__FILE__)) . '/common/sqlconnect/SQLManager.php');
+    include_once(__DIR__.'/../common/sqlconnect/SQLManager.php');
 }
 class AuditScannerReport extends ScancoordDispatch
 {
@@ -35,18 +35,16 @@ class AuditScannerReport extends ScancoordDispatch
     
     private function clear_scandata_hander($dbc,$storeID,$username) 
     {
-        
         $args = array($storeID,$username);
         $query = $dbc->prepare("DELETE FROM woodshed_no_replicate.AuditScanner WHERE store_id = ? AND username = ?");
         $dbc->execute($query,$args);
         
-        return '
-        <div align="center">
-            <div class="alert alert-success">Data Cleared - <a href="AuditScannerReport.php">collapse message</a>
-            </div>
-        </div>
-        ';
-        
+        return <<<HTML
+<div align="center">
+    <div class="alert alert-success">Data Cleared - <a href="AuditScannerReport.php">collapse message</a>
+    </div>
+</div>
+HTML;
     }
     
     private function clear_notes_handler($dbc,$storeID,$username)
@@ -55,17 +53,16 @@ class AuditScannerReport extends ScancoordDispatch
         $query = $dbc->prepare("UPDATE woodshed_no_replicate.AuditScanner SET notes = 'n/a' WHERE store_id = ? AND username = ?");
         $dbc->execute($query,$args);
         
-        return '
-        <div align="center">
-            <div class="alert alert-success">Notes Cleared - <a href="AuditScannerReport.php">collapse message</a>
-            </div>
-        </div>
-        ';
+        return <<<HTML
+<div align="center">
+    <div class="alert alert-success">Notes Cleared - <a href="AuditScannerReport.php">collapse message</a>
+    </div>
+</div>
+HTML;
     }
     
     private function update_scandata_handler($dbc,$storeID,$username)
     {
-        
         $args = array($storeID,$username);
         $query = $dbc->prepare("SELECT upc FROM woodshed_no_replicate.AuditScanner WHERE store_id = ? AND username = ?");
         $res = $dbc->execute($query,$args);
@@ -75,8 +72,6 @@ class AuditScannerReport extends ScancoordDispatch
         }
         
         foreach ($upcs as $upc) {
-            //$args = array($upc);
-
             $args = array($upc,$upc,$upc,$upc,$upc,$upc,$upc,$upc);
             $prep = $dbc->prepare("
                 UPDATE woodshed_no_replicate.AuditScanner 
@@ -90,7 +85,6 @@ class AuditScannerReport extends ScancoordDispatch
                 WHERE upc = ?;
             ");
             $dbc->execute($prep,$args);
-            
         }
         
         if ($er = $dbc->error()) {
@@ -130,9 +124,8 @@ class AuditScannerReport extends ScancoordDispatch
             }
         }
         
-        include('../config.php');
+        include(__DIR__.'/../config.php');
         foreach ($plus as $upc) {
-            //$upc = str_pad($upc, 13, 0, STR_PAD_LEFT);
             $args = array($storeID,$upc);
             $query = $dbc->prepare("
                 SELECT
@@ -271,8 +264,8 @@ class AuditScannerReport extends ScancoordDispatch
     
         $ret = '';
         
-        include('../config.php');
-        include('../common/lib/PriceRounder.php');
+        include(__DIR__.'/../config.php');
+        include(__DIR__.'/../common/lib/PriceRounder.php');
         $this->addScript('../common/javascript/tablesorter/js/jquery.tablesorter.min.js');
         $this->addScript('../common/javascript/tablesorter/js/jquery.metadata.js');
 
@@ -447,6 +440,9 @@ class AuditScannerReport extends ScancoordDispatch
         
         $ret .= '
                 <style>
+                    .key {
+                        cursor: pointer;
+                    }
                     .grey {
                         background-color:lightgrey;
                     }

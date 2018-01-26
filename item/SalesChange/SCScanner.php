@@ -1,58 +1,38 @@
-<?php 
-session_start();
-?>
-
-<script type="text/javascript" src="/git/fannie/src/javascript/jquery.js"></script>
-<script type="text/javascript" src="/git/fannie/src/javascript/linea/cordova-2.2.0.js"></script>
-<script type="text/javascript" src="/git/fannie/src/javascript/linea/ScannerLib-Linea-2.0.0.js"></script>
-<script type="text/javascript" src="scanner.js"></script>
-<script type="text/javascript">
-$(document).ready(function(){
-    enableLinea('#upc', function(){$('#my-form').submit();});
-});
-function sendToQueue(button, upc, queue_id, session,notes)
-{
-    $.ajax({
-        url: 'salesChangeAjax2.php',
-        data: 'upc='+upc+'&queue='+queue_id+'&session='+session+'&notes='+notes,
-        success: function(response)
-        {
-            $('#ajax-resp').html(response);
-        }
-    });
-}
-function changeStoreID(button, store_id)
-{
-    $.ajax({
-        url: 'salesChangeAjax3.php',
-        data: 'store_id='+store_id,
-        success: function(response)
-        {
-            $('#ajax-resp').html(response);
-            window.location.reload();
-        }
-    });
-}
-</script>
-    <title>SalesChangeScanner</title>
-</head>
-<body><br>
-
 <?php
-include('../../config.php');
+/*******************************************************************************
+    Copyright 2016 Whole Foods Community Co-op.
+
+    This file is a part of Scannie.
+
+    Scannie is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+    Scannie is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    in the file LICENSE along with Scannie; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+*********************************************************************************/
+include(__DIR__.'/../../config.php');
 if (!class_exists('ScancoordDispatch')) {
-    include($SCANROOT.'/common/ui/CorePage.php');
+    include(__DIR__.'/../../common/ui/CorePage.php');
 }
 class SCScanner extends scancoordDispatch
 {
-    
     protected $title = "Sales Change Scanner";
     protected $description = "[Sales Change Scanner] is the portion of 
         batch check tools used for scanning barcodes.";
     protected $ui = FALSE;
+    protected $enable_linea = true;
     
     public function body_content()
     {
+
+        $_GET['upc'] = scanLib::trimCheckDigit($_GET['upc']);
         
         $ret = '';
         $ret .= $this->form_content();
@@ -64,11 +44,12 @@ class SCScanner extends scancoordDispatch
             $_SESSION['store_id'] = $_POST['store_id'];
         }
         $item = array ( array() );
+        $upc = ScanLib::upcParse($_GET['upc']);
 
         if (isset($_GET['notes'])) {
             $note = $_GET['notes'];
             $ret .= "<script type='text/javascript'>" .
-                "sendToQueue(this, '{$_GET['upc']}', 2, '{$_SESSION['session']}','{$note}');" .
+                "sendToQueue(this, '{$upc}', 2, '{$_SESSION['session']}','{$note}');" .
                 "</script>"
             ;
             unset($_GET['notes']);
@@ -82,10 +63,10 @@ class SCScanner extends scancoordDispatch
         }
         $ret .= "<strong>" . $_SESSION['session'] . "</strong>";
         $ret .= "</div>";
-        if (isset($_GET['upc'])) {
+        if (isset($upc)) {
             $ret .= '
                     <div align="center">
-                        <h5><b>UPC:</b> ' . str_pad($_GET['upc'], 13, '0', STR_PAD_LEFT) . '</h5>
+                        <h5><b>UPC:</b> ' . $upc . '</h5>
                     </div>
             ';
         }
@@ -110,7 +91,7 @@ class SCScanner extends scancoordDispatch
         include('../../common/sqlconnect/SQLManager.php');
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANALTDB, $SCANUSER, $SCANPASS);
 
-        if ($upc = $_GET['upc']) {
+        if ($upc) {
             
             $sesh = $_SESSION['session'];
             $sid = $_SESSION['store_id'];
@@ -277,6 +258,7 @@ class SCScanner extends scancoordDispatch
             ';
             
             $ret .= $this->EOP();
+            $this->addScript('SCScanner.js');
             
             return $ret;
     }
@@ -305,7 +287,7 @@ class SCScanner extends scancoordDispatch
     public function form_content()
     {
         return '
-            <form class="form-inline" method="get" name="MyForm" id="my-form">
+            <form class="form-inline" method="get" name="MyForm" id="upc-form">
               <div class="text-center container" style="text-align:center">
                 <input class="form-control" type="text" name="upc" id="upc" placeholder="Scan Item">
                 <input type="submit" value="go" hidden>
@@ -333,74 +315,65 @@ class SCScanner extends scancoordDispatch
     
     public function css_content()
     {
-        return '
-            button {
-                width: 80%;
-                border-radius: 5px;
-                font-size: 18;
-            }
-            .btn-wide {
-                width: 80%;
-            }
-            .btn-group {
-                width: 80%;
-            }
-            .btn-container {
-                padding: 10px;
-            }
-            .fancyboxLink {
-                width: 29vw;
-            }
-            .red {
-                color: tomato;
-            }
-            a {
-                font-size: 18;
-                text-align: center;
-            }
-            table, tr, td, th {
-                border-top: none !important;
-                padding: none;   
-                font-size: 12px;
-            }
-            .code {
-                padding: 3px;
-                border-radius: 3px;
-            }            
-        ';
+        include(__DIR__.'/../../config.php');
+        return <<<HTML
+body {
+    background: red; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(left top, lightblue, white); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(bottom right, lightblue, white); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(bottom lightblue, white); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(130deg, #EC804E 0%, #44311F 100%); /* Standard syntax */
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+    background-size: cover;
+}
+input, select, .form-control {
+    background-color: rgba(255,255,255,0.2);
+    border: rgba(255,255,255,0.8);
+    color: rgba(0,0,0,0.4);
+}
+.btn {
+    border: rgba(255,255,255,1);
+}
+.alert {
+    width: 90%;
+}
+button {
+    width: 80%;
+    border-radius: 5px;
+    font-size: 18;
+}
+.btn-wide {
+    width: 80%;
+}
+.btn-group {
+    width: 80%;
+}
+.btn-container {
+    padding: 10px;
+}
+.fancyboxLink {
+    width: 29vw;
+}
+.red {
+    color: tomato;
+}
+a {
+    font-size: 18;
+    text-align: center;
+}
+table, tr, td, th {
+    border-top: none !important;
+    padding: none;   
+    font-size: 12px;
+}
+.code {
+    padding: 3px;
+    border-radius: 3px;
+}
+HTML;
     }
     
-    
-    public function javascriptContent() 
-    {
-        
-        ob_start();
-        ?>
-$('#myTabs a').click(function (e) {
-  e.preventDefault()
-  $(this).tab('show')
-})
-
-function button(button, href) {
-    window.open(href, '_blank');
-}
-
-function getErrNote(upc)
-{
-    $.ajax({
-        url: 'salesChangeAjaxErrSigns.php',
-        data: 'upc='+upc,
-        success: function(response)
-        {
-            $('#ajax-form').html(response);
-            $('#errBtn').hide();
-            $('#noteTr').show();
-        }
-    });
-}
-        <?php
-        return ob_get_clean();
-        
-    }
 }
 scancoordDispatch::conditionalExec();
