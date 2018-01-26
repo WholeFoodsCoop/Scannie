@@ -29,6 +29,15 @@
 class scanLib
 {
 
+    public function dateDistance($date)
+    {
+        $date = new DateTime($date);
+        $today = new DateTime();
+        $interval = $today->diff($date);
+
+        return abs($interval->format('%R%a'));
+    }
+
     public function getConObj($db="SCANDB")
     {
         include(dirname(__FILE__).'/../../config.php');
@@ -254,10 +263,14 @@ class scanLib
     }
 
     /**
-     *  @class upcPreparse
-     *  @param str STRING upc to preparse.
-     *  @return str STRING
-     */
+      Zero-padd a UPC to standard length
+      @param $upc string upc
+      @return standard length upc
+    */
+    static public function padUPC($upc)
+    {
+        return self::upcParse($upc);
+    }
 
     public function upcPreparse($str)
     {
@@ -294,6 +307,14 @@ class scanLib
 
         return $rstr;
     }
+
+    public function scanBarcodeUpc($upc)
+    {
+        $upc = substr($upc,0,-1);
+        $upc = self::upcParse($upc);
+        return $upc;
+    }
+
 
 }
 
