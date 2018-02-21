@@ -1,0 +1,281 @@
+/*
+    Global Style
+*/
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: rgba(255,255,255,0.9);
+    background: linear-gradient(135deg, #42a7f4, #0a1528);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+#btnNext {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+}
+span.social {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    margin-left: 35px;
+    margin-top: 10px;
+    width: 500px;
+}
+img.icon {
+    width: 20px;
+    height: 20px;
+}
+.vertSpace {
+    height: 15px;
+}
+.menuBtn {
+    height: 100px;
+    width: 110px;
+    background-image: url('../src/img/mobileMenuBtn.png');
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    display: none;
+    z-index: 999;
+}
+.contactFormCont {
+    padding: 25px;
+    max-width: 500px;
+}
+.googleMap {
+    padding: 25px;
+    margin-top: 15px;
+}
+#mapouter, #maptwo {
+    box-shadow: 3px 3px 3px rgba(5,55,75,0.7);
+    border: 1px solid rgba(5,55,75,0.8);
+    border-radius: 2px;
+}
+/*
+    Core Navigation
+*/
+div.titleLogo {
+    position: relative;
+    max-width: 500px;
+    width: 85vw;
+}
+img.titleLogo {
+    position: relative;
+    max-width: 500px;
+    width: 85vw;
+}
+div.navBar {
+    position: absolute;
+    max-width: 500px;
+    bottom: -40px;
+    left: 0px;
+    width: 85vw;
+}
+span.navNav {
+    margin-left: 25px;
+    margin-right: 25px;
+}
+a.navNav {
+    text-decoration: none;
+    color: black;
+    font-size: 18px;
+    font-weight: bold;
+    text-shadow: 1px 1px lightblue;
+}
+/*
+    Page Style
+*/
+div.rightContent {
+}
+div.leftContent {
+}
+div.insideLeft, div.insideRight {
+    //border: 4px solid rgba(51,122,183); /* this is the <a> default color*/
+    border: 4px solid rgba(42,101,150,1);
+    border-radius: 5px;
+    background: #8c81d6; /* For browsers that do not support gradients */
+    background:
+        -webkit-linear-gradient(left top, #b7b4cc, #8c81d6); /* For Safari 5.1 to 6.0 */
+    background:
+        -o-linear-gradient(bottom right, #b7b4cc, #8c81d6); /* For Opera 11.1 to 12.0 */
+    background:
+        -moz-linear-gradient(bottom right, #b7b4cc, #8c81d6); /* For Firefox 3.6 to 15 */
+    background:
+        linear-gradient(to bottom right, #b7b4cc, #8c81d6); /* Standard syntax */
+    margin-left: 15px;
+    margin-right: 15px;
+    min-height: 500px;
+    min-width: 400px;
+}
+div.pageContent {
+    min-height: 400px;
+}
+h2.heading {
+    font-size: 28px;
+    font-weight: bold;
+    text-shadow: 1px 1px lightblue;
+}
+.basicText {
+    padding: 5px 25px 5px 25px;
+    font-size: 16px;
+}
+a.basic {
+    text-decoration: none;
+    //color: black; /*intended for this to be black, but the anchor blue w/ shadow...*/
+}
+div.infoContainer {
+    max-width: 500px;
+}
+/*
+    Bootstrap-mods
+*/
+.input-default, .textarea-default {
+    background-color: #b7b4cc;
+}
+/*
+    CoreNav
+*/
+div.insideLeftFoot, div.insideRightFoot {
+    //border: 4px solid rgba(51,122,183); /* this is the <a> default color*/
+    border: 4px solid rgba(42,101,150,0);
+    background: rgba(0,0,0,0); /* For browsers that do not support gradients */
+    margin-left: 15px;
+    margin-right: 15px;
+    //min-height: 500px;
+    min-width: 400px;
+}
+/*
+    Wigits
+*/
+/*
+    Test
+*/
+.outsideTest {
+    width: 500px;
+    height: 350px;
+    border: 1px solid transparent;
+    background: -moz-linear-gradient(bottom right,#8c81d6,#b7b4cc);
+    border-radius: 5px;
+}
+.insideTest {
+    width: 489px;
+    height: 339px;
+    border: 1px solid transparent;
+    margin: 5px;
+    background-color: rgba(249,249,249,1);
+    border-radius: 3px;
+}
+/* All Content below is Mobile Content - mv me? */
+/*
+    Global Mobile Style
+*/
+.mobileMenuContent {
+    width: 80vw;
+    height: auto;
+    color: white;
+    font-size: 100px;
+    color: rgba(51,122,183,0.9);
+    text-shadow: 2px 2px lightblue;
+    font-weight: bold;
+    margin-top: 400px;
+}
+div.mobileBlock {
+    height: 200px;
+    padding: 100px;
+}
+a.mobileHeader:hover{
+    text-decoration: none;
+}
+/*
+    Pre-Mobile
+*/
+.testmobile {
+    color: red;
+}
+/* Galaxy S4, S5, Note 4  */
+@media screen
+  and (device-width: 360px)
+  and (device-height: 640px)
+  and (-webkit-device-pixel-ratio: 3),
+  and (device-width: 360px)
+  and (device-height: 640px)
+  and (-webkit-device-pixel-ratio: 3)
+  and (orientation: portrait),
+  and (device-width: 360px)
+  and (device-height: 640px)
+  and (-webkit-device-pixel-ratio: 3)
+  and (orientation: landscape) {
+    body {
+        zoom: 150%;
+    }
+    img.icon {
+        height: 50px;
+        width: 50px;
+    }
+    .testmobile {
+        color: blue;
+    }
+    .pageContent,
+    .leftContent,
+    .rightContent,
+    .basicText {
+        font-size: 42px;
+    }
+    h2.heading {
+        font-size: 58px;
+    }
+    a.navNav {
+        display: none;
+    }
+    .menuBtn {
+        display: block;
+    }
+    div.infoContainer {
+        max-width: 80%;
+    }
+    .input-default {
+        height: 50px;
+        font-size: 38px;
+    }
+    .textarea-default {
+        height: 600px;
+        font-size: 38px;
+    }
+    .contactFormCont {
+        max-width: 80%;
+    }
+    .btn {
+        min-width: 200px;
+        min-height: 75px; 
+        font-size: 38;
+    }
+    label {
+        font-size: 42px;
+    }
+}
+/*
+    @lg-only
+*/
+@media only screen and (min-width: 1170px) {
+    .insideLeft, .insideLeftFoot {
+        float: right; 
+    }
+    .insideRight, .insideRightFoot {
+        float: left; 
+    }
+    div.insideLeft, div.insideRight {
+    }
+}
+/*
+    @all-sizes-except-lg
+*/
+@media only screen and (max-width: 1170px) {
+    span.social {
+        margin-left: auto;
+        margin-right: auto;
+        left: 0;
+        right: 0;
+    }
+}
