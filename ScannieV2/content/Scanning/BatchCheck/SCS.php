@@ -22,6 +22,10 @@ class SCS extends PageLayoutA
         include(__DIR__.'/../../../config.php');
 
         $dbc = scanLib::getConObj(); 
+        if (FormLib::get('signout', false)) {
+            session_unset();
+            $this->addOnloadCommand('window.location.href = "SCS.php"');
+        }
         if (FormLib::get('edit', false)) {
             $this->editHandler($dbc);
             die();
@@ -32,18 +36,7 @@ class SCS extends PageLayoutA
             $this->removeQueueHandler($dbc); 
             die();
         } elseif (FormLib::get('forceBatch', false)) {
-            //move this into a function
-            /*this is not going to work without using Fannie API
-            if (!class_exists('BatchesModel')) {
-                include(__DIR__."/../../../../../git/fannie/classlib2.0/data/models/op/BatchesModel.php");
-            }
-            if (!class_exists('BasicModel')) {
-                include(__DIR__."/../../../../../git/fannie/classlib2.0/data/models/BasicModel.php");
-            }
-            $bid = FormLib::get('bid');
-            $model = new BatchesModel();
-            $model->forceStartBatch($bid);
-            */
+            //method to force a batch goes here.
             die(); 
         } elseif (FormLib::get('loginSubmit', false)) {
             $this->loginSubmitHandler($dbc);
@@ -873,7 +866,7 @@ HTML;
         <h2 class="menuOption"><a class="menuOption" href="#">Menu Option 1</a></h2>
         <h2 class="menuOption"><a class="menuOption" href="#">Menu Option 2</a></h2>
         <h2 class="menuOption"><a class="menuOption" href="#">Menu Option 3</a></h2>
-        <h2 class="menuOption"><a class="menuOption" href="#">Menu Option 4</a></h2>
+        <h2 class="menuOption"><a class="menuOption" href="SCS.php?signout=1">Sign Out</a></h2>
         <br/>
         <button class="close" id="closeMenu" style="margin-right:40vw;">Close</div>
     </div>
