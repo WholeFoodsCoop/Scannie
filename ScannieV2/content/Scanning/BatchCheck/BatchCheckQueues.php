@@ -158,14 +158,14 @@ HTML;
 
         $thead = '';
         foreach ($fields as $field) {
-            $thead .= "<th>$field</th>";
+            $thead .= "<th class='col-hide col-$field'>$field</th>";
         }
         $table = "<table class='table table-stiped'><thead>$thead</thead><tbody>";
         //this is what will be different based on queues
         foreach ($upc as $k => $v) {
             if ($option == 0 && !in_array($k,$inQueueItems)) {
                 $table .= "<tr>";
-                $table .= "<td>$k</td>";
+                $table .= "<td class='col-upc'>$k</td>";
                 foreach ($fields as $field) {
                     if ($field != 'upc') {
                         $temp = ${$field}[$k];
@@ -217,6 +217,7 @@ HTML;
         $table = $this->getTableContents($dbc);
 
         $this->addScript("SalesChangeQueues.js");
+        $this->addScript("batchCheckQueues.js");
 
         return <<<HTML
 $ret
@@ -228,7 +229,7 @@ HTML;
     {
         $options = '';
         foreach ($this->options as $id => $name) {
-            $options .= "<button type='submit' class='aPage' name='option' value='$id'><div class='mobilePage'>$name</div></a>";
+            $options .= "<div align='center'><button type='submit' class='toggle-btn' name='option' value='$id'><div class='mobilePage'>$name</div></a></div>";
         }
         return <<<HTML
 <div class="switchQContainer">
@@ -238,10 +239,9 @@ HTML;
         </div>
     </button>
     <form method="get">
-        <div id="switchQ" class="mobileMenu collapse draggable">
-            <div class="switchBlock">
+        <div id="switchQ" class="toggle-container collapse draggable">
                 $options
-            </div>
+            <button id="" class="close close-btn" data-toggle="collapse" data-target="#switchQ">close</button>
         </div>
     </form>
 </div>
@@ -529,6 +529,29 @@ HTML;
     public function cssContent()
     {
         return <<<HTML
+.close-btn {
+    margin-right: 10px;
+}
+.toggle-btn {
+    margin-top: 5px;
+    width: 100%;
+    border: rgba(255,255,255,0.1);
+    background-color: rgba(255,255,255,0.3); 
+    padding: 5px;
+    font-weight: bold;
+    color: rgba(0,0,0,0.8);
+}
+.toggle-container {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 300px;
+    background-color: rgba(0,55,255,0.99);
+    border-right: 4px solid rgba(0,55,255,0.99);
+    border-bottom: 4px solid rgba(0,55,255,0.99);
+    border-bottom-right-radius: 1%;
+}
+
 table, th, tr, td {
     background-color: rgba(255,255,255,0.89);
     border: 2px solid transparent;
