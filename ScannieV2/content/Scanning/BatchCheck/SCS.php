@@ -151,6 +151,21 @@ HTML;
             $inQueues[] = $row['inQueue'];
         }
         switch($queue) {
+            case 'Unchecked':
+                //needed for the BatchCheckQueues
+                //if in 'good','missing' delete row, if does not exist, do nothing.
+                if (in_array(1,$inQueues)) {
+                    $args = array($upc,$sessionName,$storeID);
+                    $prep = $dbc->prepare("DELETE FROM woodshed_no_replicate.batchCheckQueues 
+                        WHERE inQueue = 1 AND upc = ? AND session = ? AND storeID = ?");
+                    $dbc->execute($prep,$args);
+                } elseif (in_array(2,$inQueues)) {
+                    $args = array($upc,$sessionName,$storeID);
+                    $prep = $dbc->prepare("DELETE FROM woodshed_no_replicate.batchCheckQueues 
+                        WHERE inQueue = 1 AND upc = ? AND session = ? AND storeID = ?");
+                    $dbc->execute($prep,$args);
+                }
+                break;
             case 'Good':
                 if (in_array(1,$inQueues)) {
                     //do nothing
