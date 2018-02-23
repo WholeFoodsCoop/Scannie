@@ -95,6 +95,8 @@ class WebDispatch
         return <<<HTML
 <html>
 <head>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="http://{$MY_ROOTDIR}/common/bootstrap4/css/bootstrap.min.css">
     <link rel="stylesheet" href="http://{$MY_ROOTDIR}/common/css/commonInterface.css">
     <script src="http://{$MY_ROOTDIR}/common/bootstrap/jquery.min.js"></script>
