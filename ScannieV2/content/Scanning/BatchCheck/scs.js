@@ -116,12 +116,6 @@ $('.btn-queue').click(function(){
 $('#capBtn').click(function(){
     $('#capButtons').show();
 });
-$('#noteBtn').click(function(){
-    //$('#noteUI').show();
-});
-$('#cancelNote').click(function(){
-    //$('#noteUI').hide();
-});
 $('#showMoreBatches').click(function(){
     $('#allBatches').show();
 });

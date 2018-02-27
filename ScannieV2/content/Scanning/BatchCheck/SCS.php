@@ -19,6 +19,9 @@ class SCS extends PageLayoutA
 
     public function preprocess()
     {
+        if (FormLib::get('option', false) == 99) {
+            header('location: BatchCheckMenu.php');
+        }
         include(__DIR__.'/../../../config.php');
 
         $dbc = scanLib::getConObj(); 
@@ -37,6 +40,7 @@ class SCS extends PageLayoutA
             die();
         } elseif (FormLib::get('forceBatch', false)) {
             //method to force a batch goes here.
+            //currently this does not exist
             die(); 
         } elseif (FormLib::get('loginSubmit', false)) {
             $this->loginSubmitHandler($dbc);
@@ -53,7 +57,7 @@ class SCS extends PageLayoutA
             $this->displayFunction = $this->view($dbc);
         }
 
-        return false;
+        return true;
     }
 
     private function removeQueueHandler($dbc)
@@ -98,9 +102,11 @@ class SCS extends PageLayoutA
 
     private function loginView($dbc)
     {
+        $storeID = scanLib::getStoreID();
         $sessions = ''; 
-        $prep = $dbc->prepare("SELECT session FROM woodshed_no_replicate.batchCheckQueues GROUP BY session;");
-        $res = $dbc->execute($prep);
+        $args = array($storeID);
+        $prep = $dbc->prepare("SELECT session FROM woodshed_no_replicate.batchCheckQueues WHERE storeID = ? GROUP BY session;");
+        $res = $dbc->execute($prep,$args);
         while ($row = $dbc->fetchRow($res)) {
             $s = $row['session'];
             $sessions .= "<option value='$s'>$s</option>"; 
@@ -120,11 +126,13 @@ class SCS extends PageLayoutA
             <input class="loginForm" name="newSession" type="text" placeholder="Name a New Session">
         </div>
         <div class="form-group">
+            <input type="hidden" name="storeID" value="$storeID">
+            <!-- 
             <select class="loginForm" name="storeID" required>
                 <option value="0">Select a Store ID</option>
                 <option value="1">Hillside</option>
                 <option value="2">Denfeld</option>
-            </select>
+            </select>-->
         </div>
         <div class="form-group">
             <button type="submit" name="loginSubmit" value="1" class="loginForm">Submit</button>
@@ -258,8 +266,8 @@ HTML;
                     return 'products';
                 case 'notes':
                     $tempTable = 'woodshed_no_replicate.batchCheckNotes';
-                    $args = array($upc);
-                    $query = "SELECT notes FROM $tempTable WHERE upc = ?";
+                    $args = array($upc,$sessionName);
+                    $query = "SELECT notes FROM $tempTable WHERE upc = ? AND session = ?";
                     $prep = $dbc->prepare($query);
                     $res = $dbc->execute($prep,$args);
                     $rows = $dbc->numRows($res);
@@ -294,17 +302,20 @@ HTML;
         while ($row = $dbc->fetchRow($res)) {
             $inQueues[] = $row['inQueue'];
         }
-        $stores = array(1,2);
-        foreach ($stores as $storeID) {
-            if (in_array(11,$inQueues)) {
-                //do nothing
-            } else { 
-                //insert
-                $args = array($upc,$sessionName,$storeID,11);
-                $prep = $dbc->prepare("INSERT INTO woodshed_no_replicate.batchCheckQueues 
-                    (upc,session,storeID,inQueue) VALUES (?,?,?,?)");
-                $dbc->execute($prep,$args);
-                $json['error'] = $dbc->error();
+        //do NOT do this if notes were entered. 
+        if ($field != 'notes') {
+            $stores = array(1,2);
+            foreach ($stores as $storeID) {
+                if (in_array(11,$inQueues)) {
+                    //do nothing
+                } else { 
+                    //insert
+                    $args = array($upc,$sessionName,$storeID,11);
+                    $prep = $dbc->prepare("INSERT INTO woodshed_no_replicate.batchCheckQueues 
+                        (upc,session,storeID,inQueue) VALUES (?,?,?,?)");
+                    $dbc->execute($prep,$args);
+                    $json['error'] = $dbc->error();
+                }
             }
         }
 
@@ -325,10 +336,11 @@ HTML;
     
     private function getProdData($dbc)
     {
+        $storeID = scanLib::getStoreID();
         $upc = FormLib::get('upc');
         $upc = scanLib::padUPC($upc);
-        $args = array($upc);
-        $prep = $dbc->prepare("SELECT bl.upc, bl.salePrice, bl.batchID AS bid, p.brand AS pbrand, p.description AS pdesc, pu.brand AS pubrand, p.size, p.special_price, pu.description AS pudesc, b.batchName, f.sections FROM batchList AS bl LEFT JOIN products AS p ON bl.upc=p.upc LEFT JOIN productUser AS pu ON p.upc=pu.upc LEFT JOIN batches AS b ON bl.batchID=b.batchID INNER JOIN FloorSectionsListView AS f ON p.upc=f.upc WHERE bl.batchID IN ( SELECT b.batchID FROM batches AS b WHERE NOW() BETWEEN startDate AND endDate) AND bl.upc = ? GROUP BY bl.batchID;");
+        $args = array($upc,$storeID);
+        $prep = $dbc->prepare("SELECT bl.upc, bl.salePrice, bl.batchID AS bid, p.brand AS pbrand, p.description AS pdesc, pu.brand AS pubrand, p.size, p.special_price, pu.description AS pudesc, b.batchName, f.sections FROM batchList AS bl LEFT JOIN products AS p ON bl.upc=p.upc LEFT JOIN productUser AS pu ON p.upc=pu.upc LEFT JOIN batches AS b ON bl.batchID=b.batchID INNER JOIN FloorSectionsListView AS f ON p.upc=f.upc AND p.store_id=f.storeID WHERE bl.batchID IN ( SELECT b.batchID FROM batches AS b WHERE NOW() BETWEEN startDate AND DATE_ADD(endDate, INTERVAL 1 DAY)) AND bl.upc = ? AND p.store_id = ? GROUP BY bl.batchID;");
         $res = $dbc->execute($prep,$args);
         $rows = $dbc->numRows($res);
         if ($rows > 0) {
@@ -408,10 +420,8 @@ HTML;
         $location = 'n/a';
         $location = $this->data[$upc]['sections'];
 
-        $args = array($upc);
-        //replace this - notes should be gathered at the same time queues info is gathered.
-        //and should be called here via object variables. 
-        $prep = $dbc->prepare("SELECT notes FROM woodshed_no_replicate.batchCheckNotes WHERE upc = ?");
+        $args = array($upc,$sessionName);
+        $prep = $dbc->prepare("SELECT notes FROM woodshed_no_replicate.batchCheckNotes WHERE upc = ? AND session = ?");
         $res = $dbc->execute($prep,$args);
         while ($row = $dbc->fetchRow($res)) {
             $notes = $row['notes'];
@@ -474,36 +484,33 @@ HTML;
                 value="$upc" placeholder="upc">
         </div>
     </form>
-    <h5>$store $session</h5>
-    <div class="line"></div>
-
-    <div class="buttons container">
+    <div class="container containerBtns">
         <div class="row">
-            <div class="col-xs-4">
+            <div class="col-4">
                 <button class="btn btn-invisible btn-sub-queue" id="noteBtn">&nbsp;</button>
             </div>
-            <div class="col-xs-4">
+            <div class="col-4">
                 <button class="btn btn-warning btn-queue" value="2">Miss</button>
             </div>
-            <div class="col-xs-4">
+            <div class="col-4">
                 <button class="btn btn-success btn-queue" value="1">Good</button>
             </div>
         </div>
-        <div class="row">
-            <div class="col-xs-4">
+        <div class="row secondRow">
+            <div class="col-4">
                 <button class="btn btn-surprise btn-queue" value="5">Tag</button>
             </div>
-            <div class="col-xs-4">
+            <div class="col-4">
                 <button class="btn btn-inverse btn-sub-queue" id="capBtn">Cap</button>
             </div>
-            <div class="col-xs-4">
+            <div class="col-4">
                 <button class="btn btn-primary btn-queue" value="4">Add</button>
             </div>
         </div>
     </div>
 
     <input type="hidden" name="storeID" id="formStoreID" value="$storeID">
-    <input type="hidden" name="storeID" id="formSession" value="$session">
+    <input type="hidden" name="sessionName" id="formSession" value="$session">
 
     <div class="data">
         <span class="smtext">Name:</span>
@@ -532,9 +539,7 @@ HTML;
     <div class="data">
         <span class="smtext">POS:</span><span class="curPrice">$curPrice</span>
     </div>
-    
     $batchData
-    
     <!-- show which queues an item is in -->
     <div class="queued">
         <div align="center" class="smtext">Current Queues:</div>
@@ -546,10 +551,9 @@ HTML;
         </div>
         
     </div>
-
-
 </div>
 
+<div class='header'><h5>$store $session</h5></div>
 
 <a id="reload" href="SCS.php">reload</a>
 HTML;
@@ -568,6 +572,21 @@ HTML;
     {
         include(__DIR__.'/../../../config.php');
         return <<<HTML
+.secondRow {
+    margin-top: 8vw;
+    margin-bottom: 4vw;
+}
+.containerBtns {
+    margin-top: -8vw;
+}
+h2.menuOption {
+    background: rgba(255,255,255,0.1);
+    background-color: rgba(255,255,255,0.1);
+    padding: 25px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 3px;
+    margin: 5px;
+}
 .menuOption {
     color: rgba(255,255,255,0.6);
     margin-top: 10vw;
@@ -590,10 +609,10 @@ HTML;
 }
 #menuBtn {
     position: absolute;
-    top: 25px;
-    left: 25px;
-    height: 7vw;
-    width: 7vw;
+    top: 6vw;
+    left: 6vw;
+    height: 9vw;
+    width: 9vw;
     background-color: rgba(255,255,255,0.1);
     font-size: 3vw;
     overflow: hidden;
@@ -629,7 +648,7 @@ HTML;
 }
 .loginForm {
     width: 90vw;
-    margin-top: 50px;
+    margin: 25px;
     border-radius: 0px;
     background-color: rgba(255,255,255,0.3);
 }
@@ -703,7 +722,6 @@ HTML;
     height: 20vw;
     width: 20vw;
     font-size: 5vw;
-    margin: 20px;
     border-radius: 10%;
     color: white;
     opacity: 0.9;
@@ -712,7 +730,6 @@ HTML;
     height: 20vw;
     width: 20vw;
     font-size: 5vw;
-    margin: 20px;
     border-radius: 10%;
     color: white;
     opacity: 0.9;
@@ -798,6 +815,7 @@ body {
     font-size: 6vw;
     color: rgba(255,255,255,0.8);
     overflow-x: hidden;
+    //overflow-y: hidden;
 }
 h3 {
     font-size: 15vw;
@@ -806,9 +824,16 @@ h4 {
     font-size: 6vw;
 }
 h5 {
-    font-size: 9vw;
-    margin-top: -40px;
+    font-size: 4vw;
     color: rgba(255,255,255,0.5);
+}
+.header {
+    position: absolute;
+    margin-top: 20px;
+    top: 0px;
+    right: 0px;
+    width: 25vw;
+    text-align: center;
 }
 .mdtext {
     font-size: 4vw;
@@ -859,13 +884,13 @@ HTML;
 <div align="center" id="capButtons">
     <div class="capButtons container">
         <div class="row">
-            <div class="col-xs-4">
+            <div class="col-4">
                 <button class="btn btn-inverse btn-queue" value="6">12UP</button>
             </div>
-            <div class="col-xs-4">
+            <div class="col-4">
                 <button class="btn btn-inverse btn-queue" value="7">4UP</button>
             </div>
-            <div class="col-xs-4">
+            <div class="col-4">
                 <button class="btn btn-inverse btn-queue" value="8">2UP</button>
             </div>
         </div>
@@ -878,9 +903,7 @@ HTML;
 <div id="menu">
     <div align="center">
         <h1>Main Menu</h1>
-        <h2 class="menuOption"><a class="menuOption" href="#">Menu Option 1</a></h2>
-        <h2 class="menuOption"><a class="menuOption" href="#">Menu Option 2</a></h2>
-        <h2 class="menuOption"><a class="menuOption" href="#">Menu Option 3</a></h2>
+        <h2 class="menuOption"><a class="menuOption" href="BatchCheckMenu.php">Batch Check Main Menu</a></h2>
         <h2 class="menuOption"><a class="menuOption" href="SCS.php?signout=1">Sign Out</a></h2>
         <br/>
         <button class="close" id="closeMenu" style="margin-right:40vw;">Close</div>

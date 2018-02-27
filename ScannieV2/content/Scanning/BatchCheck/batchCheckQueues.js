@@ -34,3 +34,13 @@ $('.queue-btn').click(function(){
         }
     });
 });
+
+//do something based on current option
+$(function(){
+    var option = $('#curOption').val();
+    if (parseInt(option,10) == 3) {
+        $('#blank-th').show();
+        $('#blank-th').html('Notes');
+    }
+});
+

@@ -26,6 +26,9 @@ class BatchCheckQueues extends PageLayoutA
 
     public function preprocess()
     {
+        if (FormLib::get('option', false) == 99) {
+            header('location: BatchCheckMenu.php');
+        }
         $dbc = scanLib::getConObj();
         if (FormLib::get('loginSubmit', false)) {
             $this->loginSubmitHandler($dbc);
@@ -70,9 +73,11 @@ class BatchCheckQueues extends PageLayoutA
 
     private function loginView()
     {
+        $storeID = scanLib::getStoreID();
         $dbc = scanLib::getConObj();
         $sessions = ''; 
-        $prep = $dbc->prepare("SELECT session FROM woodshed_no_replicate.batchCheckQueues GROUP BY session;");
+        $args = array($storeID);
+        $prep = $dbc->prepare("SELECT session FROM woodshed_no_replicate.batchCheckQueues WHERE storeID = ? GROUP BY session;");
         $res = $dbc->execute($prep);
         while ($row = $dbc->fetchRow($res)) {
             $s = $row['session'];
@@ -93,11 +98,13 @@ class BatchCheckQueues extends PageLayoutA
             <input class="loginForm" name="newSession" type="text" placeholder="Name a New Session">
         </div>
         <div class="form-group">
+            <input type="hidden" name="storeID" value="$storeID">
+            <!--
             <select class="loginForm" name="storeID" required>
                 <option value="0">Select a Store ID</option>
                 <option value="1">Hillside</option>
                 <option value="2">Denfeld</option>
-            </select>
+            </select>-->
         </div>
         <div class="form-group">
             <button type="submit" name="loginSubmit" value="1" class="loginForm">Submit</button>
@@ -114,43 +121,64 @@ HTML;
         $storeID = $_SESSION['storeID'];
 
         //get all data for products on sale
-        $args = array($storeID);
+        $args = array($storeID,$storeID);
+        $optionZeroFilter = ($option == 0) ? "WHERE bl.batchID IN ( SELECT b.batchID FROM batches AS b WHERE NOW() BETWEEN startDate AND endDate)" : '';
         $query = "
             SELECT bl.upc, bl.salePrice, bl.batchID AS bid, p.brand AS pbrand, 
                 p.description AS pdesc, pu.brand AS pubrand, p.size, p.special_price, 
-                pu.description AS pudesc, b.batchName, f.sections 
+                pu.description AS pudesc, b.batchName, f.sections, 
+                DATE(p.last_sold) as last_sold
             FROM batchList AS bl 
                 LEFT JOIN products AS p ON bl.upc=p.upc 
                 LEFT JOIN productUser AS pu ON p.upc=pu.upc 
                 LEFT JOIN batches AS b ON bl.batchID=b.batchID 
                 INNER JOIN FloorSectionsListView AS f ON p.store_id=f.storeID AND p.upc=f.upc
-            WHERE bl.batchID IN ( SELECT b.batchID FROM batches AS b WHERE NOW() BETWEEN startDate AND endDate) 
+                LEFT JOIN StoreBatchMap AS sbm ON b.batchID=sbm.batchID 
+                $optionZeroFilter
                 AND f.storeID = ?
+                AND p.inUse = 1
+                AND sbm.storeID = ? 
             GROUP BY p.upc ORDER BY f.sections
         ";
         $prep = $dbc->prepare($query);
         $res = $dbc->execute($prep,$args);
         $fields = array('upc','salePrice','bid','pbrand','pubrand','pdesc','pudesc','size','special_price',
-            'batchName','sections');
+            'batchName','sections','last_sold');
         $hiddenContent = '';
         foreach ($fields as $field) {
             $hiddenContent .= "<button class='col-filter btn btn-info' id='col-filter-$field'>$field</button>";
         }
         $hiddenContent .= "
             <input type='hidden' id='sessionName' name='sessionName' value='{$_SESSION['sessionName']}'>
+            <input type='hidden' id='formSession' value='{$_SESSION['sessionName']}'>
             <input type='hidden' id='storeID' name='storeID' value='{$_SESSION['storeID']}'>
+            <input type='hidden' id='curOption' name='curOption' value='$option'>
         ";
         while ($row = $dbc->fetchRow($res)) {
             foreach ($fields as $field) {
                 ${$field}[$row['upc']] = $row[$field];
             }
         }
+        if ($er = $dbc->error()) echo "<div class='alert alert-danger'>$er</div>";
 
         //additional query to limit results shown
         $inQueueItems = array();
-        if ($option != 0) {
+        if ($option != 0 && $option != 11 && $option != 6) {
             $args = array($sessionName,$storeID,$option);
             $prep = $dbc->prepare("SELECT upc FROM woodshed_no_replicate.batchCheckQueues WHERE session = ? AND storeID = ? AND inQueue = ?");
+            $res = $dbc->execute($prep,$args);
+            while ($row = $dbc->fetchRow($res)) {
+                $inQueueItems[] = $row['upc'];
+            }
+        } elseif ($option == 11) {
+            $prep = $dbc->prepare("SELECT upc FROM woodshed_no_replicate.batchCheckQueues WHERE inQueue = 11");
+            $res = $dbc->execute($prep);
+            while ($row = $dbc->fetchRow($res)) {
+                $inQueueItems[] = $row['upc'];
+            }
+        } elseif ($option == 6) { 
+            $args = array($sessionName,$storeID);
+            $prep = $dbc->prepare("SELECT upc FROM woodshed_no_replicate.batchCheckQueues WHERE session = ? AND storeID = ? AND inQueue in (6,7,8)");
             $res = $dbc->execute($prep,$args);
             while ($row = $dbc->fetchRow($res)) {
                 $inQueueItems[] = $row['upc'];
@@ -172,41 +200,63 @@ HTML;
         foreach ($queueBtns as $qv) {
             $thead .= "<th class='col-{$this->options[$qv]}'>{$this->options[$qv]}</th>";
         }
-        $table = "<div class='table-responsive'><table class='table table-stiped table-compressed small'><thead>$thead</thead><tbody>";
-        //this is what will be different based on queues
+        $thead .= "<th class='blank-th' id='blank-th'></th>";
+        $table = "<div class='table-responsive'><table class='table table-stiped table-compressed small'><thead id='mythead'>$thead</thead><tbody>";
         $r = 1;
         foreach ($upc as $k => $v) {
-            if ($option == 0 && !in_array($k,$inQueueItems)) {
-                $table .= ($r % 2 == 0) ? "<tr>" : "<tr class='altRow'>";
-                $table .= "<td class='col-upc'>$k</td>";
-                foreach ($fields as $field) {
-                    if ($field != 'upc') {
-                        $temp = ${$field}[$k];
-                        $table .= "<td class='col-$field'>$temp</td>";
+            if ($option == 0) {
+                if (!in_array($k,$inQueueItems)) { 
+                    $table .= ($r % 2 == 0) ? "<tr>" : "<tr class='altRow'>";
+                    $table .= "<td class='col-upc'>$k</td>";
+                    foreach ($fields as $field) {
+                        if ($field != 'upc') {
+                            $temp = ${$field}[$k];
+                            $table .= "<td class='col-$field'>$temp</td>";
+                        }
                     }
-                }
-                foreach ($queueBtns as $qv) {
-                    $table .= "<td><button id='queue$k' value='$qv' class='queue-btn btn btn-info'>{$this->options[$qv]}</button></td>";
-                }
-                $table .= "</tr>";
-                $r++;
-            } elseif (in_array($k,$inQueueItems)) {
-                $table .= ($r % 2 == 0) ? "<tr>" : "<tr class='altRow'>";
-                $table .= "<td>$k</td>";
-                foreach ($fields as $field) {
-                    if ($field != 'upc') {
-                        $temp = ${$field}[$k];
-                        $table .= "<td class='col-$field'>$temp</td>";
+                    foreach ($queueBtns as $qv) {
+                        $table .= "<td><button id='queue$k' value='$qv' class='queue-btn btn btn-info'>{$this->options[$qv]}</button></td>";
                     }
+                    $table .= "</tr>";
+                    $r++;
                 }
-                foreach ($queueBtns as $qv) {
-                    $table .= "<td><button id='queue$k' value='$qv' class='queue-btn btn btn-info'>{$this->options[$qv]}</button></td>";
-                }
+            } elseif (in_array($option,array(1,2,4,5,6,11))) {
+                if (in_array($k,$inQueueItems)) {
+                    $table .= ($r % 2 == 0) ? "<tr>" : "<tr class='altRow'>";
+                    $table .= "<td>$k</td>";
+                    foreach ($fields as $field) {
+                        if ($field != 'upc') {
+                            $temp = ${$field}[$k];
+                            $table .= "<td class='col-$field'>$temp</td>";
+                        }
+                    }
+                    foreach ($queueBtns as $qv) {
+                        $table .= "<td><button id='queue$k' value='$qv' class='queue-btn btn btn-info'>{$this->options[$qv]}</button></td>";
+                    }
+                    $table .= "</tr>";
+                    $r++;
+                }             
+            } 
+        }
+        if ($option == 3) {
+            $table = '<div class="table-responsive"><table class="table table-stiped table-compressed small"><thead><th>upc</th><th>notes</th></thead><tbody>';
+            $args = array($sessionName);
+            $prep = $dbc->prepare("SELECT upc, session, notes FROM woodshed_no_replicate.batchCheckNotes WHERE session = ?");
+            $res = $dbc->execute($prep,$args);
+            while ($row = $dbc->fetchRow($res)) {
+                $table .= ($r % 2 == 0) ? "<tr>" : "<tr class='altRow'>";
+                $curUpc = $row['upc'];
+                $temp = $row['notes'];
+                $table .= "<td>$curUpc</td>";
+                $table .= "<td class='col-$field editable' id='editnotes'>$temp</td>";
                 $table .= "</tr>";
                 $r++;
             }
+            $table .= '</tbody></table></div>';
         }
+
         $table .= "</tbody></table></div>";
+        $this->addScript('scs.js');
 
         if ($er = $dbc->error()) {
             return "<div class='alert alert-danger'>$er</div>";
@@ -226,6 +276,8 @@ HTML;
         $ret .= "<div align='center'>";
         $ret .= "<h2>$stores[$storeID]</h2>";
         $ret .= "<h1>$sessionName</h1>";
+        $q = FormLib::get('option');
+        $ret .= "<h4>{$this->options[$q]}</h4>";
         $ret .= "</div>";
 
         foreach ($_GET as $key => $value) {
@@ -251,7 +303,8 @@ HTML;
     {
         $options = '';
         foreach ($this->options as $id => $name) {
-            $options .= "<div align='center'><button type='submit' class='btn-primary toggle-btn' name='option' value='$id'><div class='mobilePage'>$name</div></a></div>";
+            $addClass = ($name == 'Disco/Supplies Last') ? 'disable' : '';
+            $options .= "<div align='center'><button type='submit' class='btn-primary toggle-btn' name='option' value='$id'><div class='mobilePage $addClass'>$name</div></a></div>";
         }
         return <<<HTML
 <div class="switchQContainer">
@@ -299,9 +352,20 @@ HTML;
     public function cssContent()
     {
         return <<<HTML
-h2, h1 {
+.disable {
+    color: grey;
+    background-color: red;
+    background: rgba(0,0,0,0.5);
+}
+#blank-th {
+    display: none;
+}
+h4, h2, h1 {
     color: rgba(255,255,255,0.8);
     text-shadow: 1px 1px rgba(0,0,0,0.5);
+}
+h4 {
+    color: orange;
 }
 .highlighted {
     background-color: blue;
