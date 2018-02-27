@@ -85,6 +85,7 @@ class WebDispatch
         $DataCollect = new DataCollect;
         $DataCollect::run();
         */
+        //$this->addScript(__DIR__.'/../lib/javascript/scannie.js');
         if ($this->enable_linea) {
             $this->addScript("http://{$MY_ROOTDIR}/common/lib/javascript/linea/cordova-2.2.0.js");
             $this->addScript("http://{$MY_ROOTDIR}/common/lib/javascript/linea/ScannerLib-Linea-2.0.0.js");
@@ -103,6 +104,7 @@ class WebDispatch
     <script src="http://{$MY_ROOTDIR}/common/javascript/popper.min.js"></script>
     <script src="http://{$MY_ROOTDIR}/common/bootstrap4/js/bootstrap.min.js"></script>
     <script src="http://{$MY_ROOTDIR}/common/ui/CoreNav.js"></script>
+    <script src="http://{$MY_ROOTDIR}/common/lib/javascript/scannie.js"></script>
     <title>{$this->title}</title>
     <link rel="icon" href="http://{$MY_ROOTDIR}/common/src/icons/scannie_favicon.ico">
 <style>
