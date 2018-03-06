@@ -5,6 +5,7 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     background-color: rgba(255,255,255,0.9);
     background: linear-gradient(135deg, #42a7f4, #0a1528);
+    background-color: linear-gradient(135deg, #42a7f4, #0a1528);
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
@@ -52,6 +53,21 @@ img.icon {
     box-shadow: 3px 3px 3px rgba(5,55,75,0.7);
     border: 1px solid rgba(5,55,75,0.8);
     border-radius: 2px;
+}
+/*
+    Scanicons
+*/
+.scanicon-tablesorter {
+    background-image: url('../src/img/icons/tablesorter.png');
+    height: 25px;
+    width: 25px;
+    background-repeat: no-repeat;
+    display: inline-block;
+}
+.scanicon-trash {
+    background-image: url('../src/img/icons/trash.png');
+    background-repeat: no-repeat;
+    display: inline-block;
 }
 /*
     Core Navigation
