@@ -1,9 +1,14 @@
-//$(function(){alert('hi');});
-$('.col-hide').click(function(){
-    var colName = $(this).text();
-    var filterBtnID = '#col-filter-'+colName;
-    $('.col-'+colName).hide();
-    $(filterBtnID).show();
+$(function(){
+    //alert('hi');
+    $('#mytable').tablesorter({
+        selectorSort : 'button.sorter'    
+    });
+    $('.col-hide').click(function(){
+        var colName = $(this).val();
+        var filterBtnID = '#col-filter-'+colName;
+        $('.col-'+colName).hide();
+        $(filterBtnID).show();
+    });
 });
 $('.col-filter').click(function(){
     var colName = $(this).text(); 
@@ -27,7 +32,11 @@ $('.queue-btn').click(function(){
         dataType: 'json',
         success: function(json) {
             //alert('success');
-            closestTr.css('background-color','red');
+            if (qv == 0) {
+                closestTr.css('background-color','white');
+            } else {
+                closestTr.css('background-color','red');
+            }
             if (json.error) {
                 alert(json.error);
             }
@@ -35,7 +44,16 @@ $('.queue-btn').click(function(){
     });
 });
 
-//do something based on current option
+/*
+$('th').each(function(){
+    var nameElm = $(this).find('.name');
+    var thName = nameElm.text(); 
+    thName = thName.toUpperCase();
+    nameElm.text(thName);
+});
+*/
+
+//do something based on current option. I don't think this is in-use. 
 $(function(){
     var option = $('#curOption').val();
     if (parseInt(option,10) == 3) {

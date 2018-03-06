@@ -1,5 +1,12 @@
+var mode = 'tall';
 $(function(){
     //alert('hello');
+    var h = document.body.clientHeight; 
+    var w = document.body.clientWidth; 
+    //alert('width: '+w+' | height: '+h);
+    if (parseInt(w,10) > parseInt(h,10)) {
+        mode = 'wide' 
+    }
 });
 
 $('.editable').each(function(){
@@ -12,6 +19,7 @@ $('.editable').focusout(function(){
     var upc = $('#upc').val();
     if (newValue != oldValue) {
         //change is detected, deploy $ajax
+        newValue = encodeURIComponent(newValue);
         $.ajax({
             type: 'post',
             url: 'SCS.php',
@@ -44,15 +52,28 @@ $('.editable').focusout(function(){
             }
         });
     }
-});
+})
 
 $('.editlocation').click(function(){
     var location = $('#formStoreID').val();
     var session = $('#formSession').val();
     var upc = $('#upc').val();
+    var device = 'ipod'; 
+    if (!upc) {
+        //editLocation being called from BCQ 
+        upc = $(this).closest('tr:first-child').html();
+        var upcAnchor = $(this).closest('tr').find('a');
+        upc = upcAnchor.html();
+        device = 'tablet';
+    }
     c = confirm('Edit Location?');
     if (c == true) {
-        window.location.href = '../../../../../git/fannie/item/ProdLocationEditor.php?store_id='+location+'&upc='+upc+'&searchupc=1&batchCheck=1';
+        if (device == 'ipod') {
+            window.location.href = '../../../../../git/fannie/item/ProdLocationEditor.php?store_id='+location+'&upc='+upc+'&searchupc=1&batchCheck=1';
+        } else {
+            window.open('../../../../../git/fannie/item/ProdLocationEditor.php?store_id='+location+'&upc='+upc+'&searchupc=1&batchCheck=1','_blank');
+
+        }
     }
 });
 
@@ -66,6 +87,7 @@ var queuesToButtons = {
     7:'inverse',
     8:'inverse',
     9:'danger',
+    10:'danger',
     11:'danger',
 };
 $('.btn-queue').click(function(){
@@ -81,6 +103,12 @@ $('.btn-queue').click(function(){
     }
     if (parseInt(qval,10) == parseInt(8,10)) {
         $('#capButtons').hide();
+    }
+    if (parseInt(qval,10) == parseInt(9,10)) {
+        $('#discoButtons').hide();
+    }
+    if (parseInt(qval,10) == parseInt(10,10)) {
+        $('#discoButtons').hide();
     }
     //alert(queue);
         $.ajax({
@@ -115,6 +143,9 @@ $('.btn-queue').click(function(){
 /* button/click events */
 $('#capBtn').click(function(){
     $('#capButtons').show();
+});
+$('#discoBtn').click(function(){
+    $('#discoButtons').show();
 });
 $('#showMoreBatches').click(function(){
     $('#allBatches').show();
@@ -182,6 +213,10 @@ $('.useBatch').click(function(){
             }
         });
     }
+});
+
+$('#submitUpc').click(function(){
+    document.forms['upcForm'].submit();
 });
 
 ;(function($) {

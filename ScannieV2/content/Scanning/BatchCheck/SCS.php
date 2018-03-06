@@ -195,6 +195,8 @@ HTML;
             case '12UP':
             case '4UP':
             case '2UP':
+            case 'Disco':
+            case 'While':
                 //always insert
                 $args = array($upc,$sessionName,$storeID,$qval);
                 $prep = $dbc->prepare("INSERT INTO woodshed_no_replicate.batchCheckQueues 
@@ -395,6 +397,7 @@ HTML;
     public function view($dbc)
     {
         $upc = FormLib::get('upc');
+        //fix: I don't think this actually works.
         if ($upc < 999999 && $upc > 99999) {
             echo "hi";
             $upc = ltrim($upc, '0');
@@ -420,7 +423,7 @@ HTML;
         $location = 'n/a';
         $location = $this->data[$upc]['sections'];
 
-        $args = array($upc,$sessionName);
+        $args = array($upc,$session);
         $prep = $dbc->prepare("SELECT notes FROM woodshed_no_replicate.batchCheckNotes WHERE upc = ? AND session = ?");
         $res = $dbc->execute($prep,$args);
         while ($row = $dbc->fetchRow($res)) {
@@ -442,6 +445,7 @@ HTML;
             7 => 'inverse',
             8 => 'inverse',
             9 => 'danger',
+            10 => 'danger',
             11 => 'danger',
         );
         foreach ($queued as $id => $queue) {
@@ -470,24 +474,24 @@ HTML;
         $timestamp = time();
         $this->addScript('scanning.js?time='.$timestamp);
         
-        $this->addScript('scs.js?');
+        $this->addScript('scs.js?time='.$timestamp);
 
         return <<<HTML
 <div id="response"></div>
 {$this->hiddenContent()}
 <div id="menuBtn">
 </div>
-<div align="center">
-    <form class="form-inline" id="upcForm" name="upcForm" method="post" pattern="[0-9]">
+<div align="center" id="grandparent">
+    <form class="form-inline" id="upcForm" name="upcForm" method="post">
         <div class="form-group" align="center">
-            <input type="text" class="form-control" id="upc" name="upc" 
+            <input type="text" class="form-control" id="upc" name="upc" pattern="\d*" 
                 value="$upc" placeholder="upc">
         </div>
     </form>
     <div class="container containerBtns">
         <div class="row">
             <div class="col-4">
-                <button class="btn btn-invisible btn-sub-queue" id="noteBtn">&nbsp;</button>
+                <button class="btn btn-danger btn-sub-queue" id="discoBtn">Disco</button>
             </div>
             <div class="col-4">
                 <button class="btn btn-warning btn-queue" value="2">Miss</button>
@@ -553,7 +557,7 @@ HTML;
     </div>
 </div>
 
-<div class='header'><h5>$store $session</h5></div>
+<div class='header' id='submitUpc'><h5>$store $session</h5></div>
 
 <a id="reload" href="SCS.php">reload</a>
 HTML;
@@ -572,6 +576,8 @@ HTML;
     {
         include(__DIR__.'/../../../config.php');
         return <<<HTML
+#grandparent {
+}
 .secondRow {
     margin-top: 8vw;
     margin-bottom: 4vw;
@@ -689,7 +695,16 @@ h2.menuOption {
     padding-top: 100px;
     padding-bottom: 100px;
 }
-.capButtons {
+#discoButtons {
+    display: none;
+    width: 100%;
+    position: absolute;
+    top: 30vh;
+    background-color: rgba(0,0,0,0.8);
+    z-index: 100;
+    width: 100%;
+    padding-top: 100px;
+    padding-bottom: 100px;
 }
 #response {
     position: fixed;
@@ -907,6 +922,20 @@ HTML;
         <h2 class="menuOption"><a class="menuOption" href="SCS.php?signout=1">Sign Out</a></h2>
         <br/>
         <button class="close" id="closeMenu" style="margin-right:40vw;">Close</div>
+    </div>
+</div>
+<div align="center" id="discoButtons">
+    <div class="discoButtons container">
+        <div class="row">
+            <div class="col-4">
+                <button class="btn btn-danger btn-queue" value="9">Disco</button>
+            </div>
+            <div class="col-4">
+                <button class="btn btn-danger btn-queue" value="10">While</button>
+            </div>
+            <div class="col-4">
+            </div>
+        </div>
     </div>
 </div>
 HTML;

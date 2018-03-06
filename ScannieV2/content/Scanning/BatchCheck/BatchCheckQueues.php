@@ -18,7 +18,7 @@ class BatchCheckQueues extends PageLayoutA
         3 => 'Note',
         4 => 'Add',
         5 => 'Shelf-Tag',
-        6 => 'Generic-Signs',
+        6 => 'Cap-Signs',
         9 => 'Disco/Supplies Last',
         11 => 'Edited',
         99 => 'Main Menu',
@@ -116,6 +116,7 @@ HTML;
 
     private function getTableContents($dbc)
     {
+        include(__DIR__.'/../../../config.php');
         $option = FormLib::get('option');
         $sessionName = $_SESSION['sessionName'];
         $storeID = $_SESSION['storeID'];
@@ -144,16 +145,6 @@ HTML;
         $res = $dbc->execute($prep,$args);
         $fields = array('upc','salePrice','bid','pbrand','pubrand','pdesc','pudesc','size','special_price',
             'batchName','sections','last_sold');
-        $hiddenContent = '';
-        foreach ($fields as $field) {
-            $hiddenContent .= "<button class='col-filter btn btn-info' id='col-filter-$field'>$field</button>";
-        }
-        $hiddenContent .= "
-            <input type='hidden' id='sessionName' name='sessionName' value='{$_SESSION['sessionName']}'>
-            <input type='hidden' id='formSession' value='{$_SESSION['sessionName']}'>
-            <input type='hidden' id='storeID' name='storeID' value='{$_SESSION['storeID']}'>
-            <input type='hidden' id='curOption' name='curOption' value='$option'>
-        ";
         while ($row = $dbc->fetchRow($res)) {
             foreach ($fields as $field) {
                 ${$field}[$row['upc']] = $row[$field];
@@ -163,7 +154,7 @@ HTML;
 
         //additional query to limit results shown
         $inQueueItems = array();
-        if ($option != 0 && $option != 11 && $option != 6) {
+        if ($option != 0 && $option != 11 && $option != 6&& $option != 9) {
             $args = array($sessionName,$storeID,$option);
             $prep = $dbc->prepare("SELECT upc FROM woodshed_no_replicate.batchCheckQueues WHERE session = ? AND storeID = ? AND inQueue = ?");
             $res = $dbc->execute($prep,$args);
@@ -178,10 +169,21 @@ HTML;
             }
         } elseif ($option == 6) { 
             $args = array($sessionName,$storeID);
-            $prep = $dbc->prepare("SELECT upc FROM woodshed_no_replicate.batchCheckQueues WHERE session = ? AND storeID = ? AND inQueue in (6,7,8)");
+            $prep = $dbc->prepare("SELECT upc, inQueue FROM woodshed_no_replicate.batchCheckQueues WHERE session = ? AND storeID = ? 
+                AND inQueue in (6,7,8)");
             $res = $dbc->execute($prep,$args);
             while ($row = $dbc->fetchRow($res)) {
                 $inQueueItems[] = $row['upc'];
+                $inQueue[$row['upc']][] = $row['inQueue'];
+            }
+        } elseif ($option == 9) {
+            $args = array($sessionName,$storeID);
+            $prep = $dbc->prepare("SELECT upc, inQueue FROM woodshed_no_replicate.batchCheckQueues WHERE session = ? AND storeID = ? 
+                AND inQueue in (9,10)");
+            $res = $dbc->execute($prep,$args);
+            while ($row = $dbc->fetchRow($res)) {
+                $inQueueItems[] = $row['upc'];
+                $inQueue[$row['upc']][] = $row['inQueue'];
             }
         } else {
             $args = array($sessionName,$storeID);
@@ -193,25 +195,65 @@ HTML;
         }
 
         $thead = '';
-        foreach ($fields as $field) {
-            $thead .= "<th class='col-hide col-$field'>$field</th>";
+        $theadFields = array();
+        
+        $theadFields[] = 'upc';
+        $theadFields[] = 'salePrice';
+        $theadFields[] = 'bid';
+        $theadFields[] = 'pbrand';
+        $theadFields[] = 'pubrand';
+        $theadFields[] = 'pdesc';
+        $theadFields[] = 'pudesc';
+        $theadFields[] = 'size';
+        $theadFields[] = 'special_price';
+        $theadFields[] = 'batchName';
+        $theadFields[] = 'sections';
+        $theadFields[] = 'last_sold';
+        if ($option == 6) {
+            $theadFields[] = 'Needed';
+        } elseif ($option == 9) {
+            $theadFields[] = 'InQueue';
+        }
+
+        $hiddenContent = '';
+        foreach ($theadFields as $field) {
+            $hiddenContent .= "<button class='col-filter btn btn-info' id='col-filter-$field'>$field</button>";
+        }
+        $hiddenContent .= "
+            <input type='hidden' id='sessionName' name='sessionName' value='{$_SESSION['sessionName']}'>
+            <input type='hidden' id='formSession' value='{$_SESSION['sessionName']}'>
+            <input type='hidden' id='storeID' name='storeID' value='{$_SESSION['storeID']}'>
+            <input type='hidden' id='curOption' name='curOption' value='$option'>
+        ";
+
+        foreach ($theadFields as $field) {
+            $thead .= "
+                <th class='col-$field '>
+                    <div class='thLine'>
+                        <span class='name'>$field</span>
+                        <button class='scanicon-tablesorter sorter'>&nbsp;</button>
+                        <button class='col-hide' value='$field'>-</button>
+                    </div>
+                </th>";
         }
         $queueBtns = array(0,1,2);
         foreach ($queueBtns as $qv) {
             $thead .= "<th class='col-{$this->options[$qv]}'>{$this->options[$qv]}</th>";
         }
         $thead .= "<th class='blank-th' id='blank-th'></th>";
-        $table = "<div class='table-responsive'><table class='table table-stiped table-compressed small'><thead id='mythead'>$thead</thead><tbody>";
+        $table = "<div class='table-responsive'><table id='mytable' class='table table-stiped table-compressed tablesorter small'><thead id='mythead'>$thead</thead><tbody>";
         $r = 1;
         foreach ($upc as $k => $v) {
             if ($option == 0) {
                 if (!in_array($k,$inQueueItems)) { 
                     $table .= ($r % 2 == 0) ? "<tr>" : "<tr class='altRow'>";
-                    $table .= "<td class='col-upc'>$k</td>";
+                    $upcLink = "<a href='http://$FANNIE_ROOTDIR/item/ItemEditorPage.php?searchupc=$k' target='_BLANK'>$k</a>";
+                    $table .= "<td class='col-upc'>$upcLink</td>";
                     foreach ($fields as $field) {
                         if ($field != 'upc') {
                             $temp = ${$field}[$k];
-                            $table .= "<td class='col-$field'>$temp</td>";
+                            $extraClass = ($field == 'sections') ? 'editLocation' : '';
+                            $table .= "<td class='col-$field $extraClass'>$temp</td>";
                         }
                     }
                     foreach ($queueBtns as $qv) {
@@ -220,7 +262,7 @@ HTML;
                     $table .= "</tr>";
                     $r++;
                 }
-            } elseif (in_array($option,array(1,2,4,5,6,11))) {
+            } elseif (in_array($option,array(1,2,4,5,11))) {
                 if (in_array($k,$inQueueItems)) {
                     $table .= ($r % 2 == 0) ? "<tr>" : "<tr class='altRow'>";
                     $table .= "<td>$k</td>";
@@ -236,7 +278,35 @@ HTML;
                     $table .= "</tr>";
                     $r++;
                 }             
-            } 
+            } elseif (in_array($option,array(6,9))) {
+                if (in_array($k,$inQueueItems)) {
+                    $table .= ($r % 2 == 0) ? "<tr>" : "<tr class='altRow'>";
+                    $table .= "<td>$k</td>";
+                    foreach ($fields as $field) {
+                        if ($field != 'upc') {
+                            $temp = ${$field}[$k];
+                            $table .= "<td class='col-$field'>$temp</td>";
+                        }
+                    }
+                    $tempQueueNames = array(6=>'12UP',7=>'4UP',8=>'2UP',9=>'Disco',10=>'While Supplies Last');
+                    $tempQueueString = '';
+                    foreach ($inQueue as $upc => $queues) {
+                        if ($k == $upc) {
+                            foreach ($queues as $v) {
+                                $tempQueueString .= $tempQueueNames[$v].',';
+                            }
+                            $tempQueueString = trim($tempQueueString,',');
+                            $colname = ($option == 6) ? 'Needed' : 'InQueue';
+                            $table .= "<td class='col-$colname'><b>$tempQueueString</b></td>";
+                        }
+                    }
+                    foreach ($queueBtns as $qv) {
+                        $table .= "<td><button id='queue$k' value='$qv' class='queue-btn btn btn-info'>{$this->options[$qv]}</button></td>";
+                    }
+                    $table .= "</tr>";
+                    $r++;
+                }             
+            }
         }
         if ($option == 3) {
             $table = '<div class="table-responsive"><table class="table table-stiped table-compressed small"><thead><th>upc</th><th>notes</th></thead><tbody>';
@@ -256,7 +326,8 @@ HTML;
         }
 
         $table .= "</tbody></table></div>";
-        $this->addScript('scs.js');
+        $timestamp = time();
+        $this->addScript('scs.js?time='.$timestamp);
 
         if ($er = $dbc->error()) {
             return "<div class='alert alert-danger'>$er</div>";
@@ -292,6 +363,8 @@ HTML;
         $timestamp = time();
         $this->addScript("SalesChangeQueues.js?time=".$timestamp);
         $this->addScript("batchCheckQueues.js?time=".$timestamp);
+        $this->addScript('http://'.$MY_ROOTDIR.'/common/javascript/tablesorter/js/jquery.tablesorter.min.js');
+        $this->addScript('http://'.$MY_ROOTDIR.'/common/javascript/tablesorter/js/jquery.metadata.js');
 
         return <<<HTML
 $ret
@@ -303,8 +376,7 @@ HTML;
     {
         $options = '';
         foreach ($this->options as $id => $name) {
-            $addClass = ($name == 'Disco/Supplies Last') ? 'disable' : '';
-            $options .= "<div align='center'><button type='submit' class='btn-primary toggle-btn' name='option' value='$id'><div class='mobilePage $addClass'>$name</div></a></div>";
+            $options .= "<div align='center'><button type='submit' class='btn-primary toggle-btn' name='option' value='$id'><div class='mobilePage'>$name</div></a></div>";
         }
         return <<<HTML
 <div class="switchQContainer">
@@ -352,6 +424,16 @@ HTML;
     public function cssContent()
     {
         return <<<HTML
+.thLine {
+    overflow: hidden; 
+    white-space: nowrap;
+}
+.col-hide, .sorter {
+    padding: 0px;
+    height: 15px;
+    width: 15px;
+    border: 1px solid grey;
+}
 .disable {
     color: grey;
     background-color: red;
