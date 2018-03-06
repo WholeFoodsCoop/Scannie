@@ -44,14 +44,21 @@ $('.queue-btn').click(function(){
     });
 });
 
-/*
+var altNames = {
+    Spec: 'special_price',
+    Sale: 'salePrice',
+};
 $('th').each(function(){
     var nameElm = $(this).find('.name');
     var thName = nameElm.text(); 
-    thName = thName.toUpperCase();
-    nameElm.text(thName);
+    $.each(altNames, function(k,v) {
+        if (thName == v) {
+            nameElm.text(k);
+        }
+    });
+    //thName = thName.toUpperCase();
+    //nameElm.text(thName);
 });
-*/
 
 //do something based on current option. I don't think this is in-use. 
 $(function(){
