@@ -69,3 +69,30 @@ $(function(){
     }
 });
 
+$('.filter').on('change',function(){
+    var select = $(this).find(':selected');
+    var filter = $(this).attr('name');
+    if (select.text() == 'View All') {
+        $('td').each(function(){
+            $(this).closest('tr').show();
+        });
+    } else {
+        $('td').each(function(){
+            $(this).closest('tr').show();
+        });
+        $('td').each(function(){
+            var tdvalue = $(this).text();
+            if ($(this).hasClass('col-'+filter)) {
+                if (tdvalue != select.text()) {
+                    /*
+                    alert(
+                        'selected: '+select.text()+
+                        ', fiter: '+filter+
+                        ', tdvalue: '+tdvalue
+                    );*/
+                    $(this).closest('tr').hide();
+                }
+            } 
+        });
+    }
+});

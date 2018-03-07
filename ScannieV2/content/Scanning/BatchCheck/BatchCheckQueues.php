@@ -78,7 +78,7 @@ class BatchCheckQueues extends PageLayoutA
         $sessions = ''; 
         $args = array($storeID);
         $prep = $dbc->prepare("SELECT session FROM woodshed_no_replicate.batchCheckQueues WHERE storeID = ? GROUP BY session;");
-        $res = $dbc->execute($prep);
+        $res = $dbc->execute($prep,$args);
         while ($row = $dbc->fetchRow($res)) {
             $s = $row['session'];
             $sessions .= "<option value='$s'>$s</option>"; 
@@ -114,16 +114,47 @@ class BatchCheckQueues extends PageLayoutA
 HTML;
     }
 
+    private function getCurrentBatches($dbc)
+    {
+        $storeID = $_SESSION['storeID'];
+        $sessionName = $_SESSION['sessionName'];
+        $args = array($storeID);
+        $prep = $dbc->prepare("
+            SELECT bl.upc, bl.batchID AS bid, b.batchName
+            FROM batchList AS bl 
+                LEFT JOIN products AS p ON bl.upc=p.upc 
+                LEFT JOIN batches AS b ON bl.batchID=b.batchID 
+                LEFT JOIN StoreBatchMap AS sbm ON b.batchID=sbm.batchID 
+            WHERE bl.batchID IN ( SELECT b.batchID FROM batches AS b WHERE NOW() BETWEEN startDate AND endDate)
+                AND p.inUse = 1
+                AND sbm.storeID = ? 
+        ");
+        $res = $dbc->execute($prep,$args);
+        $data = array();
+        while ($row = $dbc->fetchRow($res)) {
+            $data[$row['upc']]['bid'] = $row['bid'];
+            $data[$row['upc']]['batchName'] = $row['batchName'];
+        }
+
+        return $data;
+    }
+
     private function getTableContents($dbc)
     {
         include(__DIR__.'/../../../config.php');
         $option = FormLib::get('option');
         $sessionName = $_SESSION['sessionName'];
         $storeID = $_SESSION['storeID'];
+        $batches = array();
 
         //get all data for products on sale
         $args = array($storeID,$storeID);
-        $optionZeroFilter = ($option == 0) ? "WHERE bl.batchID IN ( SELECT b.batchID FROM batches AS b WHERE NOW() BETWEEN startDate AND endDate)" : '';
+        if ($option == 0) {
+            $optionZeroFilter = "WHERE bl.batchID IN ( SELECT b.batchID FROM batches AS b WHERE NOW() BETWEEN startDate AND endDate)";
+        } else {
+            $batches = $this->getCurrentBatches($dbc);
+            $optionZeroFilter = '';
+        }
         $query = "
             SELECT bl.upc, bl.salePrice, bl.batchID AS bid, p.brand AS pbrand, 
                 p.description AS pdesc, pu.brand AS pubrand, p.size, p.special_price, 
@@ -135,7 +166,7 @@ HTML;
                 LEFT JOIN batches AS b ON bl.batchID=b.batchID 
                 INNER JOIN FloorSectionsListView AS f ON p.store_id=f.storeID AND p.upc=f.upc
                 LEFT JOIN StoreBatchMap AS sbm ON b.batchID=sbm.batchID 
-                $optionZeroFilter
+            $optionZeroFilter
                 AND f.storeID = ?
                 AND p.inUse = 1
                 AND sbm.storeID = ? 
@@ -145,9 +176,33 @@ HTML;
         $res = $dbc->execute($prep,$args);
         $fields = array('upc','salePrice','bid','pbrand','pubrand','pdesc','pudesc','size','special_price',
             'batchName','sections','last_sold');
+        $optBatchName = array();
+        $optBrand = array();
+        $optSections = array();
         while ($row = $dbc->fetchRow($res)) {
             foreach ($fields as $field) {
+                // get data for rows
                 ${$field}[$row['upc']] = $row[$field];
+                // get batch names & bids for products not in option 1
+                if ($option != 0) {
+                    if (in_array($field,array('bid','batchName'))) {
+                        ${$field}[$row['upc']] = ($batches[$row['upc']][$field]) ? $batches[$row['upc']][$field] : 'n/a';
+                    }
+                }
+                $value = $row[$field];
+                if ($field == 'batchName') {
+                    if (!in_array($value,$optBatchName)) {
+                        $optBatchName[] = $row[$field];
+                    }
+                } elseif ($field == 'pbrand') {
+                    if (!in_array($value,$optBrand)) {
+                        $optBrand[] = $row[$field];
+                    }
+                } elseif ($field == 'sections') {
+                    if (!in_array($value,$optSections)) {
+                        $optSections[] = $row[$field];
+                    }
+                }
             }
         }
         if ($er = $dbc->error()) echo "<div class='alert alert-danger'>$er</div>";
@@ -219,6 +274,33 @@ HTML;
         foreach ($theadFields as $field) {
             $hiddenContent .= "<button class='col-filter btn btn-info' id='col-filter-$field'>$field</button>";
         }
+
+        // Add filters/filter options
+        $filter = '';
+        $filters = array('brand','batchName','sections');
+        sort($optBrand);
+        sort($optSections);
+        sort($optBatchName);
+        foreach ($filters as $name) {
+            $filter .= "<select name='$name' id='select-$name' class='filter'>
+                <option>Filter by $name</option>
+                <option>View All</option>";
+            if ($name == 'brand') {
+                foreach ($optBrand as $filterName) {
+                    $filter .= "<option>$filterName</option>";
+                }
+            } elseif ($name == 'batchName') {
+                foreach ($optBatchName as $filterName) {
+                    $filter .= "<option>$filterName</option>";
+                }
+            } elseif ($name == 'sections') {
+                foreach ($optSections as $filterName) {
+                    $filter .= "<option>$filterName</option>";
+                }
+            }
+            $filter.= "</select>";
+        }
+
         $hiddenContent .= "
             <input type='hidden' id='sessionName' name='sessionName' value='{$_SESSION['sessionName']}'>
             <input type='hidden' id='formSession' value='{$_SESSION['sessionName']}'>
@@ -230,13 +312,13 @@ HTML;
             $thead .= "
                 <th class='col-$field '>
                     <div class='thLine'>
-                        <span class='name'>$field</span>
-                        <button class='scanicon-tablesorter sorter'>&nbsp;</button>
+                        <span class='name'>$field</span> &nbsp;&nbsp;
+                        <button class='scanicon-tablesorter sorter'>&nbsp;</button>&nbsp;&nbsp;
                         <button class='col-hide' value='$field'>-</button>
                     </div>
                 </th>";
         }
-        $queueBtns = array(0,1,2);
+        $queueBtns = array(1,2,0);
         foreach ($queueBtns as $qv) {
             $thead .= "<th class='col-{$this->options[$qv]}'>{$this->options[$qv]}</th>";
         }
@@ -332,7 +414,7 @@ HTML;
         if ($er = $dbc->error()) {
             return "<div class='alert alert-danger'>$er</div>";
         } else {
-            return $hiddenContent.$table;
+            return $filter.$hiddenContent.$table;
         }
 
     }
@@ -424,6 +506,13 @@ HTML;
     public function cssContent()
     {
         return <<<HTML
+select.filter {
+    float: right;
+    background-color: rgba(255,255,255,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 2px;
+    margin-right: 5px;
+}
 .thLine {
     overflow: hidden; 
     white-space: nowrap;
@@ -531,7 +620,7 @@ a.aPage:hover {
 }
 button.switchBtn {
     position: fixed;
-    top: 25px;
+    bottom: 25px;
     left: 0px;
     opacity: 0.8;
     width: 70px;
