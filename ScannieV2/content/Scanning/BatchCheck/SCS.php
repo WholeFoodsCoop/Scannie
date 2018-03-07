@@ -238,6 +238,29 @@ HTML;
                     $dbc->execute($prep,$args);
                 }
                 break;
+            case 'Clear':
+                if ($qval == 6) {
+                    $args = array($upc,$sessionName,$storeID);
+                    $prep = $dbc->prepare("DELETE FROM woodshed_no_replicate.batchCheckQueues 
+                        WHERE upc = ? AND session = ? AND storeID = ? AND inQueue in (6,7,8)");
+                    $dbc->execute($prep,$args);
+                } elseif ($qval == 9) {
+                    $args = array($upc,$sessionName,$storeID);
+                    $prep = $dbc->prepare("DELETE FROM woodshed_no_replicate.batchCheckQueues 
+                        WHERE upc = ? AND session = ? AND storeID = ? AND inQueue in (9,10)");
+                    $dbc->execute($prep,$args);
+                } elseif ($qval == 3) {
+                    $args = array($upc,$sessionName);
+                    $prep = $dbc->prepare("DELETE FROM woodshed_no_replicate.batchCheckNotes 
+                        WHERE upc = ? AND session = ?");
+                    $dbc->execute($prep,$args);
+                } else {
+                    $args = array($upc,$sessionName,$storeID,$qval);
+                    $prep = $dbc->prepare("DELETE FROM woodshed_no_replicate.batchCheckQueues 
+                        WHERE upc = ? AND session = ? AND storeID = ? AND inQueue = ?");
+                    $dbc->execute($prep,$args);
+                }
+                break;
         }
 
         $json = array();

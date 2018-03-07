@@ -76,6 +76,18 @@ $('.filter').on('change',function(){
         $('td').each(function(){
             $(this).closest('tr').show();
         });
+    } else if (select.text() == 'Hide Yellow') {
+        $('td').each(function(){
+            if ($(this).hasClass('text-warning') || $(this).text() == '') {
+                $(this).closest('tr').hide();
+            }
+        });
+    } else if (select.text() == 'Hide Red & Yellow') {
+        $('td').each(function(){
+            if ($(this).hasClass('text-warning') || $(this).hasClass('text-danger') || $(this).text() == '') {
+                $(this).closest('tr').hide();
+            }
+        });
     } else {
         $('td').each(function(){
             $(this).closest('tr').show();
@@ -94,5 +106,40 @@ $('.filter').on('change',function(){
                 }
             } 
         });
+    }
+});
+
+
+$('td').each(function(){
+    var text = $(this).text(); 
+    var col = $(this).attr('class');
+    if (col == 'col-last_sold ') {
+        var tdate = new Date(text);
+        var year = tdate.getFullYear();
+        var month = tdate.getMonth()+1;
+        var day = tdate.getDate()+1;
+
+        var check1 = new Date();
+        check1.setMonth(check1.getMonth() - 2);
+        var cy = check1.getFullYear();
+        var cm = check1.getMonth()+1;
+        var cd = check1.getDate()+1;
+        
+        var check2 = new Date();
+        check2.setMonth(check2.getMonth() - 12);
+        var cy = check2.getFullYear();
+        var cm = check2.getMonth()+1;
+        var cd = check2.getDate()+1;
+
+        var date1 = year+'-'+month+'-'+day;
+        var date2 = cy+'-'+cm+'-'+cd;
+
+        year = parseInt(year,10);
+        cy = parseInt(cy,10);
+        if (tdate < check2) {
+            $(this).addClass('text-danger');
+        } else if (tdate < check1) {
+            $(this).addClass('text-warning');
+        }
     }
 });

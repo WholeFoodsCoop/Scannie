@@ -277,7 +277,7 @@ HTML;
 
         // Add filters/filter options
         $filter = '';
-        $filters = array('brand','batchName','sections');
+        $filters = array('pbrand','batchName','sections','date');
         sort($optBrand);
         sort($optSections);
         sort($optBatchName);
@@ -285,7 +285,7 @@ HTML;
             $filter .= "<select name='$name' id='select-$name' class='filter'>
                 <option>Filter by $name</option>
                 <option>View All</option>";
-            if ($name == 'brand') {
+            if ($name == 'pbrand') {
                 foreach ($optBrand as $filterName) {
                     $filter .= "<option>$filterName</option>";
                 }
@@ -297,6 +297,9 @@ HTML;
                 foreach ($optSections as $filterName) {
                     $filter .= "<option>$filterName</option>";
                 }
+            } elseif ($name == 'date') {
+                $filter .= "<option>Hide Yellow</option>";
+                $filter .= "<option>Hide Red & Yellow</option>";
             }
             $filter.= "</select>";
         }
@@ -322,14 +325,17 @@ HTML;
         foreach ($queueBtns as $qv) {
             $thead .= "<th class='col-{$this->options[$qv]}'>{$this->options[$qv]}</th>";
         }
+        if (in_array($option,array(1,2,4,5,6,9,11))) {
+            $thead .= "<th class=''>Clear</th>";
+        }
         $thead .= "<th class='blank-th' id='blank-th'></th>";
         $table = "<div class='table-responsive'><table id='mytable' class='table table-stiped table-compressed tablesorter small'><thead id='mythead'>$thead</thead><tbody>";
         $r = 1;
         foreach ($upc as $k => $v) {
+            $upcLink = "<a href='http://$FANNIE_ROOTDIR/item/ItemEditorPage.php?searchupc=$k' target='_BLANK'>$k</a>";
             if ($option == 0) {
                 if (!in_array($k,$inQueueItems)) { 
                     $table .= ($r % 2 == 0) ? "<tr>" : "<tr class='altRow'>";
-                    $upcLink = "<a href='http://$FANNIE_ROOTDIR/item/ItemEditorPage.php?searchupc=$k' target='_BLANK'>$k</a>";
                     $table .= "<td class='col-upc'>$upcLink</td>";
                     foreach ($fields as $field) {
                         if ($field != 'upc') {
@@ -347,7 +353,7 @@ HTML;
             } elseif (in_array($option,array(1,2,4,5,11))) {
                 if (in_array($k,$inQueueItems)) {
                     $table .= ($r % 2 == 0) ? "<tr>" : "<tr class='altRow'>";
-                    $table .= "<td>$k</td>";
+                    $table .= "<td>$upcLink</td>";
                     foreach ($fields as $field) {
                         if ($field != 'upc') {
                             $temp = ${$field}[$k];
@@ -357,6 +363,7 @@ HTML;
                     foreach ($queueBtns as $qv) {
                         $table .= "<td><button id='queue$k' value='$qv' class='queue-btn btn btn-info'>{$this->options[$qv]}</button></td>";
                     }
+                    $table .= "<td><button id='queue$k' value='$option' class='queue-btn btn btn-info'>Clear</button></td>";
                     $table .= "</tr>";
                     $r++;
                 }             
@@ -385,22 +392,25 @@ HTML;
                     foreach ($queueBtns as $qv) {
                         $table .= "<td><button id='queue$k' value='$qv' class='queue-btn btn btn-info'>{$this->options[$qv]}</button></td>";
                     }
+                    $table .= "<td><button id='queue$k' value='$option' class='queue-btn btn btn-info'>Clear</button></td>";
                     $table .= "</tr>";
                     $r++;
                 }             
             }
         }
         if ($option == 3) {
-            $table = '<div class="table-responsive"><table class="table table-stiped table-compressed small"><thead><th>upc</th><th>notes</th></thead><tbody>';
+            $table = '<div class="table-responsive"><table class="table table-stiped table-compressed small"><thead><th>upc</th><th>notes</th><th>Clear</th></thead><tbody>';
             $args = array($sessionName);
             $prep = $dbc->prepare("SELECT upc, session, notes FROM woodshed_no_replicate.batchCheckNotes WHERE session = ?");
             $res = $dbc->execute($prep,$args);
             while ($row = $dbc->fetchRow($res)) {
                 $table .= ($r % 2 == 0) ? "<tr>" : "<tr class='altRow'>";
                 $curUpc = $row['upc'];
+                $upcLink = "<a href='http://$FANNIE_ROOTDIR/item/ItemEditorPage.php?searchupc=$curUpc' target='_BLANK'>$curUpc</a>";
                 $temp = $row['notes'];
-                $table .= "<td>$curUpc</td>";
+                $table .= "<td>$upcLink</td>";
                 $table .= "<td class='col-$field editable' id='editnotes'>$temp</td>";
+                $table .= "<td><button id='queue$curUpc' value='$option' class='queue-btn btn btn-info'>Clear</button></td>";
                 $table .= "</tr>";
                 $r++;
             }
