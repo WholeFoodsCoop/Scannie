@@ -148,12 +148,12 @@ HTML;
         $batches = array();
 
         //get all data for products on sale
-        $args = array($storeID,$storeID);
+        $args = array($storeID);
         if ($option == 0) {
             $optionZeroFilter = "WHERE bl.batchID IN ( SELECT b.batchID FROM batches AS b WHERE NOW() BETWEEN startDate AND endDate)";
         } else {
             $batches = $this->getCurrentBatches($dbc);
-            $optionZeroFilter = '';
+            $optionZeroFilter = 'WHERE 1 ';
         }
         $query = "
             SELECT bl.upc, bl.salePrice, bl.batchID AS bid, p.brand AS pbrand, 
@@ -164,13 +164,13 @@ HTML;
                 LEFT JOIN products AS p ON bl.upc=p.upc 
                 LEFT JOIN productUser AS pu ON p.upc=pu.upc 
                 LEFT JOIN batches AS b ON bl.batchID=b.batchID 
-                INNER JOIN FloorSectionsListView AS f ON p.store_id=f.storeID AND p.upc=f.upc
-                LEFT JOIN StoreBatchMap AS sbm ON b.batchID=sbm.batchID 
+                INNER JOIN FloorSectionsListView AS f ON p.upc=f.upc AND p.store_id=f.storeID 
+                LEFT JOIN StoreBatchMap AS sbm ON b.batchID=sbm.batchID AND p.store_id=sbm.storeID
             $optionZeroFilter
-                AND f.storeID = ?
+                AND p.store_id = ?
                 AND p.inUse = 1
-                AND sbm.storeID = ? 
-            GROUP BY p.upc ORDER BY f.sections
+            GROUP BY p.upc 
+            ORDER BY f.sections
         ";
         $prep = $dbc->prepare($query);
         $res = $dbc->execute($prep,$args);
@@ -357,7 +357,9 @@ HTML;
                     foreach ($fields as $field) {
                         if ($field != 'upc') {
                             $temp = ${$field}[$k];
-                            $table .= "<td class='col-$field'>$temp</td>";
+                            //$table .= "<td class='col-$field'>$temp</td>";
+                            $extraClass = ($field == 'sections') ? 'editLocation' : '';
+                            $table .= "<td class='col-$field $extraClass'>$temp</td>";
                         }
                     }
                     foreach ($queueBtns as $qv) {
