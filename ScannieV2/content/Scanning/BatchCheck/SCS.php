@@ -365,7 +365,18 @@ HTML;
         $upc = FormLib::get('upc');
         $upc = scanLib::padUPC($upc);
         $args = array($upc,$storeID);
-        $prep = $dbc->prepare("SELECT bl.upc, bl.salePrice, bl.batchID AS bid, p.brand AS pbrand, p.description AS pdesc, pu.brand AS pubrand, p.size, p.special_price, pu.description AS pudesc, b.batchName, f.sections FROM batchList AS bl LEFT JOIN products AS p ON bl.upc=p.upc LEFT JOIN productUser AS pu ON p.upc=pu.upc LEFT JOIN batches AS b ON bl.batchID=b.batchID INNER JOIN FloorSectionsListView AS f ON p.upc=f.upc AND p.store_id=f.storeID WHERE bl.batchID IN ( SELECT b.batchID FROM batches AS b WHERE NOW() BETWEEN startDate AND DATE_ADD(endDate, INTERVAL 1 DAY)) AND bl.upc = ? AND p.store_id = ? GROUP BY bl.batchID;");
+        $prep = $dbc->prepare("
+            SELECT bl.upc, bl.salePrice, bl.batchID AS bid, p.brand AS pbrand, p.description AS pdesc, pu.brand AS pubrand, p.size, p.special_price, pu.description AS pudesc, b.batchName, f.sections 
+            FROM batchList AS bl 
+                LEFT JOIN products AS p ON bl.upc=p.upc 
+                LEFT JOIN productUser AS pu ON p.upc=pu.upc 
+                LEFT JOIN batches AS b ON bl.batchID=b.batchID 
+                INNER JOIN FloorSectionsListView AS f ON p.upc=f.upc AND p.store_id=f.storeID 
+            WHERE bl.batchID IN ( SELECT b.batchID FROM batches AS b WHERE NOW() BETWEEN startDate AND DATE_ADD(endDate, INTERVAL 1 DAY)) 
+                AND bl.upc = ? 
+                AND p.store_id = ?
+            GROUP BY bl.batchID;
+        ");
         $res = $dbc->execute($prep,$args);
         $rows = $dbc->numRows($res);
         if ($rows > 0) {
@@ -380,8 +391,16 @@ HTML;
                 $this->batches[$bid]['saleprice'] = $salePrice;
             }
         } else {
-            $args = array($upc);
-            $prep = $dbc->prepare("SELECT p.upc, p.brand AS pbrand, p.description AS pdesc, p.size, p.special_price, pu.brand AS pubrand, pu.description AS pudesc, f.sections FROM products AS p LEFT JOIN productUser AS pu ON pu.upc=p.upc INNER JOIN FloorSectionsListView AS f ON p.upc=f.upc WHERE p.upc = ? GROUP BY p.upc;"); 
+            $args = array($upc,$storeID);
+            $prep = $dbc->prepare("
+                SELECT p.upc, p.brand AS pbrand, p.description AS pdesc, p.size, p.special_price, pu.brand AS pubrand, pu.description AS pudesc, f.sections 
+                FROM products AS p 
+                    LEFT JOIN productUser AS pu ON pu.upc=p.upc 
+                    INNER JOIN FloorSectionsListView AS f ON p.upc=f.upc AND p.store_id=f.storeID
+                WHERE p.upc = ? 
+                    AND p.store_id = ?
+                GROUP BY p.upc;
+            "); 
             $res = $dbc->execute($prep,$args);
             $fields = array('upc','brand','pbrand','pdesc','pudesc','pubrand','size','special_price','sections');
             while ($row = $dbc->fetchRow($res)) {
@@ -420,7 +439,9 @@ HTML;
     public function view($dbc)
     {
         $upc = FormLib::get('upc');
-        //fix: I don't think this actually works.
+        // fix: confirmed, this does not work.
+        // scans should also be able to convert UPCs to
+        // scale items. 
         if ($upc < 999999 && $upc > 99999) {
             echo "hi";
             $upc = ltrim($upc, '0');
