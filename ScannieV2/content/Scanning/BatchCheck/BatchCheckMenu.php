@@ -65,11 +65,13 @@ HTML;
     private function view()
     {
         $links = array(
-            'Batch Check Queues' => 'BatchCheckQueues.php',
-            'Scanner' => 'SCS.php',
-            'Cleanup (Delete) Sessions' => 'BatchCheckMenu.php?delete=1',
             'Audie' => '../../../../item/AuditScanner.php',
+            'Batch Check Queues' => 'BatchCheckQueues.php',
             'Chat' => 'BatchCheckChat.php',
+            'Scanner' => 'SCS.php',
+            'Sign Out' => 'SCS.php?signout=1',
+            '*Cleanup*<br>Delete Sessions' => 'BatchCheckMenu.php?delete=1',
+            '*Cleanup*<br>Delete Chat' => 'BatchCheckChat.php?delete=1',
         );
         $linksContent = '';
         foreach ($links as $name => $href) {
@@ -81,7 +83,6 @@ HTML;
         <h1>Batch Check Menu</h1>
         <br/>
         $linksContent
-        <h2 class="menuOption"><a class="menuOption" href="SCS.php?signout=1">Sign Out</a></h2>
     </div>
 </div>
 HTML;
@@ -90,6 +91,12 @@ HTML;
     public function javascriptContent()
     {
         return <<<HTML
+$('.menuOption').click(function(){
+    //var c = confirm('Are you sure?');
+    if (c == true) {
+        
+    }
+});
 $('.delete').click(function(){
     var id = $(this).attr('id');
     var storeID = $(this).attr('storeID');

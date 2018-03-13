@@ -20,11 +20,22 @@ class BatchCheckChat extends PageLayoutA
         } elseif (FormLib::get('getNewMsg', false)) {
             $this->getNewMsgHandler($dbc);
             die();
+        } elseif (FormLib::get('delete', false)) {
+            $this->deleteHandler($dbc);
+            echo "<div align='center'>Chat has been deleted.</div></div></div></div></div></div></div></div></div>";
+            //die();
         }
 
         $this->displayFunction = $this->view($dbc);
 
         return false;
+    }
+
+    private function deleteHandler($dbc)
+    {
+        $prep = $dbc->prepare("DELETE FROM woodshed_no_replicate.batchCheckChat;");
+        $res = $dbc->execute($prep);
+        $row = $dbc->fetchRow($res);
     }
 
     private function getNewMsgHandler($dbc)
@@ -90,6 +101,7 @@ class BatchCheckChat extends PageLayoutA
     private function view($dbc)
     {
         $storeID = scanLib::getStoreID();
+        $userName = ($u = scanLib::getUser()) ? "$u@" : '';
 
         $prep = $dbc->prepare("SELECT max(id) AS maxid FROM woodshed_no_replicate.batchCheckChat");
         $res = $dbc->execute($prep);
@@ -106,7 +118,7 @@ class BatchCheckChat extends PageLayoutA
             $text = $row['text'];
             $messages .= "
                 <div id='m$id' class='message'>
-                    <div class='user'>$store</div>
+                    <div class='user'>$userName$store</div>
                     <p class='message'>$text</p>
                 </div>
             ";
@@ -168,6 +180,9 @@ HTML;
         }
         $cssContent = SCS::cssContent(); 
         return <<<HTML
+.userName {
+    color: #cacaca;
+}
 .newmessage {
     border: 2px solid tomato;
     padding: 5px;
