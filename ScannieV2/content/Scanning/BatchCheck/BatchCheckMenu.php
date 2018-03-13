@@ -68,6 +68,8 @@ HTML;
             'Batch Check Queues' => 'BatchCheckQueues.php',
             'Scanner' => 'SCS.php',
             'Cleanup (Delete) Sessions' => 'BatchCheckMenu.php?delete=1',
+            'Audie' => '../../../../item/AuditScanner.php',
+            'Chat' => 'BatchCheckChat.php',
         );
         $linksContent = '';
         foreach ($links as $name => $href) {

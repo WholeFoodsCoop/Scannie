@@ -53,7 +53,7 @@ class BatchCheckChat extends PageLayoutA
                 $user = $row['user'];
                 $text = $row['text'];
                 $json['output'] .= "
-                    <div id='m$id' class='message'>
+                    <div id='m$id' class='message newmessage'>
                         <div class='user'>$user</div>
                         <p class='message'>$text</p>
                     </div>
@@ -118,9 +118,10 @@ class BatchCheckChat extends PageLayoutA
 <div class="form" id="myform" >
     <form name="chatForm" method="post" action="BatchCheckChat.php#myform">
         <input type="hidden" id="lastMsg" name="lastMsg" value="$lastMsgId">
-        <textarea class="form-control" name="message" ></textarea>
+        <textarea class="form-control" name="message" id="message"></textarea>
         <button type="submit" name="sendMsg" value="1" class="btn btn-default">Send</button>
     </form>
+    <a class="btn btn-default" href="SCS.php">Back to Scanner</a>
 </div>
 HTML;
     }
@@ -167,6 +168,10 @@ HTML;
         }
         $cssContent = SCS::cssContent(); 
         return <<<HTML
+.newmessage {
+    border: 2px solid tomato;
+    padding: 5px;
+}
 #messageBoard {
     padding: 5px;
 }
