@@ -102,6 +102,7 @@ class SCS extends PageLayoutA
 
     private function loginView($dbc)
     {
+        include(__DIR__.'/../../../config.php');
         $storeID = scanLib::getStoreID();
         $sessions = ''; 
         $args = array($storeID);
@@ -138,6 +139,15 @@ class SCS extends PageLayoutA
             <button type="submit" name="loginSubmit" value="1" class="loginForm">Submit</button>
         </div>
     </form>    
+    <form action="http://$FANNIE_ROOTDIR/item/ProdLocationEditor.php" method="get">
+        <div class="form-group">
+            <input type="hidden" name="start" value="CURRENT">
+            <input type="hidden" name="end" value="CURRENT">
+            <input type="hidden" name="store_id" value="$storeID">
+            <button type="submit" name="" value="1" class="loginForm">
+                Click to Update <br/>Product Locations</button>
+        </div>
+    </form>
 </div>
 HTML;
     }
@@ -465,7 +475,7 @@ HTML;
         $notes = 'n/a';
 
         $location = 'n/a';
-        $location = $this->data[$upc]['sections'];
+        $location = (!is_null($this->data[$upc]['sections'])) ? $this->data[$upc]['sections'] : 'n/a';
 
         $args = array($upc,$session);
         $prep = $dbc->prepare("SELECT notes FROM woodshed_no_replicate.batchCheckNotes WHERE upc = ? AND session = ?");
