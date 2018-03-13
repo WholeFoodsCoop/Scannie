@@ -114,10 +114,11 @@ class BatchCheckQueues extends PageLayoutA
 HTML;
     }
 
+    // get current batch info, only called if option != 0
     private function getCurrentBatches($dbc)
     {
-        $storeID = $_SESSION['storeID'];
-        $sessionName = $_SESSION['sessionName'];
+        $storeID = scanLib::getStoreID();
+        echo $storeID;
         $args = array($storeID);
         $prep = $dbc->prepare("
             SELECT bl.upc, bl.batchID AS bid, b.batchName
@@ -148,7 +149,7 @@ HTML;
         $batches = array();
 
         //get all data for products on sale
-        $args = array($storeID);
+        $args = array($storeID,$storeID);
         if ($option == 0) {
             $optionZeroFilter = "WHERE bl.batchID IN ( SELECT b.batchID FROM batches AS b WHERE NOW() BETWEEN startDate AND endDate)";
         } else {
@@ -169,6 +170,7 @@ HTML;
             $optionZeroFilter
                 AND p.store_id = ?
                 AND p.inUse = 1
+                AND sbm.storeID = ?
             GROUP BY p.upc 
             ORDER BY f.sections
         ";
@@ -277,7 +279,7 @@ HTML;
 
         // Add filters/filter options
         $filter = '';
-        $filters = array('pbrand','batchName','sections','date');
+        $filters = array('pbrand','batchName','sections','date','Coop+Deals');
         sort($optBrand);
         sort($optSections);
         sort($optBatchName);
@@ -300,6 +302,8 @@ HTML;
             } elseif ($name == 'date') {
                 $filter .= "<option>Hide Yellow</option>";
                 $filter .= "<option>Hide Red & Yellow</option>";
+            } elseif ($name =='Coop+Deals') {
+                $filter .= "<option>Show Only Coop+Deals</option>";
             }
             $filter.= "</select>";
         }
