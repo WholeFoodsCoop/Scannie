@@ -88,6 +88,14 @@ $('.filter').on('change',function(){
                 $(this).closest('tr').hide();
             }
         });
+    } else if (select.text() == 'Show Only Coop+Deals') {
+        $('td').each(function(){
+            var str = $(this).text();
+            var index = str.indexOf('Co-op Deals');
+            if ($(this).hasClass('col-batchName') && str.indexOf('Co-op Deals') == -1) {
+                $(this).closest('tr').hide();
+            }
+        });
     } else {
         $('td').each(function(){
             $(this).closest('tr').show();
