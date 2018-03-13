@@ -144,7 +144,7 @@ class SCS extends PageLayoutA
             <input type="hidden" name="start" value="CURRENT">
             <input type="hidden" name="end" value="CURRENT">
             <input type="hidden" name="store_id" value="$storeID">
-            <button type="submit" name="" value="1" class="loginForm">
+            <button type="submit" name="batchCheck" value="1" class="loginForm">
                 Click to Update <br/>Product Locations</button>
         </div>
     </form>
@@ -448,6 +448,15 @@ HTML;
 
     public function view($dbc)
     {
+        $lastMsg = $_SESSION['lastMsg'];
+        $prep = $dbc->prepare("SELECT max(id) AS maxid FROM woodshed_no_replicate.batchCheckChat;");
+        $res = $dbc->execute($prep);
+        $row = $dbc->fetchRow($res);
+        if ($row['maxid'] != $lastMsg) {
+            //show #msgBtn
+            $this->addOnloadCommand("$('#msgBtn').show();");
+        }
+
         $upc = FormLib::get('upc');
         // fix: confirmed, this does not work.
         // scans should also be able to convert UPCs to
@@ -533,8 +542,8 @@ HTML;
         return <<<HTML
 <div id="response"></div>
 {$this->hiddenContent()}
-<div id="menuBtn">
-</div>
+<div id="menuBtn"></div>
+<a href="BatchCheckChat.php#message"><div id="msgBtn"></div></a>
 <div align="center" id="grandparent">
     <form class="form-inline" id="upcForm" name="upcForm" method="post">
         <div class="form-group" align="center">
@@ -680,6 +689,22 @@ h2.menuOption {
     opacity: 0.5;
     background-image: url("http://$MY_ROOTDIR/common/src/img/icons/mobileMenu.png");
     background-size: cover;
+}
+#msgBtn {
+    position: absolute;
+    top: 6vw;
+    right: 6vw;
+    height: 9vw;
+    width: 9vw;
+    background-color: rgba(255,255,255,0.1);
+    font-size: 3vw;
+    overflow: hidden;
+    cursor: pointer;
+    opacity: 0.9;
+    background-image: url("http://$MY_ROOTDIR/common/src/img/icons/msgBtn.png");
+    background-size: cover;
+    z-index: 999;
+    display:none;
 }
 .close {
     font-size: 8vw;
@@ -950,6 +975,7 @@ HTML;
         }
 
         return <<<HTML
+<!-- End Cap Options -->
 <div align="center" id="capButtons">
     <div class="capButtons container">
         <div class="row">
@@ -969,15 +995,17 @@ HTML;
     $allBatches
     <button class="close" id="closeAllBatches" style="float: left; margin-top:25px;">Close</div>
 </div>
+<!-- SCS Menu -->
 <div id="menu">
     <div align="center">
-        <h1>Main Menu</h1>
-        <h2 class="menuOption"><a class="menuOption" href="BatchCheckMenu.php">Batch Check Main Menu</a></h2>
+        <h1>Scanner Options</h1>
+        <h2 class="menuOption"><a class="menuOption" href="BatchCheckMenu.php">Main Menu</a></h2>
         <h2 class="menuOption"><a class="menuOption" href="SCS.php?signout=1">Sign Out</a></h2>
         <br/>
         <button class="close" id="closeMenu" style="margin-right:40vw;">Close</div>
     </div>
 </div>
+<!-- Disco/While Supplies Last Options -->
 <div align="center" id="discoButtons">
     <div class="discoButtons container">
         <div class="row">
