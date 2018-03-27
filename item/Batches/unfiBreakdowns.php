@@ -22,7 +22,7 @@ class unfiBreakdowns extends ScancoordDispatch
         
         $ret = '<div class="container">';
         $ret .= "<p>
-                <a href='../SalesChange/CoopDealsReview.php'>Coop Deals Review Page</a> | 
+                <a href='../SalesChange/CoopDealsReview.php'>Coop Deals Review Page (QA)</a> | 
                 Breakdown Items
             </p>
         ";
@@ -83,7 +83,7 @@ class unfiBreakdowns extends ScancoordDispatch
             You may want to double check the prices suggested by this page.</p>";
         
         $ret .=  '<table class="table table-striped table-condensed small" style="width:250px;border:2px solid lightgrey">
-                    <th></ht><th>upc</th><th>batchID</th><th>saleprice</th>';
+                    <th></ht><th>Add UPC to Batch</th><th>batchID</th><th>saleprice</th><th></th><th>Linked UPC</th>';
 
         foreach ($batchList as $upc => $salePrice) {
             //  GET Child
@@ -101,7 +101,7 @@ class unfiBreakdowns extends ScancoordDispatch
                 foreach ($childKey as $value) $child = $children[$value];
                 $child = str_pad($child, 13, 0, STR_PAD_LEFT);
                 if (!in_array($child,$bathListUpcs)) {
-                    $ret .=  sprintf('<tr><td>child</td><td>%s</td><td>%s</td><td>%0.2f</td></tr>',$child,$batch,$price);
+                    $ret .=  sprintf('<tr><td>child</td><td>%s</td><td>%s</td><td>%0.2f</td><td>parent</td><td>%s</td></tr>',$child,$batch,$price,$parent);
                 }                
             }
             
@@ -118,7 +118,7 @@ class unfiBreakdowns extends ScancoordDispatch
                     $price--;
                 }
                 if (!in_array($parent,$bathListUpcs)) {
-                    $ret .=  sprintf('<tr><td>parent</td><td>%s</td><td>%s</td><td>%0.2f</td></tr>',$parent,$batch,$price);
+                    $ret .=  sprintf('<tr><td>parent</td><td>%s</td><td>%s</td><td>%0.2f</td><td>child</td><td>%s</td></tr>',$parent,$batch,$price,$child);
                 }
             }
             
