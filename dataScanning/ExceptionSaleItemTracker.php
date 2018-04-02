@@ -81,7 +81,7 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
         }
         if ($dbc->error()) $ret .=  $dbc->error();
 
-        $ret .=  '<div class="panel panel-default" style="width:1000px"><table class="table table-striped">';
+        $ret .=  '<div class="panel panel-default table-responsive"><table class="table table-striped">';
         $ret .=  '
             <thead>
                 <th>upc</th>
@@ -113,20 +113,32 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
     public function form_content()
     {
         $ret .= '
-            <form method="post" class="form-inline">
-                <div class="input-group">
-                    <span class="input-group-addon">Add Item:</span>
-                    <input type="text" class="form-control" id="addItem" style="width: 175px" name="addItem" >&nbsp;&nbsp;
+            <form method="post">
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="form-group"><div class="input-group">
+                            <span class="input-group-addon">Add</span>
+                            <input type="text" class="form-control" id="addItem" name="addItem" >
+                        </div></div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group"><div class="input-group">
+                            <span class="input-group-addon">Remove</span>
+                            <input type="text" class="form-control" id="rmItem" name="rmItem" >
+                        </div></div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group"><div class="input-group">
+                            <span class="input-group-addon">Note</span>
+                            <input type="text" class="form-control" id="note" name="note" >
+                        </div></div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-default">Add/Remove</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="input-group">
-                    <span class="input-group-addon">Remove Item:</span>
-                    <input type="text" class="form-control" id="rmItem" style="width: 175px" name="rmItem" >&nbsp;&nbsp;
-                </div>
-                <div class="input-group">
-                    <span class="input-group-addon">Add a Note</span>
-                    <input type="text" class="form-control" id="note" style="width: 175px" name="note" >&nbsp;&nbsp;
-                </div>
-                <button type="submit" class="btn btn-default">Add/Remove Item</button>
             </form>
         ';
 
