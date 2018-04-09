@@ -336,7 +336,7 @@ HTML;
                         </div>
                         <div class="col-xs-4 info" >
                             <div style="float: left; color: rgba(255,255,255,0.6)">price</div><br />
-                                <span class="text-'.$warning['price'].'" style="font-weight: bold; ">
+                                <span class="text-'.$warning['price'].'" style="font-weight: bold; font-size: 18px; text-shadow: 1px 1px darkslategrey">
                                     '.$price.'</span>
                                     '.$price_rule.'<br />&nbsp;
                         </div>
@@ -516,7 +516,8 @@ HTML;
 
         $ret .= '<br /><br /><br /><br /><br /><br />';
         $this->addOnloadCommand("$('#progressBar').hide();");
-        $this->addScript('AuditScanner.js');
+        $timestamp = time();
+        $this->addScript('AuditScanner.js?unique='.$timestamp);
 
         return $ret;
     }
@@ -540,7 +541,7 @@ HTML;
             <div align="center">
                 <form method="post" class="form-inline" id="my-form" name="main_form">
                     <input class="form-control input-sm info" name="upc" id="upc" value="'.$upc.'"
-                        style="text-align: center; width: 140px; border: none;">
+                        style="text-align: center; width: 140px; border: none;" pattern="\d*">
                     <input type="hidden" name="success" value="empty"/>
                     <span id="auto_par" class="sm-label"></span><span id="par_val" class="norm-text"></span>
                     <!-- <button type="submit" class="btn btn-xs"><span class="go-icon"></span></button> -->
@@ -608,36 +609,24 @@ HTML;
                     padding: 10px;
                 }
                 body {
-                    //background: -webkit-radial-gradient(30% 30%, circle closest-corner, #FFCCFF, #FFCCCC);
-                    //background: linear-gradient(130deg, #4FBDF0, 0%, #1F3244 100%);
-
-
-                background: red; /* For browsers that do not support gradients */
-                background: -webkit-linear-gradient(left top, lightblue, white); /* For Safari 5.1 to 6.0 */
-                background: -o-linear-gradient(bottom right, lightblue, white); /* For Opera 11.1 to 12.0 */
-                background: -moz-linear-gradient(bottom lightblue, white); /* For Firefox 3.6 to 15 */
-                background: linear-gradient(130deg, #4FBDF0 0%, #1F3244 100%); /* Standard syntax */
-                -webkit-background-size: cover;
-                    -moz-background-size: cover;
-                    -o-background-size: cover;
-                    background-size: cover;
-                    //background-color: lightrgba(255,255,255,0.6);
+                    font-family: Arial, Helvetica, sans-serif;
+                    background-color: rgba(255,255,255,0.9);
+                    background: linear-gradient(135deg, #42a7f4, #0a1528);
+                    background-color: linear-gradient(135deg, #42a7f4, #0a1528);
+                    background-repeat: no-repeat;
+                    background-attachment: fixed;
                 }
                 .btn-mobile {
                     position: fixed;
                     top: 20px;
-                    right: 5px;
-                    padding: 8px;
-                    border: none;
-                }
-                .btn-mobile-lines {
-                    border: 2px solid #cacaca;
-                    width: 35px;
-                    height: 1px;
-                    border-radius: 5px;
-                }
-                .btn-mobile-sp {
-                    height: 8px;
+                    right: 20px;
+                    padding: 1px;
+                    height: 25px;
+                    width: 25px;
+                    border: rgba(255,255,255,0.3);
+                    background-color: rgba(255,255,255,0.2);
+                    box-shadow: 1px 1px rgba(255,255,255,0.1);
+                    color: rgba(255,255,255,0.4);
                 }
                 .btn-keypad {
                     height: 50px;
@@ -768,11 +757,7 @@ HTML;
     {
         include(__DIR__.'/../config.php');
         $ret = '';
-        $ret .= '
-            <button class="btn-mobile" data-toggle="modal" data-target="#keypad" id="btn-modal">
-                <img src="http://'.$SCANROOT_DIR.'/common/src/img/numpadIcon.png" 
-                class="numbpadMenuIcon">
-            </button>';
+        $ret .= '<a href="../misc/mobile.php"><button class="btn-mobile">M</button></a>';
         $ret .= '
             <div class="modal" tabindex="-1" role="dialog" id="keypad">
             <br /><br /><br /><br /><br />
