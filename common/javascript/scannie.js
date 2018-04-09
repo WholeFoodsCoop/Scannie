@@ -36,7 +36,7 @@ window.addEventListener('keydown', KeyDown);
  * xs pop-up window.
  */
 function popitup(url) {
-	newwindow=window.open(url,'name','height=700,width=290');
+	newwindow=window.open(url,'name','height=700,width=320');
 	if (window.focus) {newwindow.focus()}
 	return false;
 }
