@@ -175,7 +175,7 @@ HTML;
         }
         if (count($batchList) > 0) {
             $saleButtonClass = 'success';
-            $saleStatus = 'On Sale';
+            $saleStatus = '* On Sale *';
         } else {
             $saleButtonClass = 'inverse';
             $saleStatus = 'not on sale';
@@ -615,6 +615,7 @@ HTML;
                     background-color: linear-gradient(135deg, #42a7f4, #0a1528);
                     background-repeat: no-repeat;
                     background-attachment: fixed;
+                    color: #cacaca;
                 }
                 .btn-mobile {
                     position: fixed;
