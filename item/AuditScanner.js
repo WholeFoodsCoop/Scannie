@@ -133,3 +133,17 @@ function endLoading()
 {
     $('#progressBar').hide();
 }
+
+$('#counter').click(function(){
+    document.forms['main_form'].submit();
+});
+
+$(function(){
+    var isOnSale = $('#isOnSale').val();
+    if ($('#isOnSale').val() == 'true/') {
+        $('body').css('background','green');
+        $('body').css('background','linear-gradient(135deg, #44f441, #0e280a)');
+        $('body').css('color','white');
+    }
+});
+

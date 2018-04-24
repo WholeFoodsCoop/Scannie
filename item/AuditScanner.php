@@ -173,12 +173,21 @@ HTML;
             $batchList['batchID'][] = $row['batchID'];
             $batchList['batchName'][] = $row['batchName'];
         }
+        $isOnSale = false;
         if (count($batchList) > 0) {
             $saleButtonClass = 'success';
             $saleStatus = '* On Sale *';
+            $isOnSale = 'true';
         } else {
             $saleButtonClass = 'inverse';
             $saleStatus = 'not on sale';
+        }
+        if ($isOnSale == true) {
+            $ret .= "<style>
+                background: green;
+                background-color: green;
+                color: purple;
+            </style>";
         }
         $saleInfoStr = '';
         foreach ($batchList['price'] as $k => $v) {
@@ -518,6 +527,7 @@ HTML;
         $this->addOnloadCommand("$('#progressBar').hide();");
         $timestamp = time();
         $this->addScript('AuditScanner.js?unique='.$timestamp);
+        $ret .= "<input type='hidden' id='isOnSale' name='isOnSale' value=$isOnSale/>";
 
         return $ret;
     }
