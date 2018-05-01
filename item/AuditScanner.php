@@ -703,6 +703,7 @@ HTML;
                    height: 75px;
                    float: left;
                    font-size: 12px;
+                   color: grey;
                 }
             /*
             #note-resp {
