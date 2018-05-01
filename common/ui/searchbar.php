@@ -38,7 +38,8 @@ class search
                 'Item Edit' => 'http://'.$FANNIEROOT_DIR.'/item/ItemEditorPage.php?searchupc='.$input.'&ntype=UPC&searchBtn=',
                 'Batch Edit' => 'http://'.$FANNIEROOT_DIR.'/batches/newbatch/EditBatchPage.php?id='.$input,
                 'Item Batch History' => 'http://'.$FANNIEROOT_DIR.'/reports/ItemBatches/ItemBatchesReport.php?upc='.$input,
-                'Batch % Check' => 'http://'.$SCANROOT_DIR.'/item/Batches/CheckBatchPercent.php?batchID='.$input,
+                'Batch Review' => 'http://'.$SCANROOT_DIR.'/item/Batches/BatchReview/BatchReviewPage.php?id='.$input,
+                'Unfi_DB_Check' => 'https://customers.unfi.com/Pages/ProductSearch.aspx?SearchTerm='.$input
             );
             foreach ($pages as $name => $path) {
                 $this->data[$name] = $path;
