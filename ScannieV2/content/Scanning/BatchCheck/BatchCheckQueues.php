@@ -118,7 +118,6 @@ HTML;
     private function getCurrentBatches($dbc)
     {
         $storeID = scanLib::getStoreID();
-        echo $storeID;
         $args = array($storeID);
         $prep = $dbc->prepare("
             SELECT bl.upc, bl.batchID AS bid, b.batchName
@@ -158,19 +157,13 @@ HTML;
         $query = "SELECT upc FROM woodshed_no_replicate.batchCheckQueues WHERE inQueue IN ($inStr) AND session = ?";
         $prep = $dbc->prepare($query);
         $res = $dbc->execute($prep, $args);
+        $textarea = "<textarea class='form-control filter'>";
         while ($row = $dbc->fetchRow($res)) {
-             // echo $row['upc'].'<br/>';
+              $textarea .= $row['upc']."\r\n"; 
               $upcs[] = $row['upc'];
         }
-        echo count($upcs)." items in this queue.";
-
-        /*
-        $textarea = "<textarea cols=10 rows=5>";
-        foreach ($upcs as $upc) {
-            $textarea .= $upc."\n";
-        }
-        $textarea .= "</textarea>"; 
-        */
+        $textarea .= "</textarea>";
+        echo "<br/>".count($upcs)." items in this queue.";
 
 
         //get all data for products on sale
@@ -252,7 +245,7 @@ HTML;
         } elseif ($option == 6) { 
             $args = array($sessionName,$storeID);
             $prep = $dbc->prepare("SELECT upc, inQueue FROM woodshed_no_replicate.batchCheckQueues WHERE session = ? AND storeID = ? 
-                AND inQueue in (6,7,8)");
+                AND inQueue IN (6,7,8)");
             $res = $dbc->execute($prep,$args);
             while ($row = $dbc->fetchRow($res)) {
                 $inQueueItems[] = $row['upc'];
@@ -274,6 +267,10 @@ HTML;
             while ($row = $dbc->fetchRow($res)) {
                 $inQueueItems[] = $row['upc'];
             }
+        }
+
+        foreach ($inQueueItems as $abc) {
+            // echo "$abc<br/>";
         }
 
         $thead = '';
@@ -455,7 +452,10 @@ HTML;
         if ($er = $dbc->error()) {
             return "<div class='alert alert-danger'>$er</div>";
         } else {
-            return $filter.$hiddenContent.$table;
+            return $filter
+                .$hiddenContent
+                .$table
+                .$textarea;
         }
 
     }
@@ -471,7 +471,18 @@ HTML;
         $ret .= "<h2>$stores[$storeID]</h2>";
         $ret .= "<h1>$sessionName</h1>";
         $q = FormLib::get('option');
-        $ret .= "<h4>{$this->options[$q]}</h4>";
+        //$ret .= "<h4>{$this->options[$q]}</h4>";
+        if(isset($_POST['session'])) $_SESSION['session'] = $_POST['session'];
+        $dbc = Scanlib::getConObj();
+        $curQueue = $_GET['queue'];
+
+        if ($this->options[$q]) {
+          $ret .= "<h4>{$this->options[$q]}</h4>";
+          $table = $this->getTableContents($dbc);
+        } else {
+          $ret .= "<h4 class='alert-danger'>NO QUEUE SELECTED</h4>";
+          $table = "";
+        }
         $ret .= "</div>";
 
         foreach ($_GET as $key => $value) {
