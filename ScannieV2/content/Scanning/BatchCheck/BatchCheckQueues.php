@@ -148,6 +148,31 @@ HTML;
         $storeID = $_SESSION['storeID'];
         $batches = array();
 
+        $upcs = array();
+        $args = array();
+        if ($option == 6) {
+             $options = array(6,7,8);
+        }
+        list($inStr, $args) = $dbc->safeInClause($options);
+        $args[] = $sessionName;
+        $query = "SELECT upc FROM woodshed_no_replicate.batchCheckQueues WHERE inQueue IN ($inStr) AND session = ?";
+        $prep = $dbc->prepare($query);
+        $res = $dbc->execute($prep, $args);
+        while ($row = $dbc->fetchRow($res)) {
+             // echo $row['upc'].'<br/>';
+              $upcs[] = $row['upc'];
+        }
+        echo count($upcs)." items in this queue.";
+
+        /*
+        $textarea = "<textarea cols=10 rows=5>";
+        foreach ($upcs as $upc) {
+            $textarea .= $upc."\n";
+        }
+        $textarea .= "</textarea>"; 
+        */
+
+
         //get all data for products on sale
         $args = array($storeID,$storeID);
         if ($option == 0) {
@@ -187,7 +212,7 @@ HTML;
                 ${$field}[$row['upc']] = $row[$field];
                 // get batch names & bids for products not in option 1
                 if ($option != 0) {
-                    if (in_array($field,array('bid','batchName'))) {
+                    if (in_array($field,array('bid','batchName')) && $field == 'upc') {
                         ${$field}[$row['upc']] = ($batches[$row['upc']][$field]) ? $batches[$row['upc']][$field] : 'n/a';
                     }
                 }
@@ -454,7 +479,7 @@ HTML;
         }
         if(isset($_POST['session'])) $_SESSION['session'] = $_POST['session'];
         $dbc = Scanlib::getConObj();
-        $curQueue = $_GET['queue'];
+        $curQueue = (array_key_exists('queue', $_GET)) ? $_GET['queue'] : null;
 
         $table = $this->getTableContents($dbc);
 
