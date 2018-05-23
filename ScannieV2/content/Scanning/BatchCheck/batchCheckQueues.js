@@ -1,7 +1,6 @@
 // keep <thead> at top of window.
 var theadOnTop = 0;
 $(function(){
-    alert('this page is being edited by Corey.');
     var distance = $('#mythead').offset().top, $window = $(window);
     $window.scroll(function(){
         if ($window.scrollTop() >= distance && theadOnTop == 0) {
