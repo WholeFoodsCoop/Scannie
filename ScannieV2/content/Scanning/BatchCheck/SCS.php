@@ -381,7 +381,7 @@ HTML;
                 LEFT JOIN products AS p ON bl.upc=p.upc 
                 LEFT JOIN productUser AS pu ON p.upc=pu.upc 
                 LEFT JOIN batches AS b ON bl.batchID=b.batchID 
-                INNER JOIN FloorSectionsListView AS f ON p.upc=f.upc AND p.store_id=f.storeID 
+                LEFT JOIN FloorSectionsListTable AS f ON p.upc=f.upc AND p.store_id=f.storeID 
             WHERE bl.batchID IN ( SELECT b.batchID FROM batches AS b WHERE NOW() BETWEEN startDate AND DATE_ADD(endDate, INTERVAL 1 DAY)) 
                 AND bl.upc = ? 
                 AND p.store_id = ?
@@ -406,7 +406,7 @@ HTML;
                 SELECT p.upc, p.brand AS pbrand, p.description AS pdesc, p.size, p.special_price, pu.brand AS pubrand, pu.description AS pudesc, f.sections 
                 FROM products AS p 
                     LEFT JOIN productUser AS pu ON pu.upc=p.upc 
-                    INNER JOIN FloorSectionsListView AS f ON p.upc=f.upc AND p.store_id=f.storeID
+                    LEFT JOIN FloorSectionsListTable AS f ON p.upc=f.upc AND p.store_id=f.storeID 
                 WHERE p.upc = ? 
                     AND p.store_id = ?
                 GROUP BY p.upc;
@@ -448,6 +448,9 @@ HTML;
 
     public function view($dbc)
     {
+
+        $deviceType = $this->deviceType;
+
         $lastMsg = $_SESSION['lastMsg'];
         $prep = $dbc->prepare("SELECT max(id) AS maxid FROM woodshed_no_replicate.batchCheckChat;");
         $res = $dbc->execute($prep);
