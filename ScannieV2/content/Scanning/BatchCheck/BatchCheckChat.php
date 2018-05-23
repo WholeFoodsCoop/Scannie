@@ -101,7 +101,7 @@ class BatchCheckChat extends PageLayoutA
     private function view($dbc)
     {
         $storeID = scanLib::getStoreID();
-        $userName = ($u = scanLib::getUser()) ? "$u@" : '';
+        $userName = '';
 
         $prep = $dbc->prepare("SELECT max(id) AS maxid FROM woodshed_no_replicate.batchCheckChat");
         $res = $dbc->execute($prep);
