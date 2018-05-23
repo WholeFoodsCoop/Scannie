@@ -1,5 +1,20 @@
+// keep <thead> at top of window.
+var theadOnTop = 0;
 $(function(){
-    //alert('hi');
+    alert('this page is being edited by Corey.');
+    var distance = $('#mythead').offset().top, $window = $(window);
+    $window.scroll(function(){
+        if ($window.scrollTop() >= distance && theadOnTop == 0) {
+            $('#mythead-clone').show();
+            theadOnTop = 1;
+        } else if ($window.scrollTop() <= distance && theadOnTop == 1) {
+            $('#mythead-clone').hide();
+            theadOnTop = 0;
+        }
+    });
+});
+
+$(function(){
     $('#mytable').tablesorter({
         selectorSort : 'button.sorter'    
     });
@@ -51,6 +66,7 @@ var queuesToColors = {
     6 : 'Black',
     7 : 'Black',
     8 : 'Black',
+    98 : 'Blue',
 };
 
 var altNames = {

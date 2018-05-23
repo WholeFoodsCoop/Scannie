@@ -11,6 +11,7 @@ class BatchCheckQueues extends PageLayoutA
     
     protected $title = "Batch Check";
     protected $ui = TRUE;
+    protected $queueCounts = array();
     protected $options = array(
         0 => 'Unchecked',
         1 => 'Good',
@@ -21,8 +22,16 @@ class BatchCheckQueues extends PageLayoutA
         6 => 'Cap-Signs',
         9 => 'Disco/Supplies Last',
         11 => 'Edited',
+        98 => 'DNC',
         99 => 'Main Menu',
     );
+
+    public function __construct()
+    {
+        foreach (array(1,2,3,4,5,6,7,11,98) as $id) {
+            $this->queueCounts[$id] = 0;
+        }
+    }
 
     public function preprocess()
     {
@@ -35,6 +44,7 @@ class BatchCheckQueues extends PageLayoutA
         }
         $sessionName = $_SESSION['sessionName'];
         $storeID = $_SESSION['storeID'];
+        $this->getQueueCounts($dbc, $sessionName);
         if ($sessionName && $storeID) {
             $this->displayFunction = $this->view($sessionName,$storeID);
         } else {
@@ -42,6 +52,24 @@ class BatchCheckQueues extends PageLayoutA
         }
 
         return false;
+    }
+
+    private function getQueueCounts($dbc, $session)
+    {
+        $args = array($session);
+        $prep = $dbc->prepare("SELECT inQueue, COUNT(*) AS count FROM woodshed_no_replicate.batchCheckQueues WHERE session = ? GROUP BY inQueue, upc");
+        $prepB = $dbc->prepare("SELECT COUNT(*) AS count FROM woodshed_no_replicate.batchCheckNotes WHERE session = ?");
+        $res = $dbc->execute($prep,$args);
+        $resB = $dbc->execute($prepB,$args);
+        while ($row = $dbc->fetchrow($res)) {
+            $inQueue = $row['inQueue'];
+            $count = $row['count'];
+            $this->queueCounts[$inQueue] += $count;
+        }
+        while ($row = $dbc->fetchrow($resB)) {
+            $count = $row['count'];
+            $this->queueCounts[3] += $count;
+        }
     }
 
     private function loginSubmitHandler($dbc)
@@ -162,9 +190,9 @@ HTML;
               $textarea .= $row['upc']."\r\n"; 
               $upcs[] = $row['upc'];
         }
+        // $count = (!in_array($option, array(0))) ? count($upcs)." items in this queue." : "";
+        $count = '';
         $textarea .= "</textarea>";
-        echo "<br/>".count($upcs)." items in this queue.";
-
 
         //get all data for products on sale
         $args = array($storeID,$storeID);
@@ -260,6 +288,15 @@ HTML;
                 $inQueueItems[] = $row['upc'];
                 $inQueue[$row['upc']][] = $row['inQueue'];
             }
+        } elseif ($option == 98) {
+            $args = array($sessionName,$storeID);
+            $prep = $dbc->prepare("SELECT upc, inQueue FROM woodshed_no_replicate.batchCheckQueues WHERE session = ? AND storeID = ? 
+                AND inQueue = 98");
+            $res = $dbc->execute($prep,$args);
+            while ($row = $dbc->fetchRow($res)) {
+                $inQueueItems[] = $row['upc'];
+                $inQueue[$row['upc']][] = $row['inQueue'];
+            }
         } else {
             $args = array($sessionName,$storeID);
             $prep = $dbc->prepare("SELECT upc FROM woodshed_no_replicate.batchCheckQueues WHERE session = ? AND storeID = ?");
@@ -296,7 +333,7 @@ HTML;
 
         $hiddenContent = '';
         foreach ($theadFields as $field) {
-            $hiddenContent .= "<button class='col-filter btn btn-info' id='col-filter-$field'>$field</button>";
+            $hiddenContent .= "<button class='col-filter btn btn-info btn-sm' id='col-filter-$field'>$field</button>";
         }
 
         // Add filters/filter options
@@ -348,6 +385,8 @@ HTML;
                 </th>";
         }
         $queueBtns = array(1,2,0);
+        if ($option == 0)
+            $queueBtns[] = 98;
         foreach ($queueBtns as $qv) {
             $thead .= "<th class='col-{$this->options[$qv]}'>{$this->options[$qv]}</th>";
         }
@@ -355,7 +394,11 @@ HTML;
             $thead .= "<th class=''>Clear</th>";
         }
         $thead .= "<th class='blank-th' id='blank-th'></th>";
-        $table = "<div class='table-responsive'><table id='mytable' class='table table-stiped table-compressed tablesorter small'><thead id='mythead'>$thead</thead><tbody>";
+        $table = "<div class='table-responsive'><table id='mytable' class='table table-stiped table-compressed tablesorter small'><thead id='mythead' class='mythead'>$thead</thead><tbody>";
+
+        $hiddenThead = "<div class='table-responsive'><table id='mytable-clone' class='table table-stiped table-compressed tablesorter small'><thead id='mythead-clone' class='mythead'>$thead</thead><tbody></tbody></table></div>";
+        $hiddenContent .= $hiddenThead;
+
         $r = 1;
         foreach ($upc as $k => $v) {
             $upcLink = "<a href='http://$FANNIE_ROOTDIR/item/ItemEditorPage.php?searchupc=$k' target='_BLANK'>$k</a>";
@@ -376,7 +419,7 @@ HTML;
                     $table .= "</tr>";
                     $r++;
                 }
-            } elseif (in_array($option,array(1,2,4,5,11))) {
+            } elseif (in_array($option,array(1,2,4,5,11,98))) {
                 if (in_array($k,$inQueueItems)) {
                     $table .= ($r % 2 == 0) ? "<tr>" : "<tr class='altRow'>";
                     $table .= "<td>$upcLink</td>";
@@ -453,7 +496,8 @@ HTML;
             return "<div class='alert alert-danger'>$er</div>";
         } else {
             return $filter
-                .$hiddenContent
+                .$count
+                ."<div id='filter-buttons'>$hiddenContent</div>"
                 .$table
                 .$textarea;
         }
@@ -463,7 +507,6 @@ HTML;
     private function view($sessionName,$storeID)
     {
         include(__DIR__.'/../../../config.php');
-
         $ret = "";
         $ret .= $this->queueToggle();
         $stores = array(1=>'Hillside',2=>'Denfeld');
@@ -477,11 +520,21 @@ HTML;
         $curQueue = $_GET['queue'];
 
         if ($this->options[$q]) {
-          $ret .= "<h4>{$this->options[$q]}</h4>";
-          $table = $this->getTableContents($dbc);
+            if (in_array($q,array(0,3,9))) {
+                $ret .= "<h4>{$this->options[$q]}</h4>";
+            } elseif ($q == 6) {
+                $qCount = $this->queueCounts[6] + $this->queueCounts[7] + $this->queueCounts[8];
+                $ret .= "<h4>{$this->options[$q]} [$qCount]</h4>";
+                $table = $this->getTableContents($dbc);
+            } else {
+                $qCount = $this->queueCounts[$q];
+                $ret .= "<h4>{$this->options[$q]} [$qCount]</h4>";
+                $table = $this->getTableContents($dbc);
+            }
+            $table = $this->getTableContents($dbc);
         } else {
-          $ret .= "<h4 class='alert-danger'>NO QUEUE SELECTED</h4>";
-          $table = "";
+            $ret .= "<h4 class='alert-danger'>NO QUEUE SELECTED</h4>";
+            $table = "";
         }
         $ret .= "</div>";
 
@@ -510,7 +563,19 @@ HTML;
     {
         $options = '';
         foreach ($this->options as $id => $name) {
-            $options .= "<div align='center'><button type='submit' class='btn-primary toggle-btn' name='option' value='$id'><div class='mobilePage'>$name</div></a></div>";
+            $queueCount = $this->queueCounts[$id];
+            if ($id == 6) {
+                $queueCount = $this->queueCounts[6] + $this->queueCounts[7] + $this->queueCounts[8];
+            } 
+            $queueShow = ($queueCount > 0) ? "[$queueCount]" : "";
+            $options .= "
+                <div align='center'>
+                    <button type='submit' class='btn-primary toggle-btn' name='option' value='$id'>
+                        <div class='mobilePage'>
+                            $name <span class='lightweight'>$queueShow</span>
+                        </div>
+                    </button>
+                </div>";
         }
         return <<<HTML
 <div class="switchQContainer">
@@ -558,6 +623,25 @@ HTML;
     public function cssContent()
     {
         return <<<HTML
+#mythead-clone {
+    position: fixed;
+    top: -1px;
+    left: -1px;
+    display: none;
+}
+#mytable-clone, #mythead-clone {
+    width: 100%;
+    background: white;
+    background-color: white;
+    border-bottom: 1px solid grey;
+}
+#filter-buttons {
+    position: fixed; 
+    bottom: -10px;
+}
+span.lightweight {
+    font-weight: normal;
+}
 select.filter {
     float: right;
     background-color: rgba(255,255,255,0.3);
@@ -602,6 +686,8 @@ h4 {
 .col-filter {
     display: none;
     margin-right: 5px;
+    background-color: grey;
+    background: grey;
 }
 .close-btn {
     margin-right: 10px;
@@ -672,7 +758,7 @@ a.aPage:hover {
 }
 button.switchBtn {
     position: fixed;
-    bottom: 25px;
+    bottom: 50px;
     left: 0px;
     opacity: 0.8;
     width: 70px;

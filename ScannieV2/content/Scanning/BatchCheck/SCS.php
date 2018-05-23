@@ -271,6 +271,17 @@ HTML;
                     $dbc->execute($prep,$args);
                 }
                 break;
+            case 'DNC':
+                if (in_array(98,$inQueues)) {
+                    // do nothing
+                } else {
+                    $args = array($upc,$sessionName,$storeID,98);
+                    $prep = $dbc->prepare("INSERT INTO woodshed_no_replicate.batchCheckQueues 
+                        (upc,session,storeID,inQueue) VALUES (?,?,?,?)");
+                    $dbc->execute($prep,$args);
+                }
+                break;
+                
         }
 
         $json = array();
@@ -339,18 +350,15 @@ HTML;
         }
         //do NOT do this if notes were entered. 
         if ($field != 'notes') {
-            $stores = array(1,2);
-            foreach ($stores as $storeID) {
-                if (in_array(11,$inQueues)) {
-                    //do nothing
-                } else { 
-                    //insert
-                    $args = array($upc,$sessionName,$storeID,11);
-                    $prep = $dbc->prepare("INSERT INTO woodshed_no_replicate.batchCheckQueues 
-                        (upc,session,storeID,inQueue) VALUES (?,?,?,?)");
-                    $dbc->execute($prep,$args);
-                    $json['error'] = $dbc->error();
-                }
+            if (in_array(11,$inQueues)) {
+                //do nothing
+            } else { 
+                //insert
+                $args = array($upc,$sessionName,1,11);
+                $prep = $dbc->prepare("INSERT INTO woodshed_no_replicate.batchCheckQueues 
+                    (upc,session,storeID,inQueue) VALUES (?,?,?,?)");
+                $dbc->execute($prep,$args);
+                $json['error'] = $dbc->error();
             }
         }
 
@@ -513,6 +521,7 @@ HTML;
             9 => 'danger',
             10 => 'danger',
             11 => 'danger',
+            98 => 'success',
         );
         foreach ($queued as $id => $queue) {
             $retQueued .= "<div class='showQueue btn btn-$queues[$queue]' id='id$id'>$queue</div>";
