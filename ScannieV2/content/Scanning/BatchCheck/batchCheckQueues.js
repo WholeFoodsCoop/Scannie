@@ -49,7 +49,7 @@ $('.queue-btn').click(function(){
             if (qv == 0) {
                 closestTr.css('background-color','white');
             } else {
-                closestTr.css('background-color', queuesToColors[qv]);
+                closestTr.css('background-color', queueNamesToColors[queueName]);
             }
             if (json.error) {
                 alert(json.error);
@@ -58,14 +58,12 @@ $('.queue-btn').click(function(){
     });
 });
 
-var queuesToColors = {
-    1 : 'Green',
-    2 : 'Yellow',
-    5 : 'Red',
-    6 : 'Black',
-    7 : 'Black',
-    8 : 'Black',
-    98 : 'Blue',
+var queueNamesToColors = {
+    'Good' : 'Green',
+    'Miss' : 'Yellow',
+    'Unchecked' : 'White',
+    'Clear' : 'Grey',
+    'DNC' : 'Black',
 };
 
 var altNames = {

@@ -177,22 +177,31 @@ HTML;
 
         $upcs = array();
         $args = array();
+        $options = array();
         if ($option == 6) {
              $options = array(6,7,8);
+        } else {
+            $options[] = $option;
         }
         list($inStr, $args) = $dbc->safeInClause($options);
         $args[] = $sessionName;
         $query = "SELECT upc FROM woodshed_no_replicate.batchCheckQueues WHERE inQueue IN ($inStr) AND session = ?";
         $prep = $dbc->prepare($query);
         $res = $dbc->execute($prep, $args);
-        $textarea = "<textarea class='form-control filter'>";
+        $textarea = "<textarea rows=5 class='form-control filter'>";
         while ($row = $dbc->fetchRow($res)) {
               $textarea .= $row['upc']."\r\n"; 
               $upcs[] = $row['upc'];
         }
-        // $count = (!in_array($option, array(0))) ? count($upcs)." items in this queue." : "";
         $count = '';
         $textarea .= "</textarea>";
+        $textarea = "
+            <div class='row'>
+                <div class='col-xs-3'>
+                    $textarea
+                </div>
+            </div>
+        ";
 
         //get all data for products on sale
         $args = array($storeID,$storeID);
@@ -257,7 +266,7 @@ HTML;
 
         //additional query to limit results shown
         $inQueueItems = array();
-        if ($option != 0 && $option != 11 && $option != 6&& $option != 9) {
+        if ($option != 0 && $option != 11 && $option != 6 && $option != 9) {
             $args = array($sessionName,$storeID,$option);
             $prep = $dbc->prepare("SELECT upc FROM woodshed_no_replicate.batchCheckQueues WHERE session = ? AND storeID = ? AND inQueue = ?");
             $res = $dbc->execute($prep,$args);
@@ -515,17 +524,22 @@ HTML;
         $ret .= "<h1>$sessionName</h1>";
         $q = FormLib::get('option');
         //$ret .= "<h4>{$this->options[$q]}</h4>";
-        if(isset($_POST['session'])) $_SESSION['session'] = $_POST['session'];
+        if(isset($_POST['session'])) $_SESSION['session'] = $_POST['session'];
         $dbc = Scanlib::getConObj();
         $curQueue = $_GET['queue'];
 
         if ($this->options[$q]) {
-            if (in_array($q,array(0,3,9))) {
+            if (in_array($q,array(0))) {
                 $ret .= "<h4>{$this->options[$q]}</h4>";
             } elseif ($q == 6) {
                 $qCount = $this->queueCounts[6] + $this->queueCounts[7] + $this->queueCounts[8];
                 $ret .= "<h4>{$this->options[$q]} [$qCount]</h4>";
                 $table = $this->getTableContents($dbc);
+            } elseif ($q == 9) {
+                $qCount = $this->queueCounts[9] + $this->queueCounts[10];
+                $ret .= "<h4>{$this->options[$q]} [$qCount]</h4>";
+                $table = $this->getTableContents($dbc);
+                
             } else {
                 $qCount = $this->queueCounts[$q];
                 $ret .= "<h4>{$this->options[$q]} [$qCount]</h4>";
@@ -566,7 +580,9 @@ HTML;
             $queueCount = $this->queueCounts[$id];
             if ($id == 6) {
                 $queueCount = $this->queueCounts[6] + $this->queueCounts[7] + $this->queueCounts[8];
-            } 
+            } elseif ($id == 9) {
+                $queueCount = $this->queueCounts[9] + $this->queueCounts[10];
+            }
             $queueShow = ($queueCount > 0) ? "[$queueCount]" : "";
             $options .= "
                 <div align='center'>
