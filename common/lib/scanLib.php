@@ -40,7 +40,7 @@ class scanLib
 
     public function getConObj($db="SCANDB")
     {
-        include(dirname(__FILE__).'/../../config.php');
+        include(__DIR__.'/../../config.php');
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', ${$db}, $SCANUSER, $SCANPASS);
 
         return $dbc;
@@ -288,16 +288,16 @@ class scanLib
     {
         $rstr = str_replace(" ","",$str);
 
+        $split = array();
         if (strstr($str,"-")) {
-            $split = array();
             $split = preg_split("/[-]+/",$str);
-        }
-        $count = count($split);
-        foreach ($split as $v) {
-            if ($count == 4) {
-                $rstr = $split[0].$split[1].$split[2];
-            } elseif ($count == 2) {
-                $rstr = $split[0].substr($split[1],0,5);
+            $count = count($split);
+            foreach ($split as $v) {
+                if ($count == 4) {
+                    $rstr = $split[0].$split[1].$split[2];
+                } elseif ($count == 2) {
+                    $rstr = $split[0].substr($split[1],0,5);
+                }
             }
         }
 

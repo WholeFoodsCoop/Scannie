@@ -92,7 +92,7 @@ HTML;
         $name = array();
         $realName = array();
         $uid = array();
-        $upc = $_GET['upc'];
+        $upc = FormLib::get('upc');
         if($upc = scanLib::upcParse($upc)) {
             $args = array($upc);
             $prep = $dbc->prepare("SELECT pu.description,
@@ -171,7 +171,8 @@ HTML;
                 if($store_id[$i] == 2) $store_id[$i] = "Denfeld";
             }
             for ($i=0; $i<count($desc); $i++) {
-                if ($cost[$i] != $cost[$i-1]
+                if (array_key_exists(($i-1), $cost)
+                    && $cost[$i] != $cost[$i-1]
                     || $salePrice[$i] != $salePrice[$i-1]
                     || $cost[$i] != $cost[$i-1]
                     || $tax[$i] != $tax[$i-1]

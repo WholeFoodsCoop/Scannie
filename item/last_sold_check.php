@@ -82,7 +82,7 @@ class last_sold_check extends scancoordDispatch
             <th>UPC</th>
             <th>Last Date Sold</th>
             <th>Store ID</th>
-            <th>Descriptoin</th>
+            <th>Description</th>
             <th>Brand</th>
         ';
         foreach ($plus as $upc) {
@@ -142,18 +142,18 @@ class last_sold_check extends scancoordDispatch
         $data = array();
         $data['form'] = self::form_content();
         
-        if ($_GET['paste_list']) {
+        if (FormLib::get('paste_list')) {
             $data['list'] = self::last_sold_check_list($dbc);
         }
 
         $args = array($upc);
         $prep = $dbc->prepare("
-            SELECT last_sold, store_id
+            SELECT last_sold, store_id, inUse
             FROM products
             WHERE upc = ?
             ORDER BY store_id
         ");
-        if(!$_GET['paste_list']){
+        if(!FormLib::get('paste_list')){
             $result = $dbc->execute($prep,$args);
             $i = 0;
             while ($row = $dbc->fetchRow($result)) {
@@ -161,7 +161,13 @@ class last_sold_check extends scancoordDispatch
                     ? "<span class='text-danger'>n/a</span>" : substr($row['last_sold'],0,10);
                 $dateDiff = scanLib::dateDistance($row['last_sold']);
                 $class = ($dateDiff >= 31) ? "red" : "";
-                $data[$row['store_id']] = "<span class='$class'>$last_sold</span>";
+                $inUse = ($row['inUse'] == 1) ? "in-use" : "<i>not in-use</i>";
+                $inUse = "<span style='font-size: 14px;'>$inUse</span>";
+                $data[$row['store_id']] = "<span class='$class'>$last_sold</span> $inUse";
+            }
+            // avoid notice about appending to undefined value
+            if (!isset($data['error'])) {
+                $data['error'] = '';
             }
             $data['error'].= scanLib::getDbcError($dbc);
         }
@@ -347,10 +353,10 @@ HTML;
     background-color: white;
 }
 #hideHill {
-    border: 2px solid #95cc93;
+    //border: 2px solid #95cc93;
 }
 #hideDenf {
-    border: 2px solid lightblue;
+    //border: 2px solid lightblue;
 }
 .sp {
     margin-top: 2.5px;
