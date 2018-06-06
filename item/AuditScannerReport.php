@@ -2,9 +2,9 @@
 <?php
 /*******************************************************************************
     Copyright 2016 Whole Foods Community Co-op.
-    
+
     This file is a part of Scannie.
-    
+
     Scannie is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     in the file LICENSE along with Scannie; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-    
+
 *********************************************************************************/
 include(__DIR__.'/../config.php');
 if (!class_exists('ScancoordDispatch')) {
@@ -27,18 +27,18 @@ if (!class_exists('SQLManager')) {
 }
 class AuditScannerReport extends ScancoordDispatch
 {
-    
+
     protected $title = "Audit Scanner Report";
     protected $description = "[Audit Scanner Report] View data from recent scan job.";
     protected $ui = TRUE;
     protected $must_authenticate = TRUE;
-    
-    private function clear_scandata_hander($dbc,$storeID,$username) 
+
+    private function clear_scandata_hander($dbc,$storeID,$username)
     {
         $args = array($storeID,$username);
         $query = $dbc->prepare("DELETE FROM woodshed_no_replicate.AuditScanner WHERE store_id = ? AND username = ?");
         $dbc->execute($query,$args);
-        
+
         return <<<HTML
 <div align="center">
     <div class="alert alert-success">Data Cleared - <a href="AuditScannerReport.php">collapse message</a>
@@ -46,13 +46,13 @@ class AuditScannerReport extends ScancoordDispatch
 </div>
 HTML;
     }
-    
+
     private function clear_notes_handler($dbc,$storeID,$username)
     {
         $args = array($storeID,$username);
         $query = $dbc->prepare("UPDATE woodshed_no_replicate.AuditScanner SET notes = 'n/a' WHERE store_id = ? AND username = ?");
         $dbc->execute($query,$args);
-        
+
         return <<<HTML
 <div align="center">
     <div class="alert alert-success">Notes Cleared - <a href="AuditScannerReport.php">collapse message</a>
@@ -60,7 +60,7 @@ HTML;
 </div>
 HTML;
     }
-    
+
     private function update_scandata_handler($dbc,$storeID,$username)
     {
         $args = array($storeID,$username);
@@ -70,11 +70,11 @@ HTML;
         while ($row = $dbc->fetchRow($res)) {
             $upcs[] = $row['upc'];
         }
-        
+
         foreach ($upcs as $upc) {
             $args = array($upc,$upc,$upc,$upc,$upc,$upc,$upc,$upc);
             $prep = $dbc->prepare("
-                UPDATE woodshed_no_replicate.AuditScanner 
+                UPDATE woodshed_no_replicate.AuditScanner
                 SET price = (select normal_price from is4c_op.products where upc = ? group by upc),
                     prid = (select price_rule_id from is4c_op.products where upc = ? group by upc),
                     cost= (select cost from is4c_op.products where upc = ? group by upc),
@@ -86,7 +86,7 @@ HTML;
             ");
             $dbc->execute($prep,$args);
         }
-        
+
         if ($er = $dbc->error()) {
             return '
                 <div align="center">
@@ -97,22 +97,22 @@ HTML;
             return '
                 <div align="center">
                     <div class="alert alert-success">
-                        Update Successful - 
+                        Update Successful -
                         <a href="AuditScannerReport.php">collapse message</a>
                     </div>
-                    
+
                 </div>
             ';
         }
-        
+
         return false;
-        
+
     }
-    
+
     private function list_upcs_handler($dbc,$storeID,$username)
     {
         $ret = '';
-        
+
         if ($_POST['upcs']) {
             $upcs = $_POST['upcs'];
             $plus = array();
@@ -123,7 +123,7 @@ HTML;
                 $plus[] = $str;
             }
         }
-        
+
         include(__DIR__.'/../config.php');
         foreach ($plus as $upc) {
             $args = array($storeID,$upc);
@@ -215,7 +215,7 @@ HTML;
             }
             $passcost = $cost;
             if ($cost != $adjcost) $passcost = $adjcost;
-            
+
             $argsA = array($upc,$username,$storeID);
             $prepA = $dbc->prepare("SELECT * FROM woodshed_no_replicate.AuditScanner WHERE upc = ? AND username = ? AND store_id = ? LIMIT 1");
             $resA = $dbc->execute($prepA,$argsA);
@@ -251,19 +251,19 @@ HTML;
                 if ($dbc->error()) {
                     $ret .= '<div class="alert alert-danger">' . $dbc->error() . '</div>';
                 } else {
-                    
+
                 }
             }
         }
-        
+
         return $ret;
     }
-    
+
     public function body_content()
     {
-    
+
         $ret = '';
-        
+
         include(__DIR__.'/../config.php');
         include(__DIR__.'/../common/lib/PriceRounder.php');
         $this->addScript('../common/javascript/tablesorter/js/jquery.tablesorter.min.js');
@@ -271,9 +271,9 @@ HTML;
 
         $rounder = new PriceRounder();
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
-        $storeID = scanLib::getStoreID(); 
+        $storeID = scanLib::getStoreID();
         $username = scanLib::getUser();
-        
+
         $routes = array(
             'cleardata' => 'clear_scandata_hander',
             'update' => 'update_scandata_handler',
@@ -285,12 +285,12 @@ HTML;
                 $ret .= $this->$function($dbc,$storeID,$username);
             }
         }
-        
+
         $ret .= $this->form_content();
-        
+
         //delete me later
         $ret .= '<div id="resp"></div>';
-        
+
         $options = $this->get_notes_options($dbc,$storeID,$username);
         $noteStr = '';
         $noteStr .= '<select id="notes" style="font-size: 10px; font-weight: normal; margin-left: 5px; border: 1px solid lightgrey">';
@@ -299,9 +299,9 @@ HTML;
             $noteStr .= '<option value="'.$k.'">'.$option.'</option>';
         }
         $noteStr .= '</select>';
-        
+
         $ret .= '
-            <table class="table table-bordered table-condensed small" style="width: 500px;"> 
+            <table class="table table-bordered table-condensed small" style="width: 500px;">
                 <tr class="key"><td>Key</td><td>
                 </td></tr>
                 <tr class="key"><td id="grey-toggle" style="background-color: lightgrey">&nbsp;</td><td>Product Missing Cost</td>
@@ -313,13 +313,14 @@ HTML;
         //$ret .= $btnUpdate;
         $args = array($username,$storeID);
         $query = $dbc->prepare("
-        	SELECT upc, brand, description, cost, price, curMarg, desMarg, rsrp, srp, prid, flag, dept, vendor, notes, store_id, username
-			FROM woodshed_no_replicate.AuditScanner 
-            WHERE username = ? 
+        	SELECT id, upc, brand, description, cost, price, curMarg, desMarg, rsrp, srp, prid, flag, dept, vendor, notes, store_id, username
+			FROM woodshed_no_replicate.AuditScanner
+            WHERE username = ?
                 AND store_id = ?
                 AND upc != '0000000000000'
-            ORDER BY vendor, dept, brand;
-        ");    
+            ORDER BY id;
+        ");
+        // ORDER BY vendor, dept, brand;
         $result = $dbc->execute($query,$args);
         $data = array();
         $headers = array();
@@ -336,11 +337,11 @@ HTML;
             }
             $i++;
         }
-        
+
         //  Add columns to table
         $i = 0;
         $flags = array();
-        foreach ($data as $k => $array) { 
+        foreach ($data as $k => $array) {
             $srp = $data[$k]['srp'];
             $price = $data[$k]['price'];
             $difference = sprintf("%0.3f",$srp - $price);
@@ -351,7 +352,7 @@ HTML;
             if ($margOff > 1.05 && $srp != $price) {
                 $flags['info'][] = $i;
             } elseif ($margOff > 0.95) {
-            } elseif ($margOff < 0.95 && $margOff > 0.90 
+            } elseif ($margOff < 0.95 && $margOff > 0.90
                 && $srp != $price
                 && $srp >= $price) {
                 $flags['warning'][] = $i;
@@ -360,7 +361,7 @@ HTML;
             }
             $i++;
         }
-        
+
         $ret .= '
             <style>
                 .price {
@@ -369,7 +370,7 @@ HTML;
                 }
             </style>
         ';
-        
+
         $ret .= '<div style="font-size: 12px; padding-bottom: 10px;"><b>Filter by Notes</b>:'.$noteStr.'</div>';
         $ret .=  '<div class="panel panel-default table-responsive">
             <table class="table table-condensed small tablesorter" id="dataTable">';
@@ -391,22 +392,22 @@ HTML;
         $ret .= '<tbody id="mytable">';
         $ret .=  '<tr class="key" id="firstTr" class="highlight">';
         $upcs = array();
-        
-        foreach ($data as $k => $array) { 
+
+        foreach ($data as $k => $array) {
             foreach ($array as $column_name  => $v) {
                 if ($column_name == 'store_id') {
-                    $ret .=  '<td class="store_id">' . $v . '</td>'; 
+                    $ret .=  '<td class="store_id">' . $v . '</td>';
                 } elseif ($column_name == 'notes') {
                     if ($v == NULL) {
                         $v = 'n/a';
                     }
-                    $ret .=  '<td class="notescell">' . $v . '</td>'; 
+                    $ret .=  '<td class="notescell">' . $v . '</td>';
                 } elseif ($column_name == 'price' || $column_name == 'srp') {
-                    $ret .=  '<td class="price">$' . $v . '</td>'; 
+                    $ret .=  '<td class="price">$' . $v . '</td>';
                 } elseif ($column_name == 'upc') {
                     $upclink = '<a class="upc" href="http://192.168.1.2/git/fannie/item/ItemEditorPage.php?searchupc='.$v.
                         '&ntype=UPC&searchBtn=" target="_blank">'.$v.'</a>';
-                    $ret .=  '<td>' . $upclink . '</td>'; 
+                    $ret .=  '<td>' . $upclink . '</td>';
                     $curUpc = $v;
                     $upcs[] = $v;
                 } elseif ($column_name == 'curMarg' || $column_name == 'desMarg') {
@@ -414,12 +415,12 @@ HTML;
                 } elseif ($column_name == 'username') {
                     $ret .= '<td class="username">'.$v.'</td>';
                 } else {
-                    $ret .=  '<td>' . $v . '</td>'; 
+                    $ret .=  '<td>' . $v . '</td>';
                 }
             }
             $ret .= '<td  id="upc'.$curUpc.'"><span class="delete-icon"></span></td>';
             $ret .= '</tr>';
-            
+
             if($prevKey != $k) {
                 if ($data[$k+1]['cost'] == 0) {
                     $ret .=  '</tr><tr id="tr'.$curUpc.'" class="highlight grey rowz" style="background-color:lightgrey">';
@@ -432,12 +433,12 @@ HTML;
                 } else {
                     $ret .=  '</tr><tr id="tr'.$curUpc.'"  class="highlight normal rowz">';
                 }
-            } 
+            }
             $prevKey = $k;
         }
         $ret .=  '</tbody></table></div>';
         if ($dbc->error()) $ret .=  $dbc->error();
-        
+
         $ret .= '
                 <style>
                     .key {
@@ -450,21 +451,21 @@ HTML;
                         cursor: pointer;
                     }
                     .red {
-                        background-color:tomato; 
+                        background-color:tomato;
                         color:#700404
                     }
                     #red-toggle:hover {
                         cursor: pointer;
                     }
                     .yellow {
-                        background-color:#FFF457; 
+                        background-color:#FFF457;
                         color: #635d00
                     }
                     #yellow-toggle:hover {
                         cursor: pointer;
                     }
                     .blue {
-                        background-color:lightblue; 
+                        background-color:lightblue;
                         color: #344c57
                     }
                     #blue-toggle:hover {
@@ -475,7 +476,7 @@ HTML;
                     }
                 </style>
             ';
-        
+
         // $OppoID tells AuditScannerReport.js which store's scans to igore.
         if ($storeID == 1) {
             $OppoID = 2;
@@ -483,16 +484,22 @@ HTML;
             $OppoID = 1;
         }
         $ret .= '<input type="hidden" id="storeID" value="'.$OppoID.'" />';
-        
+
+        $ret .= "<div class='form-group'><label>List of upcs</label><br/><textarea>";
+        foreach ($upcs as $upc) {
+            $ret .= "$upc\r\n";
+        }
+        $ret .= "</textarea></div>";
+
         $this->addScript('AuditScannerReport.js');
-        
+
         return $ret;
     }
-    
+
     private function get_notes_options($dbc,$storeID,$username)
     {
         $args = array($storeID,$username);
-        $query = $dbc->prepare("SELECT notes FROM woodshed_no_replicate.AuditScanner WHERE store_id = ? AND username = ? GROUP BY notes;");    
+        $query = $dbc->prepare("SELECT notes FROM woodshed_no_replicate.AuditScanner WHERE store_id = ? AND username = ? GROUP BY notes;");
         $result = $dbc->execute($query,$args);
         $options = array();
         while ($row = $dbc->fetch_row($result)) {
@@ -503,10 +510,10 @@ HTML;
         echo $dbc->error();
         return $options;
     }
-    
+
     private function form_content()
     {
-        
+
         $ret = '';
         $ret .= '
             <div style="float: right;">
@@ -522,7 +529,7 @@ HTML;
                                 <td id="clearAllInput" class="buttonbox bb-btn">Clear ALL</td>
                                 <input type="hidden" name="cleardata" value="1" />
                             </form>
-                        
+
                             <form method="post" id="updateForm">
                                 <td id="updateInput" class="buttonbox bb-btn">Update from POS</td>
                                 <input type="hidden" name="update" value="1">
@@ -530,11 +537,11 @@ HTML;
                             <td class="buttonbox bb-btn" data-toggle="modal" data-target="#upcs_modal">Upload a List</td>
                     </tbody>
                 </table>
-                
+
                 <a class="text-info" style="width: 132px;" href="AuditScanner.php ">Goto Scanner</a><br />
             </div>
         ';
-        
+
         $ret .= '
             <div id="upcs_modal" class="modal">
                 <div class="modal-dialog" role="document">
@@ -559,29 +566,29 @@ HTML;
                 </div>
             </div>
         ';
-        
+
         return $ret;
     }
-    
+
     public function help_content()
     {
         return '
             <ul>
-                <li>Use <label>Audit Scanner Report</label> to view data collected by 
+                <li>Use <label>Audit Scanner Report</label> to view data collected by
                     Audie Audit Scanner.</li>
                 <li><label>Clear Notes</label>: clear all notes taken with scanner.</li>
                 <li><label>Clear All</label>: remove all items from this report.</li>
-                <li><label>Update from POS</label>: update products with the current 
+                <li><label>Update from POS</label>: update products with the current
                     data in POS. <i>SRP and Raw SRP will not update without being scanned.
-                    if you would like to re-calculate SRPs, select <b>Clear All</b>, then use 
+                    if you would like to re-calculate SRPs, select <b>Clear All</b>, then use
                     <b>Upload a List</b> to re-establish your list.</i></li>
-                <li><label>Upload a List</label>: Upload a list of UPCs to load products to 
+                <li><label>Upload a List</label>: Upload a list of UPCs to load products to
                     the report.</li>
-                <li>Click on a color in the <b>key</b> table to view items that are above/below the 
-                desired price-range & items that are missing cost.</li>   
+                <li>Click on a color in the <b>key</b> table to view items that are above/below the
+                desired price-range & items that are missing cost.</li>
             </ul>
         ';
     }
-    
+
 }
 ScancoordDispatch::conditionalExec();
