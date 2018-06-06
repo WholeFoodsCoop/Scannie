@@ -42,7 +42,7 @@ class BatchReviewPageMilk extends scancoordDispatch
         
         include(__DIR__.'/../../../config.php');
         include(__DIR__.'/../../../common/lib/PriceRounder.php');
-        $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
+        $dbc = scanLib::getConObj();
         $curPage = basename($_SERVER['PHP_SELF']);
         $rounder = new PriceRounder();
         
@@ -53,11 +53,11 @@ class BatchReviewPageMilk extends scancoordDispatch
         $ret .= $this->form_content($id);
         
         $ret .= '<a href="http://key/git/fannie/batches/newbatch/EditBatchPage.php?id=' 
-            . $id . '" target="_blank"><span class="text-primary">Open Batch Page</span></a>';
+            . $id . '" target="_blank"><span class="text-primary">View Batch</span></a>';
         $nextBatch = $_SERVER['PHP_SELF'] . '?id=' . ($id + 1);
         $prevBatch = $_SERVER['PHP_SELF'] . '?id=' . ($id - 1);
-        $ret .= '&nbsp;<a class="btn" href="' . $prevBatch .'"><img src="../../../common/src/img/back.png" style="width:10px;height:10px">&nbsp;Prev Batch</a>';
-        $ret .= '&nbsp;<a class="btn" href="' . $nextBatch .'">Next Batch&nbsp;<img src="../../../common/src/img/go.png" style="width:10px;height:10px"></a><br><br>';
+        $ret .= '&nbsp;<a class="btn" href="' . $prevBatch .'"><span class="scanicon-chevron-left"></a>';
+        $ret .= '&nbsp;<a class="btn" href="' . $nextBatch .'"><span class="scanicon-chevron-right"></span></a><br><br>';
 
         if ($id) {
             $query = $dbc->prepare('
@@ -137,9 +137,6 @@ class BatchReviewPageMilk extends scancoordDispatch
                 
             }
                
-            if (mysql_errno() > 0) {
-                $ret .= "<div class='alert alert-danger' align='center'>" . mysql_errno() . ": " . mysql_error(). "</div><br>";
-            }
             $ret .= '</table></div>';
 
         }

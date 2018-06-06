@@ -26,7 +26,7 @@ if (!class_exists('ScancoordDispatch')) {
     include($SCANROOT.'/common/ui/CorePage.php');
 }
 if (!class_exists('SQLManager')) {
-    include_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/common/sqlconnect/SQLManager.php');
+    include_once(__DIR__.'/../../../common/sqlconnect/SQLManager.php');
 }
 
 class BatchReviewPage extends scancoordDispatch 
@@ -41,7 +41,7 @@ class BatchReviewPage extends scancoordDispatch
     {
         
         include('../../../config.php');
-        $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
+        $dbc = scanLib::getConObj();
         $curPage = basename($_SERVER['PHP_SELF']);
         
         $id = $_GET['id'];
@@ -51,11 +51,11 @@ class BatchReviewPage extends scancoordDispatch
         $ret .= $this->form_content($id);
         
         $ret .= '<a href="http://key/git/fannie/batches/newbatch/EditBatchPage.php?id=' 
-            . $id . '" target="_blank"><span class="text-primary">Open Batch Page</span></a>';
+            . $id . '" target="_blank"><span class="text-primary">View Batch</span></a>';
         $nextBatch = $_SERVER['PHP_SELF'] . '?id=' . ($id + 1);
         $prevBatch = $_SERVER['PHP_SELF'] . '?id=' . ($id - 1);
-        $ret .= '&nbsp;<a class="btn" href="' . $prevBatch .'"><img src="../../../common/src/img/back.png" style="width:10px;height:10px">&nbsp;Prev Batch</a>';
-        $ret .= '&nbsp;<a class="btn" href="' . $nextBatch .'">Next Batch&nbsp;<img src="../../../common/src/img/go.png" style="width:10px;height:10px"></a><br><br>';
+        $ret .= '&nbsp;<a class="btn" href="' . $prevBatch .'"><span class="scanicon-chevron-left"></a>';
+        $ret .= '&nbsp;<a class="btn" href="' . $nextBatch .'"><span class="scanicon-chevron-right"></span></a><br><br>';
 
         if ($id) {
             $query = $dbc->prepare('
@@ -84,7 +84,7 @@ class BatchReviewPage extends scancoordDispatch
                 ;');
             $result = $dbc->execute($query);
             $ret .= '
-                <div class="panel panel-default"><table class="table table-striped table-condensed small">
+                <div class="panel panel-default"><table class="table table-bordered table-condensed small">
                     <th>UPC</th>
                     <th>Description</th>
                     <th>POS Dept.</th>
@@ -120,9 +120,6 @@ class BatchReviewPage extends scancoordDispatch
                     $ret .= '<td>' . $diff . '</td>';
                 }
                 
-            }
-            if (mysql_errno() > 0) {
-                $ret .= "<div class='alert alert-danger' align='center'>" . mysql_errno() . ": " . mysql_error(). "</div><br>";
             }
             $ret .= '</table></div>';
 
