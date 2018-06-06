@@ -31,7 +31,7 @@ class menu
         $calculators = self::calciframes();
         $mobileMenu = self::mobileMenu();
 
-        $user = $_SESSION['user_name'];
+        $user = (!empty($_SESSION['user_name'])) ? $_SESSION['user_name'] : null;
         $ud = '<span class="userSymbol"><b>'.strtoupper(substr($user,0,1)).'</b></span>';
         if (empty($user)) {
             $user = 'Generic User';

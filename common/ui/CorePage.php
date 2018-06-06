@@ -65,7 +65,7 @@ class ScancoordDispatch
             print '
 <div class="container" style="width:95%;">
     <div style="font-size:14px;margin-bottom:5px;" class="primaryColor hidden-lg hidden-md">
-        <a href="http://'.$SCANDIRNAME.'">Scannie</a> | an extension of
+        <a href="http://'.$SCANROOTDIR.'">Scannie</a> | an extension of
         <a href="http://'.$FANNIEROOT_DIR.'">CORE-POS</a>
             <span class="device-xs visible-xs"></span>
             <div style="font-size:14px;" class="secondaryColor" data-toggle="collapse" data-target=".navbar-default" onclick="smartToggle();">
@@ -82,7 +82,7 @@ class ScancoordDispatch
         print $this->footer();
         print $this->writeJS();
         
-        $this->recordPath();
+        // $this->recordPath();
     }
 
     private function recordPath()
@@ -157,6 +157,7 @@ class ScancoordDispatch
         $LastSold = 'http://'.$SCANROOT_DIR.'/item/last_sold_check.php';
         $ItemBatchHistory = 'http://'.$FANNIEROOT_DIR.'/reports/ItemBatches/ItemBatchesReport.php';
         $SalesBatchPercent = 'http://'.$SCANROOT_DIR.'/item/Batches/CheckBatchPercent.php';
+        $UNFICustomerPortal = 'https://customers.unfi.com/Pages/ProductSearch.aspx?';
         $quickPages = array(
             'TrackChange'=>'upc',
             'LastSold'=>'upc',
@@ -164,7 +165,8 @@ class ScancoordDispatch
             'EditBatchPage'=>'id',
             'LastSold'=>'upc',
             'ItemBatchHistory'=>'upc',
-            'SalesBatchPercent'=>'batchID'
+            'SalesBatchPercent'=>'batchID',
+            'UNFICustomerPortal'=>'SearchTerm'
         );
 
         $ret .= '<div align="center">';
@@ -245,10 +247,12 @@ class ScancoordDispatch
         $ret .= $this->cssContent();
         $ret .= '
 </style>';
+        /* deprecated, use class method javascriptContent
         $this->addScript("http://{$SCANROOT_DIR}/common/javascript/scannie.js");
         if ($this->add_javascript_content == TRUE) {
             $ret .= $class::javascript_content();
         }
+        */
         $ret .= '
 </head>
 <body>
@@ -269,7 +273,10 @@ class ScancoordDispatch
         include(__DIR__.'/../../config.php');
         $this->addScript('http://'.$SCANROOT_DIR.'/common/ui/search.js');
         $ret ='';
-        $user = $_SESSION['user_name'];
+        // $user = ($temp = $_SESSION['user_name']) ? $temp : null;
+
+        $user = (!empty($_SESSION['user_name'])) ? $_SESSION['user_name'] : null;
+
         if (empty($user)) {
             $user = 'Generic User';
             $logVerb = 'Login';

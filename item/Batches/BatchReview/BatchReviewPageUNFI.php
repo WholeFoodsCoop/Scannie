@@ -21,12 +21,12 @@
     
 *********************************************************************************/
 
-include('../../../config.php');
+include(__DIR__.'/../../../config.php');
 if (!class_exists('ScancoordDispatch')) {
-    include($SCANROOT.'/common/ui/CorePage.php');
+    include(__DIR__.'/../../../common/ui/CorePage.php');
 }
 if (!class_exists('SQLManager')) {
-    include_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/common/sqlconnect/SQLManager.php');
+    include_once(__DIR__.'/../../../common/sqlconnect/SQLManager.php');
 }
 
 class BatchReviewPageUNFI extends scancoordDispatch 
@@ -40,8 +40,9 @@ class BatchReviewPageUNFI extends scancoordDispatch
     public function body_content() 
     {
         
-        include('../../../config.php');
-        $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
+        include(__DIR__.'/../../../config.php');
+        // $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
+        $dbc = scanLib::getConObj();
         $curPage = basename($_SERVER['PHP_SELF']);
         
         $id = $_GET['id'];
@@ -101,7 +102,11 @@ class BatchReviewPageUNFI extends scancoordDispatch
                 $upc = '<a href="http://key/git/fannie/item/ItemEditorPage.php?searchupc=' . $row['upc'] . '" target="_blank">' . $row['upc'] . '</a>';
                 $diff = $newMargin - $row['unfiMarg'];
                 $diff = sprintf('%0.2f', $diff);
-                $curMargin = ($row['normal_price'] - $row['cost']) / $row['normal_price'];
+                if ($row['normal_price'] != 0) {
+                    $curMargin = ($row['normal_price'] - $row['cost']) / $row['normal_price'];
+                } else {
+                    $curMargin = "n/a";
+                }
                 
                 $ret .= '<tr><td>' . $upc . '</td>';
                 $ret .= '<td>' . $row['description'] . '</td>';
@@ -125,9 +130,6 @@ class BatchReviewPageUNFI extends scancoordDispatch
                 
                 $ret .= '<td>' . $row['unfiDeptId'] . ' - ' . $row['vendorDeptName'] . '</td>';
 
-            }
-            if (mysql_errno() > 0) {
-                $ret .= "<div class='alert alert-danger' align='center'>" . mysql_errno() . ": " . mysql_error(). "</div><br>";
             }
             $ret .= '</table></div>';
 
