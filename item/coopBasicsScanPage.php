@@ -56,9 +56,11 @@ class coopBasicsScanPage extends ScancoordDispatch
         $products = array();
         $argsA = array($storeID);
         $prepA = $dbc->prepare("
-            SELECT g.upc,p.brand,p.description FROM is4c_op.GenericUpload AS g 
-            LEFT JOIN is4c_op.products AS p ON g.upc=p.upc 
+            SELECT g.upc,p.brand,p.description 
+            FROM is4c_op.GenericUpload AS g 
+                LEFT JOIN is4c_op.products AS p ON g.upc=p.upc 
             WHERE p.store_id = ? 
+                AND inUse = 1
         ");
         $resA = $dbc->execute($prepA,$argsA);
         while ($row = $dbc->fetchRow($resA))  {
@@ -121,23 +123,6 @@ class coopBasicsScanPage extends ScancoordDispatch
             }
         }
 
-        $notInUse = array();
-        $curM = date('m');
-        foreach ($missing as $key => $upc) {
-            $args = array($storeID);
-            $query = ("select inUse from products where upc = {$upc} and store_id = ?");
-            $res = $dbc->query($query, $args);
-            while ($row = $dbc->fetchRow($res))  {
-                if ($row['inUse'] == 0) {
-                    unset($missing[$key]);
-                    $notInUse[] = $upc;
-                } else  {
-                    // do nothing
-                }
-            }
-        }
-        if ($er = $dbc->error()) $ret .=  "<div class='alert alert-warning>$er</div>";
-
         foreach ($missing as $key => $upc) {
             if (is_null($upc)) unset($missing[$key]);
         }
@@ -146,19 +131,22 @@ class coopBasicsScanPage extends ScancoordDispatch
         $tableA .=  '<tr><th colspan="3" style="text-align: center"><strong>Signs missing from sales floor.</strong></th></tr></thead><tbody>';
         $missingCopyPaste = '';
         foreach ($missing as $upc) {
-            $product = "<tr><td>".$upc."</td><td>".$products[$upc]['brand']."</td><td>"
-                .$products[$upc]['description']."</td></tr>";
-            $tableA .=  $product;
-            $missingCopyPaste .= $upc . "\n";
+            if (!in_array($upc, $notInUse)) {
+                $product = "<tr><td>".$upc."</td><td>".$products[$upc]['brand']."</td><td>"
+                    . $products[$upc]['description']."</td></tr>";
+                $tableA .= $product;
+                $missingCopyPaste .= $upc . "\n";
+            }
         }
         $tableA .=  '</tbody></table>';
         $tableA .=  '<textarea rows="3" cols="15">' . "MISSING\r\n" . $missingCopyPaste . '</textarea><br />';
+
         $tableB .=  '<table class="table table-condensed small"><thead>';
         $tableB .=  '<tr><th colspan="3">These signs are on the sales floor and should be taken down</th></tr></thead><tbody>';
         $removeCopyPaste = '';
         foreach ($remove as $upc) {
             $product = "<tr><td>".$upc."</td><td>".$products[$upc]['brand']."</td><td>"
-                .$products[$upc]['description']."</td></tr>";
+                . $products[$upc]['description']."</td></tr>";
             $tableB .=  $product;
             $removeCopyPaste .= $upc . "\n";
         }
