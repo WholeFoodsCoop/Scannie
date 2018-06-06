@@ -49,10 +49,9 @@ class MarginCalcNew extends ScancoordDispatch
         $roundedSRP = 0;
         $rawSRP = 0;
 
-        $_SESSION['dept_margin'] = $_GET['dept_margin'];
-        $cost = $_GET['cost'];
-        $price = $_GET['price'];
-        $dept_marg = $_GET['dept_margin'];
+        $dept_marg = FormLib::get('dept_margin', false);
+        $cost = FormLib::get('cost');
+        if ($dept_marg != false) $_SESSION['dept_margin'] = $dept_marg;
         
         $ret .= '
             <form method="get">
@@ -60,10 +59,6 @@ class MarginCalcNew extends ScancoordDispatch
                 <div class="input-group">
                     <span class="input-group-addon input-sm">Cost</span>
                     <input class="form-control" name="cost" value="'.$cost.'">
-                </div>
-                <div class="input-group">
-                    <span class="input-group-addon input-sm">Price</span>
-                    <input class="form-control" name="price" value="'.$price.'">
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon input-sm">dMarg</span>
@@ -78,28 +73,12 @@ class MarginCalcNew extends ScancoordDispatch
         $ret .= "<table class=\"table\" align=\"center\">";
 
         //  Find SRP
-        if ($cost && $dept_marg){
-            $dept_marg *= .01;
-            $srp = $cost / (1 - $dept_marg);
-            $round_srp = $rounder->round($srp);
-            $ret .= "<tr><td>Raw SRP</td><td>" . sprintf('%.3f', $srp) . "</tr>";
-            $ret .= "<tr><td>Rounded SRP</td><td><strong class='success'>" . $round_srp . "</strong></tr>";
-        }
+        $dept_marg *= .01;
+        $srp = $cost / (1 - $dept_marg);
+        $round_srp = $rounder->round($srp);
+        $ret .= "<tr><td>Raw SRP</td><td>" . sprintf('%.3f', $srp) . "</tr>";
+        $ret .= "<tr><td>Rounded SRP</td><td><strong class='success'>" . $round_srp . "</strong></tr>";
 
-        //  Find Marginal Data
-        if ($cost && $price) {
-            $actualMargin = ($price - $cost) / $price;
-            $ret .= "<tr><td style='width:180px;'>Actual Margin</td><td>" . sprintf('%.4f', $actualMargin) . "</tr>";
-        } elseif ($round_srp) {
-            $ret .= "<tr><td style='width:180px;'>Marg @ round srp </td><td><strong>" . sprintf('%.2f%%', 100*($round_srp - $cost) / $round_srp) . "</strong></tr>";
-        }
-
-        //  Find Cost
-        if ($price && $dept_marg) {
-            $dept_marg *= .01;
-            $cost = - ( $price * ($dept_marg - 1)  );
-            $ret .= "<tr><td>Approximate Cost</td><td>" . sprintf('%.2f', $cost) . "</tr>";
-        }
         $ret .= "</table>";
         $ret .= "</div>";
         $ret .= "</div>";
@@ -110,11 +89,6 @@ class MarginCalcNew extends ScancoordDispatch
 
         
         return $ret;
-    }
-    
-    private function form_content()
-    {
-
     }
     
     public function css_content()
