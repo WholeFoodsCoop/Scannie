@@ -44,13 +44,15 @@ class PercentCalc extends ScancoordDispatch
         include('../common/lib/PriceRounder.php');
         $rounder = new PriceRounder();
         
-		if ($_GET['price'] && $_GET['percent']) {
-			$price = $_GET['price'];
-			$percent = $_GET['percent'];
-			$newprice = $price - ($price * ($percent * 0.01));
-			$rawprice = $newprice;
-			$newprice = $rounder->round($newprice);
-		}
+        $rawprice = 0;
+        $newprice = 0;
+        if (FormLib::get('price') && FormLib::get('percent')) {
+            $price = FormLib::get('price');
+            $percent = FormLib::get('percent');
+            $newprice = $price - ($price * ($percent * 0.01));
+            $rawprice = $newprice;
+            $newprice = $rounder->round($newprice);
+        }
 
 		$ret .= '
 <div align="center">
@@ -89,8 +91,7 @@ public function css_content()
 td {
     min-width: 120px;
 }
-.input-group-addon{
-    min-width: 100px;
+.input-group-addon{ min-width: 100px;
 }
 body {
     overflow: -moz-scrollbars-horizontal;
