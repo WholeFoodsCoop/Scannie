@@ -45,6 +45,9 @@ class ScancoordDispatch
 
     private function runPage($class)
     {
+        if (!class_exists('FormLib')) {
+            include(__DIR__.'/../lib/FormLib.php');
+        }
         if(!class_exists('scanLib')) {
             include(__DIR__.'/../lib/scanLib.php');
         }

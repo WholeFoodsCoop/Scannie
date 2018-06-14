@@ -34,7 +34,7 @@ class ipod extends ScancoordDispatch
         include(__DIR__.'/../config.php');
         $ret = '';
         
-        $url = "http://'.$SCANROOT_DIR.'/item/AuditScanner.php";
+        $url = "http://$SCANROOT_DIR/ScannieV2/content/Scanning/BatchCheck/SCS.php";
         if ($src = $_GET['changesrc']) {
             $url = $src;
         }
@@ -83,6 +83,7 @@ iframe {
 body {
     overflow-y: hidden;
     overflow-x: hidden;
+    background: lightgrey;
 }
 .homeBtn {
     border-radius: 100%;

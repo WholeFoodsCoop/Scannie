@@ -48,21 +48,51 @@ class mobile extends ScancoordDispatch
         ';
         
         $ret .= '
-            <div style="width: 100vw;" align="center">
+            <div style="width: 100%;" align="center">
                 <h1>Mobile Scannie</h1>
-                <a class="btn btn-default btn-mobile-menu" href="http://192.168.1.2/scancoord/item/AuditScanner.php">Audie: Scanner</a><br /><br />
-                <a class="btn btn-default btn-mobile-menu" href="http://192.168.1.2/scancoord/item/SalesChange/SCScanner.php">Batch Check</a><br /><br />
-                <a class="btn btn-default btn-mobile-menu" href="http://192.168.1.2/git/fannie/modules/plugins2.0/ShelfAudit/SaMenuPage.php">CORE-POS Fannie</a><br /><br />
-                <a class="btn btn-default btn-mobile-menu" href="http://192.168.1.2/git/fannie/item/CoopDealsLookupPage.php">Coop Deals Lookup Page</a><br /><br />
-                <a class="btn btn-default btn-mobile-menu" href="http://192.168.1.2/scancoord/item/TrackChangeNew.php">Track Change</a><br /><br />
-                <a class="btn btn-default btn-mobile-menu" href="mobile.php">&nbsp;</a><br /><br />
-                <a class="btn btn-default btn-mobile-menu" href="mobile.php">&nbsp;</a><br /><br />
-                <a class="btn btn-default btn-mobile-menu" href="..">return</a>
+                <a class="btn btn-default btn-mobile-menu" href="http://192.168.1.2/scancoord/item/AuditScanner.php">Audie <i>Scanner</i></a><br /><br />
+                <a class="btn btn-default btn-mobile-menu" href="http://192.168.1.2/scancoord/item/AuditScannerReport.php">Audie <i>Report</i></a><br /><br />
+                <a class="btn btn-default btn-mobile-menu" 
+                    href="http://192.168.1.2/scancoord/ScannieV2/content/Scanning/BatchCheck/BatchCheckMenu.php">
+                    <span class="new">NEW</span> Batch Check</a><br /><br />
+                <a class="btn btn-default btn-mobile-menu" href="http://192.168.1.2/git/fannie/item/CoopDealsLookupPage.php">Coop Deals Lookup</a><br /><br />
+                <a class="btn btn-default btn-mobile-menu" href="http://192.168.1.2/git/fannie/modules/plugins2.0/ShelfAudit/SaMenuPage.php">
+                    CORE-POS/ Fannie</a><br /><br />
+                <br/><br/>
+                <a class="btn btn-default btn-mobile-menu" href="http://192.168.1.2/scancoord/item/TrackChangeNew.php">Scannie Home</a><br /><br />
+                <a class="btn btn-default btn-mobile-menu" href="#" onClick="window.history.back(); return false;">return</a>
             </div><br /><br />
         ';
         return $ret;
     }
         
+    public function cssContent()
+    {
+        return <<<HTML
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: rgba(255,255,255,0.9);
+    background: linear-gradient(135deg, #42a7f4, #0a1528);
+    background-color: linear-gradient(135deg, #42a7f4, #0a1528);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+.old {
+    color: tomato;
+    font-weight: bold;
+}
+.new {
+    color: orange;
+    font-weight: bold;
+}
+.btn, .btn-default {
+    background-color: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(0,0,0,0.6);
+}
+HTML;
+    }
     
 }
 ScancoordDispatch::conditionalExec();

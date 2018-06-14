@@ -43,12 +43,25 @@ class generic_page extends ScancoordDispatch
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         
         $args = array();
-        $query = $dbc->prepare("");
+        $query = $dbc->prepare("select * from is4c_trans.dlog_90_view where card_no = 12259");
         $result = $dbc->execute($query,$args);
+        $data = array();
+        $skip = array('Discount','Change','Credit Card','Tax','Coupons','Donations');
         while ($row = $dbc->fetchRow($result)) {
-            
+            if (!in_array($row['description'],$skip)) {
+                if (!$data[$row['description']]) {
+                    $data[$row['description']] = $row['quantity'];
+                } else {
+                    $data[$row['description']] += $row['quantity'];
+                }
+            }
         }
         if ($dbc->error()) echo $dbc->error();
+
+        asort($data,SORT_NUMERIC);
+        foreach ($data as $desc => $qty) {
+            $ret .= "$desc: $qty<br/>";
+        }
         
         return $ret;
     }

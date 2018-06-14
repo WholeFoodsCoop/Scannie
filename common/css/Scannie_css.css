@@ -535,3 +535,21 @@ p.navText{
         margin-left: 130px;
     }
 }
+
+/*
+    scanicons
+*/
+.scanicon-chevron-right {
+    background-image: url("../src/img/scanicons/chevron-right.png");
+    background-repeat: no-repeat;
+    width: 25px;
+    height: 25px;
+    display: inline-block;
+}
+.scanicon-chevron-left {
+    background-image: url("../src/img/scanicons/chevron-left.png");
+    background-repeat: no-repeat;
+    width: 25px;
+    height: 25px;
+    display: inline-block;
+}

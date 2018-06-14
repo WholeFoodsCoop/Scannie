@@ -11,6 +11,7 @@ class WebDispatch
     protected $auth_classes = array();
     protected $enable_linea = false;
     protected $ui = true;
+    protected $deviceType = '';
 
     function __construct() {}
 
@@ -28,7 +29,7 @@ class WebDispatch
 
     private function draw_page()
     {
-
+        $this->deviceType = $this->getDeviceType();
         if (!class_exists('coreNav')) {
             include(__DIR__.'/CoreNav.php');
         }
@@ -104,7 +105,8 @@ class WebDispatch
     <script src="http://{$MY_ROOTDIR}/common/javascript/popper.min.js"></script>
     <script src="http://{$MY_ROOTDIR}/common/bootstrap4/js/bootstrap.min.js"></script>
     <script src="http://{$MY_ROOTDIR}/common/ui/CoreNav.js"></script>
-    <script src="http://{$MY_ROOTDIR}/common/lib/javascript/scannie.js"></script>
+    <script src="http://{$MY_ROOTDIR}/common/javascript/webDispatch.js"></script>
+    <!--<script src="http://{$MY_ROOTDIR}/common/lib/javascript/scannie.js"></script>-->
     <title>{$this->title}</title>
     <link rel="icon" href="http://{$MY_ROOTDIR}/common/src/icons/scannie_favicon.ico">
 <style>
@@ -186,6 +188,29 @@ HTML;
         }
         return FALSE;
     }
+        public function getDeviceType()
+        {
+            require_once(__DIR__.'/../../common/Mobile-Detect/Mobile_Detect.php');
+            $detect = new Mobile_Detect;
+            $device = '';
+            if ( $detect->isMobile() ) {
+            }
+
+            if( $detect->isTablet() ){
+            }
+
+            if( $detect->isMobile() && !$detect->isTablet() ){
+                $device = 'mobile';
+            }
+
+            if( $detect->isiOS() ){
+            }
+
+            if( $detect->isAndroidOS() ){
+            }
+
+            return $device;
+        }
 
 }
 

@@ -46,6 +46,8 @@ class PercentCalc extends ScancoordDispatch
         
         $rawprice = 0;
         $newprice = 0;
+        $price = 0;
+        $percent = 0;
         if (FormLib::get('price') && FormLib::get('percent')) {
             $price = FormLib::get('price');
             $percent = FormLib::get('percent');

@@ -71,6 +71,8 @@ class zeroPriceCheck extends ScancoordDispatch
                 AND upc <> 0085068400634
                 AND upc <> 0000000000114
                 AND upc <> 0000000001092
+                AND upc <> 0000000001108
+                AND upc <> 0065801012014
                 AND wicable = 0
                     OR (
                         m.superID != 0

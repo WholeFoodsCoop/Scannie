@@ -1,0 +1,111 @@
+diff --git a/ScannieV2/content/Scanning/BatchCheck/BatchCheckQueues.php b/ScannieV2/content/Scanning/BatchCheck/BatchCheckQueues.php
+index ff49450..f0df7fc 100755
+--- a/ScannieV2/content/Scanning/BatchCheck/BatchCheckQueues.php
++++ b/ScannieV2/content/Scanning/BatchCheck/BatchCheckQueues.php
+@@ -118,14 +118,13 @@ HTML;
+     private function getCurrentBatches($dbc)
+     {
+         $storeID = scanLib::getStoreID();
+-        echo $storeID;
+         $args = array($storeID);
+         $prep = $dbc->prepare("
+             SELECT bl.upc, bl.batchID AS bid, b.batchName
+             FROM batchList AS bl 
+                 LEFT JOIN products AS p ON bl.upc=p.upc 
+                 LEFT JOIN batches AS b ON bl.batchID=b.batchID 
+-                LEFT JOIN StoreBatchMap AS sbm ON b.batchID=sbm.batchID 
++                JOIN StoreBatchMap AS sbm ON b.batchID=sbm.batchID 
+             WHERE bl.batchID IN ( SELECT b.batchID FROM batches AS b WHERE NOW() BETWEEN startDate AND endDate)
+                 AND p.inUse = 1
+                 AND sbm.storeID = ? 
+@@ -181,9 +180,16 @@ HTML;
+         $optBatchName = array();
+         $optBrand = array();
+         $optSections = array();
++        $upcs = array();
+         while ($row = $dbc->fetchRow($res)) {
+             foreach ($fields as $field) {
++                if (!in_array($upcs,$row['upc'])) {
++                    $upcs[] = $row['upc'];
++                }
+                 // get data for rows
++                if (!isset(${$field})) {
++                    ${$field} = array();
++                }
+                 ${$field}[$row['upc']] = $row[$field];
+                 // get batch names & bids for products not in option 1
+                 if ($option != 0) {
+@@ -251,9 +257,22 @@ HTML;
+             }
+         }
+ 
++        /*
++        $missingTable = "<div><label>The following upcs are <br/>in this 
++            queue but did not<br/> show up in the table above:</label></div>
++            <div><textarea rows='5' columns='13'>";
++        if (count($inQueueItems) > 0) {
++            foreach ($inQueueItems as $upc) {
++                if (!in_array($upc,$upcs)) {
++                    $missingTable .= "$upc\r\n";
++                }
++            }
++        }
++        $missingTable .= "</textarea></div>";
++        */
++
+         $thead = '';
+         $theadFields = array();
+-        
+         $theadFields[] = 'upc';
+         $theadFields[] = 'salePrice';
+         $theadFields[] = 'bid';
+@@ -424,12 +443,20 @@ HTML;
+         }
+ 
+         $table .= "</tbody></table></div>";
++        $table .= '<textarea rows="5" cols="13">';
++        foreach ($upc as $k=>$v) {
++            if (in_array($k,$inQueueItems)) { 
++                $table .= $k . "\n";
++            }
++        }
++        $table .= '</textarea>';
+         $timestamp = time();
+         $this->addScript('scs.js?time='.$timestamp);
+ 
+         if ($er = $dbc->error()) {
+             return "<div class='alert alert-danger'>$er</div>";
+         } else {
++            // return $filter.$hiddenContent.$table.$missingTable;
+             return $filter.$hiddenContent.$table;
+         }
+ 
+@@ -446,17 +473,22 @@ HTML;
+         $ret .= "<h2>$stores[$storeID]</h2>";
+         $ret .= "<h1>$sessionName</h1>";
+         $q = FormLib::get('option');
+-        $ret .= "<h4>{$this->options[$q]}</h4>";
++        if(isset($_POST['session'])) $_SESSION['session'] = $_POST['session'];
++        $dbc = Scanlib::getConObj();
++        $curQueue = $_GET['queue'];
++
++        if ($this->options[$q]) {
++            $ret .= "<h4>{$this->options[$q]}</h4>";
++            $table = $this->getTableContents($dbc);
++        } else {
++            $ret .= "<h4 class='alert-danger'>NO QUEUE SELECTED</h4>";
++            $table = "";
++        }
+         $ret .= "</div>";
+ 
+         foreach ($_GET as $key => $value) {
+             if ($key == 'queue') $thisQueue = $value;
+         }
+-        if(isset($_POST['session'])) $_SESSION['session'] = $_POST['session'];
+-        $dbc = Scanlib::getConObj();
+-        $curQueue = $_GET['queue'];
+-
+-        $table = $this->getTableContents($dbc);
+ 
+         $timestamp = time();
+         $this->addScript("SalesChangeQueues.js?time=".$timestamp);

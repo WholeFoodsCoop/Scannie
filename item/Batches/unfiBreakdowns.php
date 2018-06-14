@@ -19,6 +19,39 @@ class unfiBreakdowns extends ScancoordDispatch
         include(__DIR__.'/../../config.php');
         include('../../common/lib/PriceRounder.php');
         $rounder = new PriceRounder();
+        $bdData = array();
+        $bdData = $this->getBreakdownList();
+        $start = $_GET['start'];
+        $end = $_GET['end'];
+        $finderUpc = $_GET['upc'];
+        $finderUpc = scanLib::padUpc($finderUpc);
+        if (isset($bdData[$finderUpc])) {
+            $returnUpc = $bdData[$finderUpc];
+        } else {
+            $keys = array_keys($bdData,$finderUpc);
+            foreach ($keys as $key) {
+                $returnUpc = $key;
+            }
+        }
+        
+
+        $bdFinder = "
+            <form name='bdFinder' id='bdFinder' class=''>
+                <input type='hidden' name='start' value='$start'>
+                <input type='hidden' name='end' value='$end'>
+                <label>Breakdown Family Finder</label>
+                <div class='form-group'>
+                    <input type='text' name='upc'>
+                </div>
+                <div class='form-group'>
+                    <button id='' type='submit' class='btn btn-default'>Find</button>
+                </div>
+                <table id='bdFinder-resp' class='table table-condensed small'>
+                    <tr><td><b>UPC</b></td><td>$finderUpc</td></tr>
+                    <tr><td><b>Relative</b></td><td>$returnUpc</td></tr>
+                </div>
+            </form>
+        ";
         
         $ret = '<div class="container">';
         $ret .= "<p>
@@ -76,7 +109,7 @@ class unfiBreakdowns extends ScancoordDispatch
            $batchDesc[$row['upc']] = $row['description'];
         }
         if ($er = $dbc->error()) {
-            $ret .= '<div class="alert alert-danger">'.$er.'</div>';
+            $ret .= '<div class="alert alert-danger" style="max-width: 400px;">'.$er.'</div>';
         }
         
         $ret .=  "<p style='width:350px'>If there are UPCs listed below, they should be added to the following batches. 
@@ -126,7 +159,18 @@ class unfiBreakdowns extends ScancoordDispatch
         $ret .=  '</table>';
         $ret .= '</div>';
         
-        return $ret;
+        return <<<HTML
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-5">
+        $ret
+    </div>
+    <div class="col-md-2">
+        $bdFinder
+    </div>
+    <div class="col-md-3"></div>
+</div>
+HTML;
     }
     
     private function form_content()
@@ -142,6 +186,50 @@ class unfiBreakdowns extends ScancoordDispatch
                 <button type="submit" class="">Submit</button>
             </form>
         ';
+    }
+
+    private function getBreakdownList()
+    {
+        $dbc = scanLib::getConObj('SCANALTDB');
+        $prep = $dbc->prepare("SELECT * FROM UnfiBreakdowns");
+        $res = $dbc->execute($prep);
+        $data = array();
+        while ($row = $dbc->fetchRow($res)) {
+            //echo scanLib::padUpc($row['child']).'<br/>';
+            $parent = scanLib::padUpc($row['parent']);
+            $child = scanLib::padUpc($row['child']);
+            $data[$parent] = $child;
+        }
+
+        return $data;
+    }
+
+    public function javascriptContent()
+    {
+        return <<<HTML
+$(function(){
+});
+
+$('#finderSubmit').on('click',function(){
+    //document.forms['bdFinder'].submit();
+});
+HTML;
+    }
+
+    public function cssContent()
+    {
+        return <<<HTML
+#bdFinder {
+    border: 2px solid lightgrey;
+    border-radius: 3px;
+    padding: 25px;
+    box-shadow: 1px 1px grey;
+    background: white;
+}
+label {
+    font-size: 12px;
+}
+HTML;
     }
     
 }

@@ -75,7 +75,7 @@ class admin
                     <div class='alert alert-success login-resp'>
                         <strong>".$curUser."</strong> successfully logged in.";
                 echo '</div>';
-                echo $this->jsRedirect();
+                //echo $this->jsRedirect();
             } else {
                 echo "<br /><br /><div align='center'><div class='alert alert-danger login-resp' >Username or Password is incorrect</div></div>";
             }

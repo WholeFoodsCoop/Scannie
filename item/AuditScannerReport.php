@@ -270,7 +270,8 @@ HTML;
         $this->addScript('../common/javascript/tablesorter/js/jquery.metadata.js');
 
         $rounder = new PriceRounder();
-        $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
+        //$dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
+        $dbc = ScanLib::getConObj();
         $storeID = scanLib::getStoreID();
         $username = scanLib::getUser();
 

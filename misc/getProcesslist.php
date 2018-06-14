@@ -35,16 +35,20 @@ class getProcesslist
         
         $prep = $dbc->prepare('show processlist');
         $res = $dbc->execute($prep);
+        $ret .= "<div class='table-responsive'><table class='table table-bordered table-condensed small'>";
+        $ret .= "<thead></thead>";
         while ($row = $dbc->fetchRow($res)) {
-            foreach ($row as $v) {
+            $ret .= "<tr>";
+            foreach ($row as $k => $v) {
                 if ($_GET['liveList'] == TRUE) {
-                    $ret .= $v . '<span style="color: #cacaca; padding: 1px;"> | </span> ';
+                    $ret .= "<td><span class='grey'>[$k]</span> $v</td>";
                 } elseif ($_GET['logList'] == TRUE) {
                     if ($row['Command'] == 'Query' && $row['Info'] != 'show processlist') {
-                        $ret .=  $v . '<span style="color: #cacaca; padding: 1px;"> | </span> ';
+                        $ret .=  "<td>$v</td>";
                     }
                 }
             }
+            $ret .= "</tr>";
             
             if ($_GET['liveList'] == TRUE) {
                 $ret .= '<div style="border: 1px solid lightgrey"></div>';
@@ -52,6 +56,7 @@ class getProcesslist
                 $ret .= '<div style="border: 1px solid #d8e2ed"></div>';
             }
         }
+            $ret .= "</table></div>";
         
         return $ret;
         

@@ -20,6 +20,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     
 *********************************************************************************/
+header('location: ../../ScannieV2/content/Scanning/BatchCheck/SCS.php');
 
 include('../../config.php');
 if (!class_exists('ScancoordDispatch')) {
@@ -59,7 +60,12 @@ class SalesChangeIndex extends ScancoordDispatch
             Audie: The Audit Scanner
         </a></td>
     </tr>
-</table></div></div></div>
+</table></div>
+    <br/>
+    <div></div>
+    <br/><br/>
+    <div><a href='../AuditScanner.php'>Audie - The Audit Scanner.</a></div>
+</div>
 HTML;
         
     }

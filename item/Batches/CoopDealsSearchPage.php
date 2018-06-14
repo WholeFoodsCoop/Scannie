@@ -236,7 +236,7 @@ HTML;
 
 					<input type="hidden" name="dealSet" value="'.$dealSet.'">
                     <br><br>&nbsp;<button class="btn btn-default btn-sm hidden-lg hidden-md">Filter by Brand</button>
-          			<a class="btn btn-default btn-sm" href="http://key/scancoord/item/Batches/CoopDealsSearchPage.php?dealSet='.$dealSet.'">Show All Brands</a>
+          			<a class="btn btn-default btn-sm" href="CoopDealsSearchPage.php?dealSet='.$dealSet.'">Show All Brands</a>
                 </form>
         </div>
         ';

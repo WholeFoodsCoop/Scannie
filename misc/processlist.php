@@ -54,6 +54,9 @@ return <<< HTML
     height: 300px;
     overflow-y: auto;
 }
+.grey {
+    color: grey;
+}
 HTML;
     }
 

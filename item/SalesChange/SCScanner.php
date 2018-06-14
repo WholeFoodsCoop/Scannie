@@ -32,7 +32,9 @@ class SCScanner extends scancoordDispatch
     public function body_content()
     {
 
-        $_GET['upc'] = scanLib::trimCheckDigit($_GET['upc']);
+        $_GET['upc'] = scanLib::padUPC($_GET['upc']);
+        $upc = $_GET['upc']; 
+        $upc = substr($upc,0,-1);
         
         $ret = '';
         $ret .= $this->form_content();
@@ -44,7 +46,6 @@ class SCScanner extends scancoordDispatch
             $_SESSION['store_id'] = $_POST['store_id'];
         }
         $item = array ( array() );
-        $upc = ScanLib::upcParse($_GET['upc']);
 
         if (isset($_GET['notes'])) {
             $note = $_GET['notes'];

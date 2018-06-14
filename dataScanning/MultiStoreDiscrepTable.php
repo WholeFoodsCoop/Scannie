@@ -192,9 +192,8 @@ $(function(){
     });
 });
 $('#hideProduce').click(function(){
-    $('tr').each(function(){
-        var td = $(this).text();
-        if (td.indexOf("PRODUCE")) {
+    $('td').each(function(){
+        if ($(this).hasClass('PRODUCE')) {
             $(this).closest('tr').hide();
         }
     });

@@ -48,7 +48,8 @@ class specialPriceCheck extends ScancoordDispatch
         }
         $regNos = array(11,12,13,14,15);
         foreach ($regNos as $regNo) {
-            $posdb .= $this->getMissingSales("SCANDENHOST","POSOPDB",$regNo,2);
+            //cannot access denfeld lanes from key anymore for some reason
+            //$posdb .= $this->getMissingSales("SCANDENHOST","POSOPDB",$regNo,2);
         }
 
         return <<<HTML
@@ -85,6 +86,7 @@ HTML;
             WHERE CONCAT(CURDATE(),' 00:00:00') BETWEEN b.startDate AND b.endDate
                 AND bl.upc NOT LIKE 'LC%'
                 AND b.discountType > 0
+                AND bl.salePrice <> 0
             GROUP BY b.batchID, bl.upc, p.store_id, s.storeID;
         ");
         $res = $dbc->execute($prep);

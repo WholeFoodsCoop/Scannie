@@ -71,7 +71,6 @@ class menu
             <li class="dropdown">
                 <a  class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Item<span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
-                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/last_sold_check.php?paste_list=1">Last Sold</a></li>
                     <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/TrackChangeNew.php">Track Change</a></li>
                     <li><a class="menu-opt" href="" onclick="popitup('http://{$SCANROOT_DIR}/item/MarginCalcNew.php')">Margin Calc</a></li>
                     <li><a class="menu-opt" href="" onclick="popitup('http://{$SCANROOT_DIR}/item/PercentCalc.php')">Percent Calc</a></li>
@@ -87,14 +86,11 @@ class menu
                 <li class="divider"></li><!-- divider with no header -->
                 <li class="dropdown-header">UNFI Sales Change</li>
                     <li class="test"><a href="http://{$SCANROOT_DIR}/item/SalesChange/SalesChangeIndex.php" style="color: green"> Batch Check </a></li>
-                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/SalesChange/CoopDealsReview.php">QA</a></li>
-                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/Batches/unfiBreakdowns.php">Breakdowns</a></li>
-                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/Batches/prodBatchHistory.php">Item Batch History</a></li>
+                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/SalesChange/CoopDealsReview.php">QA & Breakdowns</a></li>
                     <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/Batches/CoopDealsSearchPage.php">Coop+Deals File</a></li>
                 <li class="divider"></li><!-- divider with no header -->
                 <li class="dropdown-header">Price Changes</li>
                     <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/item/Batches/BatchReview/">Batch Review</a></li>
-                    <li><a class="menu-opt" href="http://http://{$SCANROOT_DIR}/item/Batches/CheckBatchPercent.php">Sales Batch %</a></li>
             </ul>
             </li>
             <li class="dropdown"><a  class="dropdown-toggle menuNav" data-toggle="dropdown" data-target="#" href="#">Data<span class="caret"></span></a>

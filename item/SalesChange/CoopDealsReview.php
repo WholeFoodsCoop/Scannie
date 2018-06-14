@@ -49,11 +49,13 @@ class CoopDealsReview extends ScancoordDispatch
         $ret .= "
             <p>
                 Coop Deals Review Page | 
-                <a href='../Batches/unfiBreakdowns.php'>Breakdown Items</a>
+                <a href='../Batches/unfiBreakdowns.php'>Breakdown Items</a> | 
+                <a href='http://$FANNIEROOT_DIR/item/ProdLocationEditor.php' >Product Locations</a>
             </p>
         ";
         $ret .= $this->form_content();
         $start = $_GET['startDate'];
+        $dealSet = $_GET['dealset'];
         $upcs = $this->getProdsInBatches($dbc);
         if (isset($start)) {
             $ret .= "
@@ -82,6 +84,19 @@ class CoopDealsReview extends ScancoordDispatch
                     <div class='col-md-3'>
                         <div class='table-responsive'>
                             {$this->getBadPrices($dbc,$upcs)}
+                        </div>
+                    </div>
+                </div>
+                <div class='row'>
+                    <div class='col-md-4'>
+                        <div class='table-responsive'>
+                            {$this->getSkuMatch($dbc,$dealSet)}
+                        </div>
+                    </div>
+                    <div class='col-md-4'>
+                    </div>
+                    <div class='col-md-3'>
+                        <div class='table-responsive'>
                         </div>
                     </div>
                 </div>
@@ -302,7 +317,7 @@ class CoopDealsReview extends ScancoordDispatch
         $startDate = $_GET['startDate'];
         $ret = '';
         $ret .='<div class="panel panel-default mypanel">
-            <legend class="panel-heading small">Items with Bad Sales Prices</legend>';
+            <legend class="panel-heading small">Items with Bad Sale Prices</legend>';
 
         $query = $dbc->prepare("
             SELECT bl.*, p.brand, p.description
@@ -340,6 +355,7 @@ class CoopDealsReview extends ScancoordDispatch
     private function form_content()
     {
         $v = $_GET['startDate'];
+        $d = $_GET['dealset'];
         return <<<HTML
 <strong>Start Date</strong>
 <form method="get" class="form-inline">
@@ -347,10 +363,49 @@ class CoopDealsReview extends ScancoordDispatch
         <input type="input" class="form-control mainInput" name="startDate" value="{$v}">
     </div>
     <div class="form-group">
+        <input type="input" class="form-control mainInput" name="dealset" placeholder="DealSet" value="{$d}">
+    </div>
+    <div class="form-group">
         <button type="submit" class="btn btn-default mainInput">Submit</button>
     </div>
 </form>
 HTML;
+    }
+
+    private function getSkuMatch($dbc, $dealset)
+    {
+        $args = array($dealset);
+        $prep = $dbc->prepare("
+            SELECT 
+                p.description, p.brand, c.upc, price, abtpr, promoDiscount 
+            FROM CoopDealsItems AS c
+                LEFT JOIN products AS p ON c.upc=p.upc
+            WHERE dealSet = ? 
+                AND skuMatch <> 0 
+            GROUP BY p.upc
+            ORDER BY upc ASC;");
+        $res = $dbc->execute($prep, $args); 
+        $ret = '';
+        $ret .='<div class="panel panel-default mypanel">
+            <legend class="panel-heading small">Multiple SKU items in Final Commit</legend>';
+        $ret .= '<table class="table table-default table-condensed small table-striped">';
+        $ROWS = array('upc', 'brand', 'description', 'price', 'abtpr', 'promoDiscount');
+        $upcs = array();
+        $tdata = ''; 
+        while ($row = $dbc->fetchRow($res)) {
+            $upcs[] = $row['upc'];
+            $tdata .= '<tr>';
+            foreach ($ROWS as $col) {
+                $temp = $row[$col];
+                $tdata .= "<td>$temp</td>";
+            }
+            $tdata .= '</tr>';
+        }
+        $ret .= $tdata;
+        $ret .= '</table></panel>';
+        $ret .= ($dbc->error()) ? "<div class='alert alert-danger'>{$dbc->error()}</div>" : ""; 
+        
+        return $ret;
     }
 
     public function javascriptContent()
