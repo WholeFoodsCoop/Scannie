@@ -250,8 +250,8 @@ class ScancoordDispatch
         $ret .= $this->cssContent();
         $ret .= '
 </style>';
-        /* deprecated, use class method javascriptContent
         $this->addScript("http://{$SCANROOT_DIR}/common/javascript/scannie.js");
+        /* deprecated, use class method javascriptContent
         if ($this->add_javascript_content == TRUE) {
             $ret .= $class::javascript_content();
         }
