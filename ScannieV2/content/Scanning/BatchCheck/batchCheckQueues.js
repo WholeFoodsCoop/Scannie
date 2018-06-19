@@ -173,3 +173,17 @@ $('td').each(function(){
         }
     }
 });
+
+// remove duplicate rows inserted when finding items left out by mysql  
+var missUpcs = [];
+$('td').each(function() {
+    if ( $(this).hasClass('col-upc') ) {
+        html = $(this).html(); 
+        if ( $.inArray(html, missUpcs) != -1 ) {
+            $(this).closest('tr').hide();
+        } else {
+            missUpcs.push(html)
+        }
+    }
+});
+
