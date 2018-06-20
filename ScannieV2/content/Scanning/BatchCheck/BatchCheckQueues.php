@@ -409,11 +409,12 @@ HTML;
         $hiddenContent .= $hiddenThead;
 
         $r = 1;
+        $upcsInTable = array();
         foreach ($upc as $k => $v) {
             $upcLink = "<a href='http://$FANNIE_ROOTDIR/item/ItemEditorPage.php?searchupc=$k' target='_BLANK'>$k</a>";
             if ($option == 0) {
                 if (!in_array($k,$inQueueItems)) { 
-                    $table .= ($r % 2 == 0) ? "<tr>" : "<tr class='altRow'>";
+                    $table .= "<tr>";
                     $table .= "<td class='col-upc'>$upcLink</td>";
                     foreach ($fields as $field) {
                         if ($field != 'upc') {
@@ -430,8 +431,9 @@ HTML;
                 }
             } elseif (in_array($option,array(1,2,4,5,11,98))) {
                 if (in_array($k,$inQueueItems)) {
-                    $table .= ($r % 2 == 0) ? "<tr>" : "<tr class='altRow'>";
+                    $table .= "<tr>";
                     $table .= "<td>$upcLink</td>";
+                    $upcsInTable[] = $k;
                     foreach ($fields as $field) {
                         if ($field != 'upc') {
                             $temp = ${$field}[$k];
@@ -441,6 +443,7 @@ HTML;
                         }
                     }
                     foreach ($queueBtns as $qv) {
+                        // echo "$qv<br/>";
                         $table .= "<td><button id='queue$k' value='$qv' class='queue-btn btn btn-info'>{$this->options[$qv]}</button></td>";
                     }
                     $table .= "<td><button id='queue$k' value='$option' class='queue-btn btn btn-info'>Clear</button></td>";
@@ -449,8 +452,9 @@ HTML;
                 }             
             } elseif (in_array($option,array(6,9))) {
                 if (in_array($k,$inQueueItems)) {
-                    $table .= ($r % 2 == 0) ? "<tr>" : "<tr class='altRow'>";
+                    $table .= "<tr>";
                     $table .= "<td>$k</td>";
+                    $upcsInTable[] = $k;
                     foreach ($fields as $field) {
                         if ($field != 'upc') {
                             $temp = ${$field}[$k];
@@ -484,9 +488,10 @@ HTML;
             $prep = $dbc->prepare("SELECT upc, session, notes FROM woodshed_no_replicate.batchCheckNotes WHERE session = ?");
             $res = $dbc->execute($prep,$args);
             while ($row = $dbc->fetchRow($res)) {
-                $table .= ($r % 2 == 0) ? "<tr>" : "<tr class='altRow'>";
+                $table .= "<tr>";
                 $curUpc = $row['upc'];
                 $upcLink = "<a href='http://$FANNIE_ROOTDIR/item/ItemEditorPage.php?searchupc=$curUpc' target='_BLANK'>$curUpc</a>";
+                $upcsInTable[] = $k;
                 $temp = $row['notes'];
                 $table .= "<td>$upcLink</td>";
                 $table .= "<td class='col-$field editable' id='editnotes'>$temp</td>";
@@ -496,7 +501,42 @@ HTML;
             }
             $table .= '</tbody></table></div>';
         }
-
+        
+        // get those missing upcs into the table.
+        // REM: buttons and clicks don't work (except clear)
+        $missingUpcs = array();
+        foreach ($upcs as $k => $upc) {
+            if (!in_array($upc, $upcsInTable)) {
+                $missingUpcs[] = $upc;
+            }
+        }
+        $emptyd = "<td></td>";
+        list($inStr,$args) = $dbc->safeInClause($missingUpcs); 
+        $query = "SELECT upc, brand, description FROM products WHERE upc IN ($inStr)";
+        $prep = $dbc->prepare($query);
+        $res = $dbc->execute($prep, $args);
+        while ($row = $dbc->fetchRow($res)) {
+            $brand = $row['brand'];
+            $description = $row['description'];
+            $upc = $row['upc'];
+            $upcLink = "<a href='http://$FANNIE_ROOTDIR/item/ItemEditorPage.php?searchupc=$upc' target='_BLANK'>$upc</a>";
+            $table .= "<tr>";
+            // table data
+            $table .= "<td class='col-upc'>$upcLink</td><td class='col-salePrice'></td><td class='col-bid'></td><td class='col-pBrand'>$brand</td><td class='col-pubrand'></td><td class='col-pDesc'>$description</td>";
+            $table .=  "<td class='col-pudesc'></td>";
+            $table .=  "<td class='col-size'></td>";
+            $table .=  "<td class='col-special_price'></td>";
+            $table .=  "<td class='col-batchName'></td>";
+            $table .=  "<td class='col-sections'></td>";
+            $table .=  "<td class='col-last_sold'></td>";
+            foreach ($queueBtns as $qv) {
+                $table .= "<td><button id='queue$upc' value='$qv' class='queue-btn btn btn-info'>{$this->options[$qv]}</button></td>";
+            }
+            $table .= "<td><button id='queue$upc' value='$option' class='queue-btn btn btn-info'>Clear</button></td>";
+            $table .= "</tr>";
+            $r++;
+        }
+        
         $table .= "</tbody></table></div>";
         $timestamp = time();
         $this->addScript('scs.js?time='.$timestamp);
@@ -664,6 +704,7 @@ select.filter {
     border: 1px solid rgba(255,255,255,0.1);
     border-radius: 2px;
     margin-right: 5px;
+    margin-top: 5px;
 }
 .thLine {
     overflow: hidden; 

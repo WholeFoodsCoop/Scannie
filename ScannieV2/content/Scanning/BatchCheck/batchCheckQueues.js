@@ -13,6 +13,7 @@ $(function(){
     });
 });
 
+// sort & hide columns
 $(function(){
     $('#mytable').tablesorter({
         selectorSort : 'button.sorter'    
@@ -30,6 +31,7 @@ $('.col-filter').click(function(){
     $(this).hide()
 });
 
+// queue button events
 $('.queue-btn').click(function(){
     var qv = $(this).val();
     var queueName = $(this).text();
@@ -82,7 +84,7 @@ $('th').each(function(){
     //nameElm.text(thName);
 });
 
-//do something based on current option. I don't think this is in-use. 
+//do something based on current option. I don't think this is being used
 $(function(){
     var option = $('#curOption').val();
     if (parseInt(option,10) == 3) {
@@ -91,6 +93,7 @@ $(function(){
     }
 });
 
+// filter events
 $('.filter').on('change',function(){
     var select = $(this).find(':selected');
     var filter = $(this).attr('name');
@@ -140,6 +143,7 @@ $('.filter').on('change',function(){
 });
 
 
+// recognize dates on page as current, past and ancient 
 $('td').each(function(){
     var text = $(this).text(); 
     var col = $(this).attr('class');
@@ -174,6 +178,7 @@ $('td').each(function(){
     }
 });
 
+
 // remove duplicate rows inserted when finding items left out by mysql  
 var missUpcs = [];
 $('td').each(function() {
@@ -187,3 +192,13 @@ $('td').each(function() {
     }
 });
 
+// dynamically add stipe to table
+var i = 0;
+$('tr').each(function(){
+    if ( $(this).is(':visible') ) {
+        if (i % 2 != 0) {
+            $(this).css('background', 'orange');   
+        }
+        i++;
+    }
+});
