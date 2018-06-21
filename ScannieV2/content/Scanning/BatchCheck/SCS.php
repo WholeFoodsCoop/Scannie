@@ -32,6 +32,9 @@ class SCS extends PageLayoutA
         if (FormLib::get('edit', false)) {
             $this->editHandler($dbc);
             die();
+        } elseif (FormLib::get('clearAll', false)) {
+            $this->clearAllHandler($dbc); 
+            die();
         } elseif (FormLib::get('queue', false)) {
             $this->queueHandler($dbc); 
             die();
@@ -44,7 +47,7 @@ class SCS extends PageLayoutA
             die(); 
         } elseif (FormLib::get('loginSubmit', false)) {
             $this->loginSubmitHandler($dbc);
-        }
+        }         
         if (FormLib::get('upc', false)) {
             $this->getProdData($dbc);
             $this->getQueueData($dbc);
@@ -60,11 +63,28 @@ class SCS extends PageLayoutA
         return true;
     }
 
+    private function clearAllHandler($dbc)
+    {
+        $qv = FormLib::get('qval');
+        $sessionName = FormLib::get('sessionName');
+        $storeID = FormLib::get('storeID');
+
+        $args = array($sessionName, $qv, $storeID);
+        $prep = $dbc->prepare("delete from woodshed_no_replicate.batchCheckQueues
+            where session = ? and inQueue = ? and storeID = ?");
+        $res = $dbc->execute($prep,$args);
+        $json = array();
+        $json['error'] = $dbc->error();
+
+        echo json_encode($json);
+        return false;
+    }
+
     private function removeQueueHandler($dbc)
     {
         $qid = FormLib::get('qid');
         $args = array($qid);
-        $prep = $dbc->prepare("DELETE FROM woodshed_no_replicate.batchCheckQueues WHERE id = ?");
+        $prep = $dbc->prepare("delete from woodshed_no_replicate.batchCheckQueues where id = ?");
         $res = $dbc->execute($prep,$args);
         $json = array();
         $json['error'] = $dbc->error();

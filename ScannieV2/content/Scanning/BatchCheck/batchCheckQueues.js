@@ -202,3 +202,31 @@ $('tr').each(function(){
         i++;
     }
 });
+
+// clear all in queue
+$('#clearAll').click(function(){
+    c = confirm("Remove all items from this queue?");
+    if (c === true) {
+        var qv = $(this).val();
+        var queueName = $(this).text();
+        var id = $(this).attr('id');
+        var sessionName = $('#sessionName').val();
+        var storeID = $('#storeID').val();
+        $.ajax({
+            type: 'post',
+            url: 'SCS.php',
+            data: 'queue='+queueName+'&qval='+qv+'&sessionName='+sessionName+'&storeID='+storeID+'&clearAll=1',
+            dataType: 'json',
+            success: function(json) {
+                $('td').each(function(){
+                    $(this).closest('tr').hide();
+                });
+                $('#textarea').val("");
+                $('#qcount').html("[0]");
+                if (json.error) {
+                    alert(json.error);
+                }
+            }
+        });
+    }
+});

@@ -188,7 +188,7 @@ HTML;
         $query = "SELECT upc FROM woodshed_no_replicate.batchCheckQueues WHERE inQueue IN ($inStr) AND session = ?";
         $prep = $dbc->prepare($query);
         $res = $dbc->execute($prep, $args);
-        $textarea = "<textarea rows=5 class='form-control filter'>";
+        $textarea = "<textarea rows=5 id='textarea' class='form-control filter'>";
         while ($row = $dbc->fetchRow($res)) {
               $textarea .= $row['upc']."\r\n"; 
               $upcs[] = $row['upc'];
@@ -570,19 +570,19 @@ HTML;
 
         if ($this->options[$q]) {
             if (in_array($q,array(0))) {
-                $ret .= "<h4>{$this->options[$q]}</h4>";
+                $ret .= "<h4 id='qcount'>{$this->options[$q]}</h4>";
             } elseif ($q == 6) {
                 $qCount = $this->queueCounts[6] + $this->queueCounts[7] + $this->queueCounts[8];
-                $ret .= "<h4>{$this->options[$q]} [$qCount]</h4>";
+                $ret .= "<h4 id='qcount'>{$this->options[$q]} [$qCount]</h4>";
                 $table = $this->getTableContents($dbc);
             } elseif ($q == 9) {
                 $qCount = $this->queueCounts[9] + $this->queueCounts[10];
-                $ret .= "<h4>{$this->options[$q]} [$qCount]</h4>";
+                $ret .= "<h4 id='qcount'>{$this->options[$q]} [$qCount]</h4>";
                 $table = $this->getTableContents($dbc);
                 
             } else {
                 $qCount = $this->queueCounts[$q];
-                $ret .= "<h4>{$this->options[$q]} [$qCount]</h4>";
+                $ret .= "<h4 id='qcount'>{$this->options[$q]} [$qCount]</h4>";
                 $table = $this->getTableContents($dbc);
             }
             $table = $this->getTableContents($dbc);
@@ -600,6 +600,7 @@ HTML;
         $curQueue = (array_key_exists('queue', $_GET)) ? $_GET['queue'] : null;
 
         $table = $this->getTableContents($dbc);
+        $clearAll = "<button id='clearAll' value='$q' class='btn btn-danger'>ClearAll</button>";
 
         $timestamp = time();
         $this->addScript("SalesChangeQueues.js?time=".$timestamp);
@@ -610,6 +611,7 @@ HTML;
         return <<<HTML
 $ret
 $table
+<div align="center">$clearAll</div>
 HTML;
     }
 
@@ -679,6 +681,9 @@ HTML;
     public function cssContent()
     {
         return <<<HTML
+#clearAll {
+    margin-bottom: 25px;
+}
 #mythead-clone {
     position: fixed;
     top: -1px;
