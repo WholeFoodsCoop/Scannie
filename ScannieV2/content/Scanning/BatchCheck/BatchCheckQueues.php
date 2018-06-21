@@ -435,9 +435,12 @@ HTML;
                     $table .= "<td>$upcLink</td>";
                     $upcsInTable[] = $k;
                     foreach ($fields as $field) {
-                        if ($field != 'upc') {
+                        if ($field == 'batchName') {
+                            $temp = $batches[$k]['batchName'];
+                            $extraClass = ($field == 'sections') ? 'editLocation' : '';
+                            $table .= "<td class='col-$field $extraClass'>$temp</td>";
+                        } elseif ($field != 'upc') {
                             $temp = ${$field}[$k];
-                            //$table .= "<td class='col-$field'>$temp</td>";
                             $extraClass = ($field == 'sections') ? 'editLocation' : '';
                             $table .= "<td class='col-$field $extraClass'>$temp</td>";
                         }
