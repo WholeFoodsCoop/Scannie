@@ -436,6 +436,7 @@ HTML;
                     $upcsInTable[] = $k;
                     foreach ($fields as $field) {
                         if ($field == 'batchName') {
+                            $temp = "";
                             $temp = $batches[$k]['batchName'];
                             $extraClass = ($field == 'sections') ? 'editLocation' : '';
                             $table .= "<td class='col-$field $extraClass'>$temp</td>";
