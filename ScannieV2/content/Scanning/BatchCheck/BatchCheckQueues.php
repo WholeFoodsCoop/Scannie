@@ -526,13 +526,13 @@ HTML;
             $upcLink = "<a href='http://$FANNIE_ROOTDIR/item/ItemEditorPage.php?searchupc=$upc' target='_BLANK'>$upc</a>";
             $table .= "<tr>";
             // table data
-            $table .= "<td class='col-upc'>$upcLink</td><td class='col-salePrice'></td><td class='col-bid'></td><td class='col-pBrand'>$brand</td><td class='col-pubrand'></td><td class='col-pDesc'>$description</td>";
-            $table .=  "<td class='col-pudesc'></td>";
-            $table .=  "<td class='col-size'></td>";
-            $table .=  "<td class='col-special_price'></td>";
-            $table .=  "<td class='col-batchName'></td>";
-            $table .=  "<td class='col-sections'></td>";
-            $table .=  "<td class='col-last_sold'></td>";
+            $table .= "<td class='col-upc'>$upcLink</td><td class='col-salePrice'>n/a</td><td class='col-bid'>n/a</td><td class='col-pbrand'>$brand</td><td class='col-pubrand'>n/a</td><td class='col-pdesc'>$description</td>";
+            $table .=  "<td class='col-pudesc'>n/a</td>";
+            $table .=  "<td class='col-size'>n/a</td>";
+            $table .=  "<td class='col-special_price'>n/a</td>";
+            $table .=  "<td class='col-batchName'>n/a</td>";
+            $table .=  "<td class='col-sections'>n/a</td>";
+            $table .=  "<td class='col-last_sold'>n/a</td>";
             foreach ($queueBtns as $qv) {
                 $table .= "<td><button id='queue$upc' value='$qv' class='queue-btn btn btn-info'>{$this->options[$qv]}</button></td>";
             }

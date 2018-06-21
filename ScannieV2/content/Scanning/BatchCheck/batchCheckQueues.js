@@ -17,6 +17,8 @@ $(function(){
 $(function(){
     $('#mytable').tablesorter({
         selectorSort : 'button.sorter'    
+    }).bind("sortEnd",function(e, t) {
+        stripeTable();    
     });
     $('.col-hide').click(function(){
         var colName = $(this).val();
@@ -24,11 +26,13 @@ $(function(){
         $('.col-'+colName).hide();
         $(filterBtnID).show();
     });
+    stripeTable();
 });
 $('.col-filter').click(function(){
     var colName = $(this).text(); 
     $('.col-'+colName).show();
-    $(this).hide()
+    $(this).hide();
+    stripeTable();
 });
 
 // queue button events
@@ -140,6 +144,7 @@ $('.filter').on('change',function(){
             } 
         });
     }
+    stripeTable();
 });
 
 
@@ -193,15 +198,21 @@ $('td').each(function() {
 });
 
 // dynamically add stipe to table
-var i = 0;
-$('tr').each(function(){
-    if ( $(this).is(':visible') ) {
-        if (i % 2 != 0) {
-            $(this).css('background', 'orange');   
+function stripeTable(){
+    var i = 0;
+    $('tr').each(function(){
+        $(this).css('background', 'white');
+    });
+    $('tr').each(function(){
+        if ( $(this).is(':visible') ) {
+            if (i % 2 != 0) {
+                $(this).css('background', 'orange');   
+            }
+            i++;
         }
-        i++;
-    }
-});
+    });
+};
+stripeTable();
 
 // clear all in queue
 $('#clearAll').click(function(){
