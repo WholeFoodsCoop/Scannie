@@ -8,21 +8,21 @@ function queue(store_id)
 {
     var upcB = document.getElementById("upc").value;
     $.ajax({
-		type: 'post',
+        type: 'post',
         url: 'AuditUpdate.php',
         data: 'upc='+upcB+'&store_id='+store_id,
-		error: function(xhr, status, error)
-		{
-			alert('error:' + status + ':' + error + ':' + xhr.responseText)
-		},
+        error: function(xhr, status, error)
+        {
+            alert('error:' + status + ':' + error + ':' + xhr.responseText)
+        },
         success: function(response)
         {
             $('#ajax-resp').html(response);
         }
     })
-	.done(function(data){
+    .done(function(data){
 
-	})
+    })
 }
 
 $( "button" ).click(function() {
@@ -147,3 +147,47 @@ $(function(){
     }
 });
 
+$('#btn-action').click(function(){
+    $('#menu-action').show();
+});
+
+$('#exit-action-menu').click(function(){
+    $('#menu-action').hide();
+});
+
+$('#mod-narrow').click(function(){
+    var upc = $('#upc').val();
+    $.ajax({
+        type: 'post',
+        url: 'AuditScanner.php',
+        data: 'upc='+upc+'&action=mod-narrow',
+        success: function(resp)
+        {
+            alert('Success!');
+        },
+        error: function(resp)
+        {
+            alert('Action Failed');
+        }
+    });
+});
+
+$('.edit-btn').click(function(){
+    var table = $(this).attr('data-table');
+    var column = $(this).attr('data-column');
+    var newtext = prompt('Enter new '+column);
+    var upc = $('#upc').val();
+    $.ajax({
+        type: 'post',
+        url: 'AuditScanner.php',
+        data: 'upc='+upc+'&action=mod-edit&newtext='+newtext+'&table='+table+'&column='+column,
+        success: function(resp)
+        {
+            alert('Success!');
+        },
+        error: function(resp)
+        {
+            alert('Action Failed');
+        }
+    });
+});

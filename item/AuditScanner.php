@@ -42,6 +42,20 @@ class AuditScanner extends ScancoordDispatch
 
         $username = scanLib::getUser();
         $dbc = scanLib::getConObj();
+
+        $action = FormLib::get('action');
+        echo $action;
+        $upc = FormLib::get('upc');
+        // echo $upc;
+
+        if ($action == 'mod-narrow') {
+            $this->mod_narrow_handler($upc);
+            die();
+        } elseif ($action == 'mod-edit') {
+            $this->mod_edit($upc);
+            die();
+        }
+
         if (isset($_GET['note'])) {
             $note = $_GET['note'];
             $error = $this->notedata_handler($dbc,$note,$username);
@@ -53,16 +67,56 @@ class AuditScanner extends ScancoordDispatch
         }
 
     }
-    public function pBar($weekPar,$deptNo,$storeID,$dbc)    
+
+    private function mod_edit($upc)
+    {
+        $dbc = scanLib::getConObj();
+        $table = FormLib::get('table');
+        $column = FormLib::get('column');
+        $newtext = FormLib::get('newtext');
+
+        $args = array($newtext, $upc);
+        $query = "UPDATE $table SET $column = ? WHERE upc = ?";
+        $prep = $dbc->prepare($query);
+        $res = $dbc->execute($prep, $args);
+        while ($row = $dbc->fetchRow($res)) {
+
+        }
+
+        return false;
+    }
+
+    private function mod_narrow_handler($upc)
+    {
+        $dbc = scanLib::getConObj();
+        $args = array($upc);
+        $prep = $dbc->prepare("SELECT upc FROM productUser WHERE upc = ? AND narrow = 1");
+        $res = $dbc->execute($prep, $args);
+        while ($row = $dbc->fetchRow($res)) {
+            $narrow = $row['upc'];
+        }
+        echo $narrow;
+        if ($narrow > 0) {
+            $prep = $dbc->prepare("UPDATE productUser SET narrow = 0");
+            $res = $dbc->execute($prep, $args);
+        } else {
+            $prep = $dbc->prepare("UPDATE productUser SET narrow = 1");
+            $res = $dbc->execute($prep, $args);
+        }
+
+        return false;
+    }
+
+    public function pBar($weekPar,$deptNo,$storeID,$dbc)
     {
         if ($_SESSION['audieDept'] != $deptNo) {
             $args = array($storeID,$deptNo);
             $prep = $dbc->prepare("
-                SELECT auto_par, auto_par*7 as par, upc, brand, description 
-                FROM products 
-                WHERE store_id = ? 
-                    AND department = ? 
-                ORDER BY auto_par DESC 
+                SELECT auto_par, auto_par*7 as par, upc, brand, description
+                FROM products
+                WHERE store_id = ?
+                    AND department = ?
+                ORDER BY auto_par DESC
                 LIMIT 1");
             $res = $dbc->execute($prep,$args);
             while ($row = $dbc->fetchRow($res)) {
@@ -90,7 +144,7 @@ HTML;
     {
         $ret = '';
         $upc = ScanLib::upcParse($_GET['upc']);
-        echo $upc;
+        //echo $upc;
         $args = array($note,$upc,$username);
         $query = $dbc->prepare("UPDATE woodshed_no_replicate.AuditScanner
             SET notes = ? WHERE upc = ? AND username = ?;");
@@ -134,7 +188,8 @@ HTML;
         include(__DIR__.'/../config.php');
         include(__DIR__.'/../common/lib/PriceRounder.php');
         $rounder = new PriceRounder();
-        $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
+        //$dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
+        $dbc = scanLib::getConObj();
         $storeID = scanLib::getStoreID();
         $upc = scanLib::upcParse($_POST['upc']);
 
@@ -143,12 +198,12 @@ HTML;
                 <div class="progress-bar progress-bar-striped active" role="progressbar"
                     aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
                 </div>
-            </div> 
+            </div>
         ';
-        
+
         $uid = '<span class="userSymbol"><b>'.strtoupper(substr($username,0,1)).
             '&nbsp;&nbsp;'.$username.'</b></span>';
-        
+
         $ret .= $uid;
         $ret .= $this->mobile_menu($upc);
         $ret .= $loading;
@@ -431,7 +486,7 @@ HTML;
                                 style="width: 100%;">Print
                             </button>
                             <input type="hidden" name="note" value="Print Tag" />
-                            <input type="hidden" name="upc" value="'.$upc.'" />
+                            <input type="hidden" id="upc" name="upc" value="'.$upc.'" />
                         </div>
                         </form>
                         <div class="col-xs-4  clear">
@@ -472,7 +527,7 @@ HTML;
             'Product Not In Use',
             'Remove This Item From Queue',
             'n/a',
-            'Disco Item' 
+            'Disco Item'
         );
         while ($row = $dbc->fetchRow($res)) {
             //echo $row['notes'];
@@ -509,14 +564,14 @@ HTML;
                     <span class="qmBtn" onClick="qm(\'Disco Item\'); return false; ">
                         <b>Disco Item</b></span>
         ';
-        
+
         foreach ($notes as $note) {
             if ($note != NULL) {
                 $ret .= '<span class="qmBtn"  onClick="qm(\''.$note.'\'); return false; ">
                     <b>'.$note.'</b></span>';
             }
         }
-        
+
         $ret .= '
                 </div>
             </div>';
@@ -528,14 +583,15 @@ HTML;
         $timestamp = time();
         $this->addScript('AuditScanner.js?unique='.$timestamp);
         $ret .= "<input type='hidden' id='isOnSale' name='isOnSale' value=$isOnSale/>";
+        $hiddenContent = $this->hiddenContent();
 
-        return $ret;
+        return $ret.$hiddenContent;
     }
-    
+
     private function getCount($dbc,$storeID,$username)
-    {    
+    {
         $args = array($username,$storeID);
-        $prep = $dbc->prepare("SELECT count(*) from woodshed_no_replicate.AuditScanner 
+        $prep = $dbc->prepare("SELECT count(*) from woodshed_no_replicate.AuditScanner
             WHERE username = ? AND store_id = ?");
         $res = $dbc->execute($prep,$args);
         $count = $dbc->fetchRow($res);
@@ -572,7 +628,7 @@ HTML;
         $argsA = array($data['upc'],$username,$storeID);
         $prepA = $dbc->prepare("SELECT * FROM AuditScanner WHERE upc = ? AND username = ? AND store_id = ? LIMIT 1");
         $resA = $dbc->execute($prepA,$argsA);
-            
+
         if ($dbc->numRows($resA) == 0) {
             $args = array(
                 $data['upc'],
@@ -613,156 +669,198 @@ HTML;
 
     public function css_content()
     {
-        return '
-                .text-xs {
-                    font-size: 8px;
-                    padding: 10px;
-                }
-                body {
-                    font-family: Arial, Helvetica, sans-serif;
-                    background-color: rgba(255,255,255,0.9);
-                    background: linear-gradient(135deg, #42a7f4, #0a1528);
-                    background-color: linear-gradient(135deg, #42a7f4, #0a1528);
-                    background-repeat: no-repeat;
-                    background-attachment: fixed;
-                    color: #cacaca;
-                }
-                .btn-mobile {
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    padding: 1px;
-                    height: 25px;
-                    width: 25px;
-                    border: rgba(255,255,255,0.3);
-                    background-color: rgba(255,255,255,0.2);
-                    box-shadow: 1px 1px rgba(255,255,255,0.1);
-                    color: rgba(255,255,255,0.4);
-                }
-                .btn-keypad {
-                    height: 50px;
-                    width: 50px;
-                    border: 5px solid white;
-                    //border-radius: 2px;
-                    background-color: lightgrey; 
-                    text-align: center;
-                    cursor: pointer;
-                }
-                #progressBar {
-                    display: none;
-                }
-            #heading {
-                color: rgba(255,255,255,0.6);
-                font-size: 10px;
-            }
-            .info {
-                opacity: 0.9;
-                //background: linear-gradient(#7c7c7c,#272822);
-                background: rgba(39, 40, 34, .05);
-                border-radius: 2px;
-                padding: 5px;
-            }
-            body {
-                //background-image: url(\'../common/src/img/lbgrad.png\');
-            }
-            .vid {
-                color: #525259;
-            }
-            .clear {
-                opacity: 0.8;
-            }
-            #ajax-resp {
-                position: fixed;
-                top: 60;
-                width: 100%;
-            }
-            .fixed-resp {
-                position: fixed;
-                top: 60;
-                width: 100%;
-            }
-            #notepad {
-                position: fixed;
-                top: 0;
-                left: 0;
-                height: 100%;
-                width: 100%;
-                background: linear-gradient(#d99696, #d64f4f);
-                opacity: 0.8;
-            }
-            .qmBtn {
-                   background-clip: padding-box;
-                   padding: 5px; 
-                   padding-top: 10px;
-                   border-radius: 5px;
-                   background-color: white;
-                   border: 3px solid transparent;
-                   //height: auto;
-                   //min-height: 50px;
-                   width: 75px;
-                   height: 75px;
-                   float: left;
-                   font-size: 12px;
-                   color: grey;
-                }
-            /*
-            #note-resp {
-                position: fixed;
-                top: 0;
-                left: 0;
-                height: 100%;
-                width: 100%;
-                horizonal-align: middle;
-                font-size: 26px;
-            }*/
-            .note-input {
-                background-color: #fceded;
-            }
-            .sm-label {
-                font-size: 10px;
-                color: rgba(255,255,255,0.6); 
-            }
-            .text-tiny {
-                font-size: 8px;
-                color: #6f6f80;
-            }
-            .text-sale {
-                color: lightgreen;
-                font-weight: bold;
-            }
-            .btn-msg {
-                width: 150px;
-            }
-            .norm-text {
-                font-size: 12px;
-                color: black;
-            }
-            .counter {
-                position: absolute;
-                top: 5;
-                left: 5;
-                width: 25;
-                height: 25;
-                font-size: 40;
-                font-weigth: bold;
-                opacity: 0.5;
-            }
-            .userSymbol {
-                position: absolute;
-                top: 55;
-                left: 8;
-                padding-left: 5px;
-                opacity: 0.5;
-            }
-            #pBar {
-                opacity: 0.5;
-                position: relative;
-                margin-bottom: 0px;
-                margin-top: 0px;
-                padding: 0px;
-                bottom: 27px;
-            }
-        ';
+        return <<<CSS
+.menu-list-space {
+    background-color: rgba(0,0,0,0);
+    list-style-type: none;
+    height: 25px;
+}
+.menu-exit {
+}
+#menu-action {
+    display: none;
+    height: 100vh;
+    width: 100vw;
+    z-index: 999;
+    background: linear-gradient(135deg, #42a7f4, #0a1528);
+    background-color: linear-gradient(135deg, #42a7f4, #0a1528);
+    position: fixed;
+    top: 0px;
+    left: 0px;
+}
+ul.menu-list {
+     padding: 25px;
+}
+li.menu-list {
+    background-color: rgba(255, 255, 255, 0.5);
+    list-style-type: none;
+    margin-top: 15px;
+    padding: 15px;
+    color: black;
+    font-weight: #CACACA;
+    cursor: pointer;
+}
+.text-xs {
+    font-size: 8px;
+    padding: 10px;
+}
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: rgba(255,255,255,0.9);
+    background: linear-gradient(135deg, #42a7f4, #0a1528);
+    background-color: linear-gradient(135deg, #42a7f4, #0a1528);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: #cacaca;
+}
+.btn-mobile {
+    position: fixed;
+    top: 20px;
+    right: 50px;
+    padding: 1px;
+    height: 25px;
+    width: 25px;
+    border: rgba(255,255,255,0.3);
+    background-color: rgba(255,255,255,0.2);
+    box-shadow: 1px 1px rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.4);
+}
+.btn-action {
+    position: fixed;
+    top: 50px;
+    right: 15px;
+    padding: 1px;
+    height: 25px;
+    width: 25px;
+    border: rgba(255,255,255,0.3);
+    background-color: rgba(255,255,255,0.2);
+    box-shadow: 1px 1px rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.4);
+}
+.btn-keypad {
+    height: 50px;
+    width: 50px;
+    border: 5px solid white;
+    //border-radius: 2px;
+    background-color: lightgrey;
+    text-align: center;
+    cursor: pointer;
+}
+#progressBar {
+    display: none;
+}
+#heading {
+color: rgba(255,255,255,0.6);
+font-size: 10px;
+}
+.info {
+opacity: 0.9;
+//background: linear-gradient(#7c7c7c,#272822);
+background: rgba(39, 40, 34, .05);
+border-radius: 2px;
+padding: 5px;
+}
+body {
+//background-image: url(\'../common/src/img/lbgrad.png\');
+}
+.vid {
+color: #525259;
+}
+.clear {
+opacity: 0.8;
+}
+#ajax-resp {
+position: fixed;
+top: 60;
+width: 100%;
+}
+.fixed-resp {
+position: fixed;
+top: 60;
+width: 100%;
+}
+#notepad {
+position: fixed;
+top: 0;
+left: 0;
+height: 100%;
+width: 100%;
+background: linear-gradient(#d99696, #d64f4f);
+opacity: 0.8;
+}
+.qmBtn {
+   background-clip: padding-box;
+   padding: 5px;
+   padding-top: 10px;
+   border-radius: 5px;
+   background-color: white;
+   border: 3px solid transparent;
+   //height: auto;
+   //min-height: 50px;
+   width: 75px;
+   height: 75px;
+   float: left;
+   font-size: 12px;
+   color: grey;
+}
+/*
+#note-resp {
+position: fixed;
+top: 0;
+left: 0;
+height: 100%;
+width: 100%;
+horizonal-align: middle;
+font-size: 26px;
+}*/
+.note-input {
+background-color: #fceded;
+}
+.sm-label {
+font-size: 10px;
+color: rgba(255,255,255,0.6);
+}
+.text-tiny {
+font-size: 8px;
+color: #6f6f80;
+}
+.text-sale {
+color: lightgreen;
+font-weight: bold;
+}
+.btn-msg {
+width: 150px;
+}
+.norm-text {
+font-size: 12px;
+color: black;
+}
+.counter {
+position: absolute;
+top: 5;
+left: 5;
+width: 25;
+height: 25;
+font-size: 40;
+font-weigth: bold;
+opacity: 0.5;
+}
+.userSymbol {
+position: absolute;
+top: 55;
+left: 8;
+padding-left: 5px;
+opacity: 0.5;
+}
+#pBar {
+opacity: 0.5;
+position: relative;
+margin-bottom: 0px;
+margin-top: 0px;
+padding: 0px;
+bottom: 27px;
+}
+CSS;
     }
 
     private function mobile_menu($upc)
@@ -770,6 +868,7 @@ HTML;
         include(__DIR__.'/../config.php');
         $ret = '';
         $ret .= '<a href="../misc/mobile.php"><button class="btn-mobile">M</button></a>';
+        $ret .= '<a href="#" id="btn-action"><button class="btn-action">A</button></a>';
         $ret .= '
             <div class="modal" tabindex="-1" role="dialog" id="keypad">
             <br /><br /><br /><br /><br />
@@ -821,6 +920,24 @@ HTML;
 
         return $ret;
 
+    }
+
+    private function hiddenContent()
+    {
+        return <<<HTML
+<div id="menu-action">
+    <ul class="menu-list">
+        <li class="menu-list" id="mod-narrow">Change Narrow Status</li>
+        <li class="menu-list edit-btn" data-table="products" data-column="brand">Edit POS-Brand</li>
+        <li class="menu-list edit-btn" data-table="products" data-column="description">Edit POS-Description</li>
+        <li class="menu-list edit-btn" data-table="products" data-column="size">Edit POS-Size</li>
+        <li class="menu-list edit-btn" data-table="productUser" data-column="brand">Edit SIGN-Brand</li>
+        <li class="menu-list edit-btn" data-table="productUser" data-column="description">Edit SIGN-Description</li>
+        <li class="menu-list-space"></li>
+        <li class="menu-list menu-exit" id="exit-action-menu">Exit Menu</li>
+    </ul>
+</div>
+HTML;
     }
 
 }
