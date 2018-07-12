@@ -185,7 +185,12 @@ HTML;
             GROUP BY dealSet");
         $res = $dbc->execute($prep);
         while ($row = $dbc->fetchRow($res)) {
-            $sets[] = $row['dealSet'];
+            $sets[] = date('m', strtotime($row['dealSet']));
+        }
+        sort($sets);
+        foreach ($sets as $k => $set) {
+            $obj = DateTime::createFromFormat('!m', $set);
+            $sets[$k] = $obj->format('F');
         }
         foreach ($sets as $set) {
             $dealSets .= "<option value='{$set}'>{$set}</option>";
