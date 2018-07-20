@@ -52,7 +52,7 @@ class AuditScanner extends ScancoordDispatch
             $this->mod_narrow_handler($upc);
             die();
         } elseif ($action == 'mod-edit') {
-            $this->mod_edit($upc);
+            $this->mod_edit_handler($upc);
             die();
         }
 
@@ -68,7 +68,7 @@ class AuditScanner extends ScancoordDispatch
 
     }
 
-    private function mod_edit($upc)
+    private function mod_edit_handler($upc)
     {
         $dbc = scanLib::getConObj();
         $table = FormLib::get('table');
@@ -79,9 +79,6 @@ class AuditScanner extends ScancoordDispatch
         $query = "UPDATE $table SET $column = ? WHERE upc = ?";
         $prep = $dbc->prepare($query);
         $res = $dbc->execute($prep, $args);
-        while ($row = $dbc->fetchRow($res)) {
-
-        }
 
         return false;
     }
@@ -97,10 +94,10 @@ class AuditScanner extends ScancoordDispatch
         }
         echo $narrow;
         if ($narrow > 0) {
-            $prep = $dbc->prepare("UPDATE productUser SET narrow = 0");
+            $prep = $dbc->prepare("UPDATE productUser SET narrow = 0 WHERE upc = ?");
             $res = $dbc->execute($prep, $args);
         } else {
-            $prep = $dbc->prepare("UPDATE productUser SET narrow = 1");
+            $prep = $dbc->prepare("UPDATE productUser SET narrow = 1 WHERE upc = ?");
             $res = $dbc->execute($prep, $args);
         }
 
