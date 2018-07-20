@@ -164,6 +164,7 @@ $('#mod-narrow').click(function(){
         success: function(resp)
         {
             alert('Success!');
+            $('#menu-action').hide();
         },
         error: function(resp)
         {
@@ -184,6 +185,7 @@ $('.edit-btn').click(function(){
         success: function(resp)
         {
             alert('Success!');
+            $('#menu-action').hide();
         },
         error: function(resp)
         {
