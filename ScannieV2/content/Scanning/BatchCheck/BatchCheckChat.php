@@ -180,6 +180,14 @@ HTML;
         }
         $cssContent = SCS::cssContent(); 
         return <<<HTML
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: rgba(255,255,255,0.9);
+    background: linear-gradient(135deg, #42a7f4, #0a1528);
+    background-color: linear-gradient(135deg, #42a7f4, #0a1528);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
 .userName {
     color: #cacaca;
 }
