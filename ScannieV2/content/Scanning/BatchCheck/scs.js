@@ -154,7 +154,8 @@ $('#closeAllBatches').click(function(){
     $('#allBatches').hide();
 });
 $('#menuBtn').click(function(){
-    $('#menu').show();
+    // $('#menu').show();
+    window.location.href = 'BatchCheckMenu.php';
 });
 $('#closeMenu').click(function(){
     $('#menu').hide();
