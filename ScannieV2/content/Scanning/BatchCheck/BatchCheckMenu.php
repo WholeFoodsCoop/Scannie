@@ -142,6 +142,7 @@ h2.menuOption {
     background: rgba(255,255,255,0.1);
     background-color: rgba(255,255,255,0.1);
     padding: 25px;
+    max-width: 500px;
 }
 h1 {
     margin-top: 25px;
