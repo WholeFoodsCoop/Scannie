@@ -69,9 +69,20 @@ class SCS extends PageLayoutA
         $sessionName = FormLib::get('sessionName');
         $storeID = FormLib::get('storeID');
 
-        $args = array($sessionName, $qv, $storeID);
-        $prep = $dbc->prepare("delete from woodshed_no_replicate.batchCheckQueues
-            where session = ? and inQueue = ? and storeID = ?");
+        $capQueues = array();
+        if ($qv == 6) {
+            $capQueues = array(6, 7, 8);
+            list($inClause, $args) = $dbc->safeInClause($capQueues);
+        } elseif ($qv == 9) {
+            $capQueues = array(9, 10);
+            list($inClause, $args) = $dbc->safeInClause($capQueues);
+        }
+        $choice = ($qv == 6 || $qv == 9) ? $inClause : $qv;
+        $query = "DELETE FROM woodshed_no_replicate.batchCheckQueues
+            WHERE inQueue IN ($choice) AND session = ? AND storeID = ?";
+        $args[] = $sessionName;
+        $args[] = $storeID;
+        $prep = $dbc->prepare($query);
         $res = $dbc->execute($prep,$args);
         $json = array();
         $json['error'] = $dbc->error();
@@ -671,6 +682,14 @@ HTML;
     {
         include(__DIR__.'/../../../config.php');
         return <<<HTML
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: rgba(255,255,255,0.9);
+    background: linear-gradient(135deg, #42a7f4, #0a1528);
+    background-color: linear-gradient(135deg, #42a7f4, #0a1528);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
 #grandparent {
 }
 .secondRow {
