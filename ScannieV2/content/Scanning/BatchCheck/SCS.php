@@ -310,9 +310,12 @@ HTML;
                     $prep = $dbc->prepare("INSERT INTO woodshed_no_replicate.batchCheckQueues 
                         (upc,session,storeID,inQueue) VALUES (?,?,?,?)");
                     $dbc->execute($prep,$args);
+                    // also, set op.products.inUse = 0
+                    $a = array($upc,$storeID);
+                    $p = $dbc->prepare("UPDATE is4c_op.products SET inUse = 0 WHERE upc = ? AND store_id = ?");
+                    $r = $dbc->execute($p,$a);
                 }
                 break;
-                
         }
 
         $json = array();
