@@ -457,7 +457,8 @@ HTML;
             } elseif (in_array($option,array(6,9))) {
                 if (in_array($k,$inQueueItems)) {
                     $table .= "<tr>";
-                    $table .= "<td>$k</td>";
+                    $upcLink = "<a href='http://$FANNIE_ROOTDIR/item/ItemEditorPage.php?searchupc=$k' target='_BLANK'>$k</a>";
+                    $table .= "<td class='col-upc'>$upcLink</td>";
                     $upcsInTable[] = $k;
                     foreach ($fields as $field) {
                         if ($field != 'upc') {
@@ -516,7 +517,35 @@ HTML;
         }
         $emptyd = "<td></td>";
         list($inStr,$args) = $dbc->safeInClause($missingUpcs); 
-        $query = "SELECT upc, brand, description FROM products WHERE upc IN ($inStr)";
+        switch($option) {
+            case 6:
+                $args[] = $storeID;
+                $args[] = $sessionName;
+                $args[] = "6, 7, 8";
+                $query = "SELECT products.upc, brand, description, 
+                    CASE WHEN inQueue THEN inQueue ELSE 'n/a' END AS inQueue FROM products 
+                    LEFT JOIN woodshed_no_replicate.batchCheckQueues ON products.upc=batchCheckQueues.upc 
+                    WHERE products.upc IN ($inStr) AND storeID = ? AND session = ? AND inQueue IN (?)";
+                break;
+            case 9:
+                $args[] = $storeID;
+                $args[] = $sessionName;
+                $args[] = "9, 10";
+                $query = "SELECT products.upc, brand, description, 
+                    CASE WHEN inQueue THEN inQueue ELSE 'n/a' END AS inQueue FROM products 
+                    LEFT JOIN woodshed_no_replicate.batchCheckQueues ON products.upc=batchCheckQueues.upc 
+                    WHERE products.upc IN ($inStr) AND storeID = ? AND session = ? AND inQueue IN (?)";
+                break;
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 11:
+            case 98:
+                $query = "SELECT upc, brand, description FROM products WHERE upc IN ($inStr)";
+                break;
+        }
         $prep = $dbc->prepare($query);
         $res = $dbc->execute($prep, $args);
         while ($row = $dbc->fetchRow($res)) {
@@ -533,6 +562,14 @@ HTML;
             $table .=  "<td class='col-batchName'>n/a</td>";
             $table .=  "<td class='col-sections'>n/a</td>";
             $table .=  "<td class='col-last_sold'>n/a</td>";
+            if (in_array($option,array(6,9))) {
+                $tempQueueNames = array(6=>'12UP',7=>'4UP',8=>'2UP',9=>'Disco',10=>'While Supplies Last');
+                $tempQueueString = '';
+                $tempQueueString = $tempQueueNames[$row['inQueue']];
+                $tempQueueString = trim($tempQueueString,',');
+                $colname = ($option == 6) ? 'Needed' : 'InQueue';
+                $table .= "<td class='col-$colname'><b>$tempQueueString</b></td>";
+            }
             foreach ($queueBtns as $qv) {
                 $table .= "<td><button id='queue$upc' value='$qv' class='queue-btn btn btn-info'>{$this->options[$qv]}</button></td>";
             }
@@ -685,6 +722,9 @@ HTML;
     public function cssContent()
     {
         return <<<HTML
+textarea {
+    margin-left: 25px;
+}
 body {
     font-family: Arial, Helvetica, sans-serif;
     background-color: rgba(255,255,255,0.9);
