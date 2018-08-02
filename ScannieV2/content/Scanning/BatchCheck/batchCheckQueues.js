@@ -32,7 +32,6 @@ $('.col-filter').click(function(){
     var colName = $(this).text(); 
     $('.col-'+colName).show();
     $(this).hide();
-    stripeTable();
 });
 
 // queue button events
