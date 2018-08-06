@@ -108,13 +108,15 @@ class AuditScanner extends ScancoordDispatch
     {
         if ($_SESSION['audieDept'] != $deptNo) {
             $args = array($storeID,$deptNo);
-            $prep = $dbc->prepare("
-                SELECT auto_par, auto_par*7 as par, upc, brand, description
+            $multiplier = ($storeID == 1) ? 3 : 7;
+            $query = "
+                SELECT auto_par, auto_par*$multiplier as par, upc, brand, description
                 FROM products
                 WHERE store_id = ?
                     AND department = ?
                 ORDER BY auto_par DESC
-                LIMIT 1");
+                LIMIT 1";
+            $prep = $dbc->prepare($query);
             $res = $dbc->execute($prep,$args);
             while ($row = $dbc->fetchRow($res)) {
                 $max = $row['par'];
@@ -291,6 +293,7 @@ HTML;
             LIMIT 1
         ");
         $result = $dbc->execute($query,$args);
+        $multiplier = ($storeID == 1) ? 3 : 7;
         while ($row = $dbc->fetchRow($result)) {
             $cost = $row['cost'];
             $price = $row['normal_price'];
@@ -309,7 +312,8 @@ HTML;
             $narrow = $row['narrow'];
             $markup = $row['shippingMarkup'];
             $discount = $row['discountRate'];
-            $weekPar = $row['auto_par']*7;
+            // Hillside multiplier = 3, Denfeld = 7
+            $weekPar = $row['auto_par'] * $multiplier;
             $ret .= '<input type="hidden" id="auto_par_value" value="'.$weekPar.'"/>';
             $ret .= $this->pBar($weekPar,$deptNo,$storeID,$dbc);
 
@@ -667,6 +671,9 @@ HTML;
     public function css_content()
     {
         return <<<CSS
+.grey {
+    color: grey;
+}
 .menu-list-space {
     background-color: rgba(0,0,0,0);
     list-style-type: none;
@@ -925,11 +932,11 @@ CSS;
 <div id="menu-action">
     <ul class="menu-list">
         <li class="menu-list" id="mod-narrow">Change Narrow Status</li>
-        <li class="menu-list edit-btn" data-table="products" data-column="brand">Edit POS-Brand</li>
-        <li class="menu-list edit-btn" data-table="products" data-column="description">Edit POS-Description</li>
-        <li class="menu-list edit-btn" data-table="products" data-column="size">Edit POS-Size</li>
-        <li class="menu-list edit-btn" data-table="productUser" data-column="brand">Edit SIGN-Brand</li>
-        <li class="menu-list edit-btn" data-table="productUser" data-column="description">Edit SIGN-Description</li>
+        <li class="menu-list edit-btn" data-table="products" data-column="brand"><span class="grey">Edit</span> POS-Brand</li>
+        <li class="menu-list edit-btn" data-table="products" data-column="description"><span class="grey">Edit</span> POS-Description</li>
+        <li class="menu-list edit-btn" data-table="products" data-column="size"><span class="grey">Edit</span> POS-Size</li>
+        <li class="menu-list edit-btn" data-table="productUser" data-column="brand"><span class="grey">Edit</span> SIGN-Brand</li>
+        <li class="menu-list edit-btn" data-table="productUser" data-column="description"><span class="grey">Edit</span> SIGN-Description</li>
         <li class="menu-list-space"></li>
         <li class="menu-list menu-exit" id="exit-action-menu">Exit Menu</li>
     </ul>
