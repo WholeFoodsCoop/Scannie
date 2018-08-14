@@ -41,7 +41,8 @@ class WebDispatch
         $this->preflight();
         $this->preprocess();
         echo $this->header();
-        echo coreNav::run();
+        if ($this->ui === true) 
+            echo coreNav::run();
         echo $this->body_content();
         echo $this->footer();
         echo $this->writeJS();
@@ -121,9 +122,6 @@ HTML;
     {
        return <<<HTML
 </body>
-<script type="text/javascript">
-{$this->javascriptContent()}
-</script>
 </html>
 HTML;
     }

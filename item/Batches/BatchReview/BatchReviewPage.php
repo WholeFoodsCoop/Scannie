@@ -92,7 +92,7 @@ class BatchReviewPage extends scancoordDispatch
                     <th>Price</th>
                     <th>New Marg.</th>
                     <th>Desired Marg.</th>
-                    <th>Diff.</th>
+                    <th title="Difference between New Margin and Desired Margin.">Diff.</th>
             ';
             while ($row = $dbc->fetch_row($result)) {
                 $newMargin = ($row['price'] - $row['cost']) / $row['price'];

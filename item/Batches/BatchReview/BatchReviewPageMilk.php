@@ -93,7 +93,7 @@ class BatchReviewPageMilk extends scancoordDispatch
                     <th>Cost</th>
                     <th>Price</th>
                     <th>SRP</th>
-                    <th>Diff.</th>
+                    <th title="Difference between New Margin and Desired Margin.">Diff.</th>
             ';
             while ($row = $dbc->fetch_row($result)) {
                 $upc = '<a href="http://key/git/fannie/item/ItemEditorPage.php?searchupc=' . $row['upc'] . '" target="_blank">' . $row['upc'] . '</a>';

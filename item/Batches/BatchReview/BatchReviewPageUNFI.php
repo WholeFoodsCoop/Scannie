@@ -88,11 +88,12 @@ class BatchReviewPageUNFI extends scancoordDispatch
                     <th>Description</th>
                     <th>POS Dept.</th>
                     <th>Cost</th>
-                    <th>Price</th>
+                    <th>Cur Price</th>
+                    <th>New Price</th>
                     <th>CUR Marg.</th>
                     <th>NEW Marg.</th>
                     <th>Desired Marg.</th>
-                    <th>Diff.</th>
+                    <th title="Difference between New Margin and Desired Margin.">Diff.</th>
                     <th>UNFI Category</th>
             ';
             while ($row = $dbc->fetch_row($result)) {
@@ -111,6 +112,7 @@ class BatchReviewPageUNFI extends scancoordDispatch
                 $ret .= '<td>' . $row['description'] . '</td>';
                 $ret .= '<td>' . $row['pdept'] . ' - ' . $row['dept_name'] . '</td>';
                 $ret .= '<td>' . $row['cost'] . '</td>';
+                $ret .= '<td>' . $row['normal_price'] . '</td>';
                 $ret .= '<td><span class="text-warning">' . $row['price'] . '</span></td>';
                 
                 if ($curMargin < ($row['unfiMarg']-0.06)) {
