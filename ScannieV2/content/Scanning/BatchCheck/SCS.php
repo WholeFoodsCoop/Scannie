@@ -333,6 +333,7 @@ HTML;
     private function editHandler($dbc)
     {
         $upc = FormLib::get('upc');
+        $storeID = scanLib::getStoreID();
         $newValue = FormLib::get('newValue');
         $field = FormLib::get('edit');
         $field = substr($field,4); 
@@ -361,7 +362,7 @@ HTML;
             }
         }
         $table = switchResult($field,$newValue,$upc,$sessionName,$dbc);
-        //editdescription
+        // make the actual edit in POS to the appropriate table
         $args = array($newValue,$upc);
         $query = "UPDATE $table SET $field = ? WHERE upc = ?";
         if ($field == 'notes') {
@@ -373,8 +374,7 @@ HTML;
         $json = array();
         $json['error'] = $dbc->error();
 
-        //add to queue 11 (shared) so all users know sign info was changed. 
-        //do this for all storeIDs
+        //add to queue 11 
         $inQueues = array();
         $args = array($sessionName,$upc);
         $prep = $dbc->prepare("SELECT inQueue FROM woodshed_no_replicate.batchCheckQueues WHERE session = ? AND upc = ?");
@@ -387,13 +387,19 @@ HTML;
             if (in_array(11,$inQueues)) {
                 //do nothing
             } else { 
-                //insert
-                $args = array($upc,$sessionName,1,11);
+                $args = array($upc,$sessionName,$storeID,11);
                 $prep = $dbc->prepare("INSERT INTO woodshed_no_replicate.batchCheckQueues 
                     (upc,session,storeID,inQueue) VALUES (?,?,?,?)");
                 $dbc->execute($prep,$args);
-                $json['error'] = $dbc->error();
             }
+        }
+
+        $json = array();
+        $json['error'] = $dbc->error();
+        //return current list of queues to refresh Current Queues: on screen.
+        $this->getQueueData($dbc);
+        foreach ($this->queues as $k => $q) {
+            $json['queues'][$k] = $q;
         }
 
         echo json_encode($json);
