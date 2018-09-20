@@ -193,8 +193,8 @@ HTML;
 
         //check how upc is curently queued
         $inQueues = array();
-        $args = array($sessionName,$upc);
-        $prep = $dbc->prepare("SELECT inQueue FROM woodshed_no_replicate.batchCheckQueues WHERE session = ? AND upc = ?");
+        $args = array($sessionName,$upc,$storeID);
+        $prep = $dbc->prepare("SELECT inQueue FROM woodshed_no_replicate.batchCheckQueues WHERE session = ? AND upc = ? AND storeID = ?");
         $res = $dbc->execute($prep,$args); 
         while ($row = $dbc->fetchRow($res)) {
             $inQueues[] = $row['inQueue'];
