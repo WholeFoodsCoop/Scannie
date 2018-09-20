@@ -78,8 +78,9 @@ class SCS extends PageLayoutA
             list($inClause, $args) = $dbc->safeInClause($capQueues);
         }
         $choice = ($qv == 6 || $qv == 9) ? $inClause : $qv;
+        $andCond = ($qv == 11) ? "" : " AND session = ? AND storeID = ?";
         $query = "DELETE FROM woodshed_no_replicate.batchCheckQueues
-            WHERE inQueue IN ($choice) AND session = ? AND storeID = ?";
+            WHERE inQueue IN ($choice) $andCond";
         $args[] = $sessionName;
         $args[] = $storeID;
         $prep = $dbc->prepare($query);
@@ -294,6 +295,11 @@ HTML;
                     $args = array($upc,$sessionName);
                     $prep = $dbc->prepare("DELETE FROM woodshed_no_replicate.batchCheckNotes 
                         WHERE upc = ? AND session = ?");
+                    $dbc->execute($prep,$args);
+                } elseif ($qval == 11) {
+                    $args = array($upc);
+                    $prep = $dbc->prepare("DELETE FROM woodshed_no_replicate.batchCheckQueues 
+                        WHERE upc = ?");
                     $dbc->execute($prep,$args);
                 } else {
                     $args = array($upc,$sessionName,$storeID,$qval);

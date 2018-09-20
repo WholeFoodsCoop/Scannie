@@ -601,7 +601,7 @@ HTML;
         $ret .= $this->queueToggle();
         $stores = array(1=>'Hillside',2=>'Denfeld');
         $ret .= "<div align='center'>";
-        $ret .= "<h2>$stores[$storeID]</h2>";
+        $ret .= "<h2>{$stores[$storeID]}</h2>";
         $ret .= "<h1>$sessionName</h1>";
         $q = FormLib::get('option');
         //$ret .= "<h4>{$this->options[$q]}</h4>";
