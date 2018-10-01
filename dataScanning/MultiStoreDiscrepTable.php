@@ -78,6 +78,15 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
             SELECT upc, description
             FROM products
             WHERE inUse = 1
+                AND brand NOT IN (
+                    'BOLTHOUSE FARMS', 
+                    'BEETOLOGY',
+                    'COLUMBIA GORGE',
+                    'EVOLUTION FRESH',
+                    'WILD POPPY',
+                    'SUJA',
+                    'HONEYDROP'
+                )
             GROUP BY upc
             HAVING MIN({$field}) <> MAX({$field})
             ORDER BY department
@@ -141,7 +150,7 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
 
         $headers = array('Hill Desc','Den Desc','Hill Cost','Den Cost');
         $ret .= '<div class="table-responsive">';
-        $ret .= '<table class="table table-condensed table-bordered small table-responsive">';
+        $ret .= '<table class="table table-condensed small table-responsive">';
         $ret .= '<thead><tr><th>upc</th><th>chg</th><th>sup_dept</th>';
         foreach ($fields as $field) {
             if ($field != 'super_name') {
@@ -167,7 +176,7 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
                     if ($row[$field] == $itemD[$upc][$field]) {
                         $td = '<td class="okay">';
                     } else {
-                        $td = '<td>';
+                        $td = '<td class="bad alert alert-warning">';
                     }
                     $ret .= $td;
                     $ret .= $row[$field] . '</td>';
@@ -204,11 +213,21 @@ HTML;
     public function css_content()
     {
         return '
+            a {
+                color: lightgrey;
+            }
             td.okay {
                 background-color: grey;
             }
+            td.bad {
+                font-weight: bold;
+            }
             td.produce {
                 background-color: #71c98a;
+            }
+            .table > tbody > tr > td, 
+            .table > tbody > tr > th {
+                border-top: none;
             }
             td.grocery, td.gen,
             td.frozen, td.refrigerated {
@@ -224,17 +243,18 @@ HTML;
                 //background-image: none;
                 //background-color: black;
             }
-            a.text {
-                color: lightgrey;
-            }
             tbody {
                 padding: 100px;
             }
             table {
-                background: linear-gradient(#ffdba1, #ffffa1);
+                // background: linear-gradient(#ffdba1, #ffffa1);
+                background: white;
             }
-            td:hover, tr:hover {
-                border: 1px solid purple;
+            thead {
+                background-color: #FFFFCC;
+            }
+            td:hover {
+                //background: rgba(255,165,0,0.2);
             }
             .row:focus {
                 background-color: red;
