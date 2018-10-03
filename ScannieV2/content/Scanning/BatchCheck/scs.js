@@ -68,7 +68,7 @@ $('.editable').focusout(function(){
     }
 })
 
-$('.editlocation').click(function(){
+$('.editlocation').unbind().click(function(){
     var location = $('#formStoreID').val();
     var session = $('#formSession').val();
     var upc = $('#upc').val();
