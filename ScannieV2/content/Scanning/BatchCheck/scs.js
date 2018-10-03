@@ -15,6 +15,20 @@ $('.editable').each(function(){
 $('.editable').focusout(function(){
     var oldValue = $(this).attr('value');
     var newValue = $(this).text();
+
+    //don't use ipod's default apostrophe
+    var newValueChars = newValue.split('');
+    var newChars = [];
+    $.each(newValueChars, function(k,v) {
+        var charCode = v.charCodeAt(0);
+        if (charCode == 8217) {
+            newChars.push("'");
+        } else {
+            newChars.push(v);
+        }
+    });
+    newValue = newChars.join('');
+
     var editField = $(this).attr('id');
     var upc = $('#upc').val();
     if (newValue != oldValue) {
