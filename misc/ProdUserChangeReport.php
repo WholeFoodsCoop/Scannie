@@ -69,12 +69,12 @@ class ProdUserChangeReport extends ScancoordDispatch
         
         $ret .= '<strong>'.count($upcs).'</strong> products were updated from 
             '.$fromdate.' to '.$todate.' by this user. <br />';
-        $ret .= '<textarea>';
+        $ret .= '<textarea rows=25 columns=10>';
         foreach ($upcs as $upc) {
             $ret .= $upc . "\r\n";
         }
         $ret .= '</textarea><br />';
-        $ret .= '<a href="http://192.168.1.2/git/fannie/item/AdvancedItemSearch.php" target="_BLANK">
+        $ret .= '<a href="http://'.$HTTP_HOST.'/git/fannie/item/AdvancedItemSearch.php" target="_BLANK">
             Advanced Search</a><br />';
         
         foreach ($uids as $uid) {

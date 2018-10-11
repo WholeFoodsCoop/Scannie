@@ -125,7 +125,7 @@ class quickLookups extends ScancoordDispatch
     
     private function form_content()
     {
-        
+        include(__DIR__.'/../config.php'); 
         $ret = '';
         $ret .= '
             
@@ -134,9 +134,9 @@ class quickLookups extends ScancoordDispatch
         $TrackChange = 'http://key/scancoord/item/TrackChangeNew.php';
         $ItemEditor = 'http://key/git/fannie/item/ItemEditorPage.php';
         $batch = 'http://key/git/fannie/batches/newbatch/EditBatchPage.php';
-        $LastSold = 'http://192.168.1.2/scancoord/item/last_sold_check.php';
-        $ItemBatchHistory = 'http://192.168.1.2/scancoord/item/Batches/prodBatchHistory.php';
-        $SalesBatchPercent = 'http://192.168.1.2/scancoord/item/Batches/CheckBatchPercent.php';
+        $LastSold = 'http://'.$HTTP_HOST.'/scancoord/item/last_sold_check.php';
+        $ItemBatchHistory = 'http://'.$HTTP_HOST.'/scancoord/item/Batches/prodBatchHistory.php';
+        $SalesBatchPercent = 'http://'.$HTTP_HOST.'/scancoord/item/Batches/CheckBatchPercent.php';
         
         
         $ret .= '<h4 >Quick Lookups</h4>';

@@ -34,7 +34,7 @@ class mobile extends ScancoordDispatch
     
     public function body_content()
     {           
-    
+        include(__DIR__.'/../config.php'); 
         $ret = '';
         $ret .= '
             <style>
@@ -50,16 +50,16 @@ class mobile extends ScancoordDispatch
         $ret .= '
             <div style="width: 100%;" align="center">
                 <h1>Mobile Scannie</h1>
-                <a class="btn btn-default btn-mobile-menu" href="http://192.168.1.2/scancoord/item/AuditScanner.php">Audie <i>Scanner</i></a><br /><br />
-                <a class="btn btn-default btn-mobile-menu" href="http://192.168.1.2/scancoord/item/AuditScannerReport.php">Audie <i>Report</i></a><br /><br />
+                <a class="btn btn-default btn-mobile-menu" href="http://'.$HTTP_HOST.'/scancoord/item/AuditScanner.php">Audie <i>Scanner</i></a><br /><br />
+                <a class="btn btn-default btn-mobile-menu" href="http://'.$HTTP_HOST.'/scancoord/item/AuditScannerReport.php">Audie <i>Report</i></a><br /><br />
                 <a class="btn btn-default btn-mobile-menu" 
-                    href="http://192.168.1.2/scancoord/ScannieV2/content/Scanning/BatchCheck/BatchCheckMenu.php">
+                    href="http://'.$HTTP_HOST.'/scancoord/ScannieV2/content/Scanning/BatchCheck/BatchCheckMenu.php">
                     <span class="new">NEW</span> Batch Check</a><br /><br />
-                <a class="btn btn-default btn-mobile-menu" href="http://192.168.1.2/git/fannie/item/CoopDealsLookupPage.php">Coop Deals Lookup</a><br /><br />
-                <a class="btn btn-default btn-mobile-menu" href="http://192.168.1.2/git/fannie/modules/plugins2.0/ShelfAudit/SaMenuPage.php">
+                <a class="btn btn-default btn-mobile-menu" href="http://'.$HTTP_HOST.'/git/fannie/item/CoopDealsLookupPage.php">Coop Deals Lookup</a><br /><br />
+                <a class="btn btn-default btn-mobile-menu" href="http://'.$HTTP_HOST.'/git/fannie/modules/plugins2.0/ShelfAudit/SaMenuPage.php">
                     CORE-POS/ Fannie</a><br /><br />
                 <br/><br/>
-                <a class="btn btn-default btn-mobile-menu" href="http://192.168.1.2/scancoord/item/TrackChangeNew.php">Scannie Home</a><br /><br />
+                <a class="btn btn-default btn-mobile-menu" href="http://'.$HTTP_HOST.'/scancoord/item/TrackChangeNew.php">Scannie Home</a><br /><br />
                 <a class="btn btn-default btn-mobile-menu" href="#" onClick="window.history.back(); return false;">return</a>
             </div><br /><br />
         ';
