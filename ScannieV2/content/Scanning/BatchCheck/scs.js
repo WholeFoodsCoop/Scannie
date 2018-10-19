@@ -241,8 +241,43 @@ $('#submitUpc').click(function(){
         var inputLength = input.length;
         do {
             input.css('font-size', fontSize);
-            fontSize = fontSize - 1;
+            fontSize = fontSize - 0;
         } while (inputLength > 25);
         return this; 
     }
 })(jQuery);
+ 
+var timer, clicker = $('#goodBtn');
+
+$(document).bind('touchstart', function(event) {
+    $(event.target).trigger('mousedown');
+});
+$(document).bind('touchend', function(event) {
+    $(event.target).trigger('mouseup');
+});
+
+clicker.mousedown(function(){
+    timeout = setInterval(function(){
+        var upc = $('#upc').val();
+        c = confirm('Mark product line Good?');
+        if (c == true) {
+            $.ajax({
+                type: 'post',
+                url: 'SCS.php',
+                data: 'upc='+upc+'&qval=1&q=Good&lineCheck=1',
+                dataType: 'json',
+                success: function(json)
+                {
+                    if (json.error) {
+                        alert(json.error);
+                    }
+                }
+            });
+        }
+    }, 1000);
+});
+
+$(document).mouseup(function(){
+    clearInterval(timeout);
+    return false;
+});

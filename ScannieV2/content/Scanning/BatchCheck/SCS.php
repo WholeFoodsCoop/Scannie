@@ -47,7 +47,10 @@ class SCS extends PageLayoutA
             die(); 
         } elseif (FormLib::get('loginSubmit', false)) {
             $this->loginSubmitHandler($dbc);
-        }         
+        } elseif (FormLib::get('lineCheck', false)) {
+            $this->lineCheckHandler($dbc);
+            die();
+        }
         if (FormLib::get('upc', false)) {
             $this->getProdData($dbc);
             $this->getQueueData($dbc);
@@ -61,6 +64,67 @@ class SCS extends PageLayoutA
         }
 
         return true;
+    }
+
+    private function lineCheckHandler($dbc)
+    {
+
+        $upc = FormLib::get('upc');
+        $queue = FormLib::get('q');
+        $qval = FormLib::get('qval');
+        $sessionName = $_SESSION['sessionName'];
+        $storeID = $_SESSION['storeID'];
+
+        // get prod info to fine line family
+        $args = array($upc);
+        $prep = $dbc->prepare("SELECT department FROM products WHERE upc = ? AND store_id = ?");
+        $res = $dbc->execute($prep, $args);
+        $row = $dbc->fetchRow($res);
+        $department = $row['department'];
+
+        $args = array($upc, $storeID, $department);
+        $prep = $dbc->prepare("SELECT SUBSTR(upc, 1, 8) AS prefix, upc, brand, description, department
+            FROM products WHERE upc like CONCAT('%',SUBSTR(?, 1, 8),'%') AND store_id = ? 
+            AND department = ? GROUP BY upc;");
+        $res = $dbc->execute($prep, $args);
+        $upcs = array();
+        while ($row = $dbc->fetchRow($res)) {
+            $upcs[] = $row['upc']; 
+        }
+
+        foreach ($upcs as $upc) {
+            //check how upc is curently queued
+            $inQueues = array();
+            $args = array($sessionName,$upc,$storeID);
+            $prep = $dbc->prepare("SELECT inQueue FROM woodshed_no_replicate.batchCheckQueues WHERE session = ? AND upc = ? AND storeID = ?");
+            $res = $dbc->execute($prep,$args); 
+            while ($row = $dbc->fetchRow($res)) {
+                $inQueues[] = $row['inQueue'];
+            }
+            if (in_array(1,$inQueues)) {
+                //do nothing
+            } elseif (in_array(2,$inQueues)) {
+                //update
+                $args = array($upc,$sessionName,$storeID);
+                $prep = $dbc->prepare("UPDATE woodshed_no_replicate.batchCheckQueues 
+                    SET inQueue = 1 WHERE inQueue = 2 AND upc = ? AND session = ? AND storeID = ?");
+                $dbc->execute($prep,$args);
+            } else {
+                //insert
+                $args = array($upc,$sessionName,$storeID,1);
+                $prep = $dbc->prepare("INSERT INTO woodshed_no_replicate.batchCheckQueues 
+                    (upc,session,storeID,inQueue) VALUES (?,?,?,?)");
+                $dbc->execute($prep,$args);
+            }
+        }
+
+        $json = array();
+        $json['error'] = $dbc->error();
+        $json['error'] = "upc:$upc, queue:$queue, qval:$qval, sesh:$sessionName,
+            storeID:$storeID"; 
+
+        echo json_encode($json);
+        return false;
     }
 
     private function clearAllHandler($dbc)
@@ -618,7 +682,7 @@ HTML;
                 <button class="btn btn-warning btn-queue" value="2">Miss</button>
             </div>
             <div class="col-4">
-                <button class="btn btn-success btn-queue" value="1">Good</button>
+                <button class="btn btn-success btn-queue" value="1" id="goodBtn">Good</button>
             </div>
         </div>
         <div class="row secondRow">
