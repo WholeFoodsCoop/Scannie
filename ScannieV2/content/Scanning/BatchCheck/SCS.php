@@ -120,8 +120,6 @@ class SCS extends PageLayoutA
 
         $json = array();
         $json['error'] = $dbc->error();
-        $json['error'] = "upc:$upc, queue:$queue, qval:$qval, sesh:$sessionName,
-            storeID:$storeID"; 
 
         echo json_encode($json);
         return false;

@@ -270,11 +270,16 @@ clicker.mousedown(function(){
                 {
                     if (json.error) {
                         alert(json.error);
+                    } else {
+                        alert('Line Queued as Good');
                     }
                 }
             });
         }
     }, 1000);
+    stopProp = setInterval(function(){
+        clicker.trigger('mouseup');
+    }, 1100);
 });
 
 $(document).mouseup(function(){
