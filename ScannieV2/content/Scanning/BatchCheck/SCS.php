@@ -76,7 +76,7 @@ class SCS extends PageLayoutA
         $storeID = $_SESSION['storeID'];
 
         // get prod info to fine line family
-        $args = array($upc);
+        $args = array($upc, $storeID);
         $prep = $dbc->prepare("SELECT department FROM products WHERE upc = ? AND store_id = ?");
         $res = $dbc->execute($prep, $args);
         $row = $dbc->fetchRow($res);
