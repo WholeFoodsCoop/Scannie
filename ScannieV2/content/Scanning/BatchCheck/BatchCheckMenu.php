@@ -67,6 +67,7 @@ HTML;
         $links = array(
             'Audie' => '../../../../item/AuditScanner.php',
             'Batch Check Queues' => 'BatchCheckQueues.php',
+            'Coop Deals Add' => '../../../../../git/IS4C/fannie/item/CoopDealsLookupPage.php',
             'Chat' => 'BatchCheckChat.php',
             'Scanner' => 'SCS.php',
             'Sign Out' => 'SCS.php?signout=1',
@@ -122,7 +123,9 @@ HTML;
         if (!class_exists('SCS')) {
             include('SCS.php');
         }
-        $cssContent = SCS::cssContent(); 
+        $cssObj = new SCS();
+
+        $cssContent = $cssObj->cssContent(); 
         return <<<HTML
 $cssContent
 body {
@@ -132,11 +135,6 @@ body {
     background-color: linear-gradient(135deg, #42a7f4, #0a1528);
     background-repeat: no-repeat;
     background-attachment: fixed;
-}
-@media screen and (min-width: 1200px) {
-    .menuOption {
-        font-size: 28px;
-    }
 }
 h2.menuOption {
     background: rgba(255,255,255,0.1);

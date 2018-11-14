@@ -178,7 +178,8 @@ HTML;
         if (!class_exists('SCS')) {
             include('SCS.php');
         }
-        $cssContent = SCS::cssContent(); 
+        $scsObj = new SCS();
+        $cssContent = $scsObj->cssContent();
         return <<<HTML
 body {
     font-family: Arial, Helvetica, sans-serif;

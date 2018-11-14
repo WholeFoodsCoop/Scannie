@@ -758,7 +758,7 @@ HTML;
     public function cssContent()
     {
         include(__DIR__.'/../../../config.php');
-        return <<<HTML
+        $css = <<<HTML
 body {
     font-family: Arial, Helvetica, sans-serif;
     background-color: rgba(255,255,255,0.9);
@@ -770,11 +770,11 @@ body {
 #grandparent {
 }
 .secondRow {
-    margin-top: 8vw;
-    margin-bottom: 4vw;
+    margin-top: 15px;
+    margin-bottom: 15px;
 }
 .containerBtns {
-    margin-top: -8vw;
+    margin-top: 15px;
 }
 h2.menuOption {
     background: rgba(255,255,255,0.1);
@@ -786,8 +786,7 @@ h2.menuOption {
 }
 .menuOption {
     color: rgba(255,255,255,0.6);
-    margin-top: 10vw;
-    font-size: 10vw;
+    margin-top: 15px;
 }
 #menu {
     position: fixed;
@@ -806,12 +805,11 @@ h2.menuOption {
 }
 #menuBtn {
     position: absolute;
-    top: 6vw;
-    left: 6vw;
-    height: 9vw;
-    width: 9vw;
+    top: 15px;
+    left: 15px;
+    height: 50px;
+    width: 50px;
     background-color: rgba(255,255,255,0.1);
-    font-size: 3vw;
     overflow: hidden;
     cursor: pointer;
     opacity: 0.5;
@@ -820,12 +818,7 @@ h2.menuOption {
 }
 #msgBtn {
     position: absolute;
-    top: 6vw;
-    right: 6vw;
-    height: 9vw;
-    width: 9vw;
     background-color: rgba(255,255,255,0.1);
-    font-size: 3vw;
     overflow: hidden;
     cursor: pointer;
     opacity: 0.9;
@@ -835,7 +828,6 @@ h2.menuOption {
     display:none;
 }
 .close {
-    font-size: 8vw;
 }
 .useBatch {
     float: right;
@@ -915,11 +907,10 @@ h2.menuOption {
 }
 #response {
     position: fixed;
-    top: 2vw;
-    right: 2vw;
-    height: 10vw;
-    width: 20vw;
-    font-size: 4vw;
+    top: 15px;
+    right: 15px;
+    height: 50px;
+    width: 100px;
     text-align: center;
     display: none;
     padding: 5px;
@@ -927,31 +918,26 @@ h2.menuOption {
 .editable {
 }
 .queued {
-    margin-top: 5vw;
 }
 .showQueue {
-    width: 10vw;
-    height: 10vw;
+    width: 50px;
+    height: 50px;
+    margin-left: 15px;
+    margin-top: 15px;
     background-color: white;
     float: left;
-    margin-left: 5vw;
-    margin-top: 5vw;
-    font-size: 5vw;
-    padding: 2vw;
     opacity: 0.8;
 }
 .btn-queue {
-    height: 20vw;
-    width: 20vw;
-    font-size: 5vw;
+    height: 75px;
+    width: 75px;
     border-radius: 10%;
     color: white;
     opacity: 0.9;
 }
 .btn-sub-queue {
-    height: 20vw;
-    width: 20vw;
-    font-size: 5vw;
+    height: 75px;
+    width: 75px;
     border-radius: 10%;
     color: white;
     opacity: 0.9;
@@ -999,7 +985,6 @@ h2.menuOption {
 }
 .curPrice {
     font-weight: bold;
-    font-size: 10vw;
 }
 .line {
     border-top: 1px solid #cacaca;
@@ -1015,7 +1000,6 @@ h2.menuOption {
     opacity: 0.2;
     width: 50vw;
     height: 1wv;
-    font-size: 5vw;
     text-align: center;
 }
 #upcForm {
@@ -1034,19 +1018,10 @@ h2.menuOption {
        text-align: center;
 }
 body {
-    font-size: 6vw;
     color: rgba(255,255,255,0.8);
     overflow-x: hidden;
-    //overflow-y: hidden;
-}
-h3 {
-    font-size: 15vw;
-}
-h4 {
-    font-size: 6vw;
 }
 h5 {
-    font-size: 4vw;
     color: rgba(255,255,255,0.5);
 }
 .header {
@@ -1057,14 +1032,106 @@ h5 {
     width: 25vw;
     text-align: center;
 }
-.mdtext {
+.smtext {
+    color: rgba(255,255,255,0.2);
+}
+HTML;
+        if ($this->deviceType == 'mobile') {
+            // Use vw sizing for handheld devices
+            $css .= <<<HTML
+#msgBtn {
+    font-size: 3vw;
+}
+.close {
+    font-size: 8vw;
+}
+#response {
+    font-size: 4vw;
+}
+.showQueue {
+    font-size: 5vw;
+}
+.btn-queue {
+    font-size: 5vw;
+}
+.btn-sub-queue {
+    font-size: 5vw;
+}
+.curPrice {
+    font-size: 10vw;
+}
+#upc {
+    font-size: 5vw;
+}
+body {
+    font-size: 6vw;
+}
+h3 {
+    font-size: 15vw;
+}
+h4 {
+    font-size: 6vw;
+}
+h5 {
     font-size: 4vw;
 }
 .smtext {
     font-size: 3vw;
-    color: rgba(255,255,255,0.2);
+}
+.menuOption {
+    font-size: 10vw;
+}
+.btn-queue {
+    height: 20vw;
+    width: 20vw;
+}
+.btn-sub-queue {
+    height: 20vw;
+    width: 20vw;
+}
+.secondRow {
+    margin-top: 8vw;
+    margin-bottom: 4vw;
+}
+.containerBtns {
+    margin-top: -8vw;
+}
+
+.menuOption {
+    //margin-top: 10vw;
+}
+#menuBtn {
+    top: 6vw;
+    left: 6vw;
+    height: 9vw;
+    width: 9vw;
+}
+#msgBtn {
+    position: absolute;
+    top: 6vw;
+    right: 6vw;
+    height: 9vw;
+    width: 9vw;
+}
+#response {
+    top: 2vw;
+    right: 2vw;
+    height: 10vw;
+    width: 20vw;
+}
+.queued {
+    margin-top: 5vw;
+}
+.showQueue {
+    width: 10vw;
+    height: 10vw;
+    margin-left: 5vw;
+    margin-top: 5vw;
 }
 HTML;
+        }
+
+        return $css;
     }
 
     private function skuToUpc($upc)
