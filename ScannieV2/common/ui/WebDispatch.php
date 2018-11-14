@@ -186,29 +186,30 @@ HTML;
         }
         return FALSE;
     }
-        public function getDeviceType()
-        {
-            require_once(__DIR__.'/../../common/Mobile-Detect/Mobile_Detect.php');
-            $detect = new Mobile_Detect;
-            $device = '';
-            if ( $detect->isMobile() ) {
-            }
 
-            if( $detect->isTablet() ){
-            }
-
-            if( $detect->isMobile() && !$detect->isTablet() ){
-                $device = 'mobile';
-            }
-
-            if( $detect->isiOS() ){
-            }
-
-            if( $detect->isAndroidOS() ){
-            }
-
-            return $device;
+    public function getDeviceType()
+    {
+        require_once(__DIR__.'/../../common/Mobile-Detect/Mobile_Detect.php');
+        $detect = new Mobile_Detect;
+        $device = '';
+        if ( $detect->isMobile() ) {
         }
+
+        if( $detect->isTablet() ){
+        }
+
+        if( $detect->isMobile() && !$detect->isTablet() ){
+            $device = 'mobile';
+        }
+
+        if( $detect->isiOS() ){
+        }
+
+        if( $detect->isAndroidOS() ){
+        }
+
+        return $device;
+    }
 
 }
 
