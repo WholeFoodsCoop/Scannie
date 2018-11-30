@@ -85,8 +85,10 @@ class MultiStoreDiscrepTable extends ScancoordDispatch
                     'EVOLUTION FRESH',
                     'WILD POPPY',
                     'SUJA',
-                    'HONEYDROP'
+                    'HONEYDROP',
+                    'SO GOOD SO YOU'
                 )
+            AND numflag & (1 << 19) = 0
             GROUP BY upc
             HAVING MIN({$field}) <> MAX({$field})
             ORDER BY department
