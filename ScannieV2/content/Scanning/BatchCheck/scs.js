@@ -248,6 +248,7 @@ $('#submitUpc').click(function(){
 })(jQuery);
  
 var timer, clicker = $('#goodBtn');
+var timeout = function(){};
 
 $(document).bind('touchstart', function(event) {
     $(event.target).trigger('mousedown');
