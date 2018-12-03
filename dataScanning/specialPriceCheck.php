@@ -87,6 +87,7 @@ HTML;
                 AND bl.upc NOT LIKE 'LC%'
                 AND b.discountType > 0
                 AND bl.salePrice <> 0
+                AND bl.pricemethod = 0
             GROUP BY b.batchID, bl.upc, p.store_id, s.storeID;
         ");
         $res = $dbc->execute($prep);
@@ -113,6 +114,9 @@ HTML;
     {
         $ret = "";
         include(__DIR__.'/../config.php');
+        $exceptions = array('0000099012219','0000099103018','0000099110318',
+            '0000099111318','0000099112018','0000099120118','0000099120618',
+            '0000099121118','0000099121318');
         $td = "";
         $stores = array();
         for ($i=1; $i<=$numstores; $i++) {
@@ -137,21 +141,23 @@ HTML;
                 foreach ($bids as $bid) {
                     if ($saleprice = $data['B'][$bid]['salePrice'][$store]) {
                         $specialprice = $this->upcs[$upc]['P'][$store];
-                        if ($saleprice != $specialprice && !in_array($specialprice, $sps)) {
-                            $curHref = "http://{$FANNIEROOT_DIR}/batches/batchhistory/BatchHistoryPage.php?upc=";
-                            $ln = "<a href='{$curHref}{$upc}' target='_blank'><span class=\"scanicon-book\"></span></a>";
-                            $ieHref = "<a href='http://{$FANNIEROOT_DIR}/item/ItemEditorPage.php?searchupc={$upc}
-                                &ntype=UPC&searchBtn=' target='_blank'>{$upc}</a>";
-                            $td .= "
-                                <tr>
-                                <td>{$ieHref}</td>
-                                <td>{$this->upcs[$upc]['P']['brand']}</td>
-                                <td>{$this->upcs[$upc]['P']['description']}</td>
-                                <td>{$this->upcs[$upc]['P'][1]} | {$this->upcs[$upc]['P'][2]}</td>
-                                <td>{$ln}{$spstr}</td>
-                                <td>{$alphaStore[$store]}</td>
-                                {$regtd}
-                                </tr>";
+                        if (!in_array($upc, $exceptions)) {
+                            if ($saleprice != $specialprice && !in_array($specialprice, $sps)) {
+                                $curHref = "http://{$FANNIEROOT_DIR}/batches/batchhistory/BatchHistoryPage.php?upc=";
+                                $ln = "<a href='{$curHref}{$upc}' target='_blank'><span class=\"scanicon-book\"></span></a>";
+                                $ieHref = "<a href='http://{$FANNIEROOT_DIR}/item/ItemEditorPage.php?searchupc={$upc}
+                                    &ntype=UPC&searchBtn=' target='_blank'>{$upc}</a>";
+                                $td .= "
+                                    <tr>
+                                    <td>{$ieHref}</td>
+                                    <td>{$this->upcs[$upc]['P']['brand']}</td>
+                                    <td>{$this->upcs[$upc]['P']['description']}</td>
+                                    <td>{$this->upcs[$upc]['P'][1]} | {$this->upcs[$upc]['P'][2]}</td>
+                                    <td>{$ln}{$spstr}</td>
+                                    <td>{$alphaStore[$store]}</td>
+                                    {$regtd}
+                                    </tr>";
+                            }
                         }
                     }
                 }
