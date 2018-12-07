@@ -145,6 +145,13 @@ HTML;
                 <br>";
             $col1 .= scanLib::getDbcError($dbc);
 
+            $ret .= "
+            <div class='form-group'>
+                <button class='btn btn-default active filter'>Hillside</button>
+                <button class='btn btn-default active filter'>Denfeld</button>
+            </div>
+            ";
+
             $ret .=  "<div class='panel panel-default panelScroll table-responsive'>";
             $ret .= '<span class="scrollRightIcon collapse" id="scrollRight"> </span>';
             $table = '';
@@ -207,7 +214,7 @@ HTML;
                     $table .=  "<td>" . $switch[$fs[$i]] . "</td>";
                     $table .=  "<td>" . $switch[$scale[$i]] . "</td>";
                     $table .=  "<td>" . $switch[$wic[$i]] . "</td>";
-                    $table .=  "<td>" . $store_id[$i] . "</td>";
+                    $table .=  "<td class='storeid'>" . $store_id[$i] . "</td>";
                     $table .=  "<td>" . $switch[$inUse[$i]] . "</td>";
                     $table .=  "<td class='modified'>" . $modified[$i] . "</td> ";
                     if ($realName[$i] == NULL) {
@@ -275,7 +282,7 @@ HTML;
 
     public function javascript_content()
     {
-        return <<<HTML
+        return <<<JAVASCRIPT
 var newCost = 0;
 var oldCost = 0;
 var end = 0; 
@@ -318,7 +325,41 @@ $(function() {
          $('#dateCost').addClass('green').append(' *today*');
      }
 });
-HTML;
+$(function(){
+    $('.filter').on('click', function(){
+        var active = $(this).hasClass('active');
+        var store = $(this).text();
+        if (active == true) {
+            // make store inactive
+            $(this).removeClass('active')
+                .addClass('inactive');
+            $('td').each(function(){
+                $(this).closest('tr').show();
+            });
+            $('td').each(function(){
+                if ($(this).hasClass('storeid')) {
+                    var hide = $(this).text();
+                    if (hide == store) {
+                        $(this).closest('tr').hide();
+                    }
+                }
+            });
+        } else {
+            // make store active
+            $(this).removeClass('inactive')
+                .addClass('active');
+            $('td').each(function(){
+                if ($(this).hasClass('storeid')) {
+                    var show = $(this).text();
+                    if (show == store) {
+                        $(this).closest('tr').show();
+                    }
+                }
+            });
+        }
+    });
+});
+JAVASCRIPT;
     }
 
 }
