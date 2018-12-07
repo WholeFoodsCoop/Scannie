@@ -148,7 +148,7 @@ HTML;
             $ret .=  "<div class='panel panel-default panelScroll table-responsive'>";
             $ret .= '<span class="scrollRightIcon collapse" id="scrollRight"> </span>';
             $table = '';
-            $table .=  "<table class='table' id='mytable'>";
+            $table .=  "<table class='table table-bordered table-condensed' id='mytable'>";
             $table .=  "
                 <thead style='position: relative;'>
                 <th>Description</th>
@@ -194,7 +194,7 @@ HTML;
                     }
 
                     $switch = array(
-                        0=>"<span class=\"alert-danger\" style=\"color: white\">off</span>",
+                        0=>"<span class=\"alert-danger\" >off</span>",
                         1=>"<span class=\"alert-success\"> on </span>"
                     );
 
@@ -211,7 +211,7 @@ HTML;
                     $table .=  "<td>" . $switch[$inUse[$i]] . "</td>";
                     $table .=  "<td class='modified'>" . $modified[$i] . "</td> ";
                     if ($realName[$i] == NULL) {
-                        $table .=  "<td><i>unknown / scheduled change " . $uid[$i] . "</i></tr>";
+                        $table .=  "<td><i style='color: grey;'>unknown / scheduled " . $uid[$i] . "</i></tr>";
                     } else {
                         $table .=  "<td>" . $realName[$i] . "</tr> ";
                     }
