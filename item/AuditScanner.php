@@ -191,6 +191,9 @@ HTML;
         $dbc = scanLib::getConObj();
         $storeID = scanLib::getStoreID();
         $upc = scanLib::upcParse($_POST['upc']);
+        // echo $int = scanLib::getSku($_POST['upc'], $dbc);
+        // echo $_POST['upc'];
+        // echo $sku = $_POST['sku'];
 
         $loading .= '
             <div class="progress" id="progressBar">
@@ -518,21 +521,9 @@ HTML;
         $prep = $dbc->prepare("SELECT notes FROM woodshed_no_replicate.AuditScanner WHERE username = ? AND store_id = ?");
         $res = $dbc->execute($prep,$args);
         $notes = array();
-        $preLoadedNotes = array(
-            'Change Sign Text: ',
-            'Line Price',
-            'Change Price: ',
-            'Print Tag ',
-            'Missing Sale Sign',
-            'Queue Narrow Tag ',
-            'Product Not In Use',
-            'Remove This Item From Queue',
-            'n/a',
-            'Disco Item'
-        );
         while ($row = $dbc->fetchRow($res)) {
             //echo $row['notes'];
-            if (!in_array($row['notes'],$notes) && !in_array($row['notes'],$preLoadedNotes)) {
+            if (!in_array($row['notes'],$notes)) {
                 $notes[] = $row['notes'];
             }
         }
@@ -546,24 +537,6 @@ HTML;
                         <input type="hidden" name="upc" value="'.$upc.'">
                         <button type="submit" class="btn btn-danger" onClick="$("#notepad").collapse("hide"); return false;">Submit Note</button>
                     </form>
-                    <span class="qmBtn"  onClick="qm(\'Change Sign Text: \'); return false; ">
-                        <b>Change Sign Text</b></span>
-                    <span class="qmBtn"  onClick="qm(\'Line Price\'); return false; ">
-                        <b>Line Price</b></span>
-                    <span class="qmBtn"  onClick="qm(\'Change Price: \'); return false; ">
-                        <b>Change Price</b></span>
-                    <span class="qmBtn"  onClick="qm(\'Print Tag \'); return false; ">
-                        <b>Print Tag</b></span>
-                    <span class="qmBtn" onClick="qm(\'Missing Sale Sign\'); return false; ">
-                        <b>Sale Sign Missing</b></span>
-                    <span class="qmBtn" onClick="qm(\'Queue Narrow Tag \'); return false; ">
-                        <b>Narrow Tag</b></span>
-                    <span class="qmBtn" onClick="qm(\'Product Not In Use\'); return false; ">
-                        <b>Not In Use</b></span>
-                    <span class="qmBtn" onClick="qm(\'Remove This Item From Queue\'); return false; ">
-                        <b>Remove From Queue</b></span>
-                    <span class="qmBtn" onClick="qm(\'Disco Item\'); return false; ">
-                        <b>Disco Item</b></span>
         ';
 
         foreach ($notes as $note) {
@@ -609,6 +582,7 @@ HTML;
                 <form method="post" class="form-inline" id="my-form" name="main_form">
                     <input class="form-control input-sm info" name="upc" id="upc" value="'.$upc.'"
                         style="text-align: center; width: 140px; border: none;" pattern="\d*">
+                    <input type="hidden" id="sku" name="sku" />
                     <input type="hidden" name="success" value="empty"/>
                     <span id="auto_par" class="sm-label"></span><span id="par_val" class="norm-text"></span>
                     <!-- <button type="submit" class="btn btn-xs"><span class="go-icon"></span></button> -->
