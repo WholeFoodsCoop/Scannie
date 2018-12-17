@@ -1,6 +1,8 @@
 $(document).ready(function(){
     enableLinea('#upc', function(){
-        $('#my-form').append('<input type=hidden name=linea value=1 />').submit();
+        $('#my-form')
+            .append('<input type=hidden name=linea value=1 />')
+            .submit();
     });
 });
 
@@ -164,6 +166,24 @@ $('#mod-narrow').click(function(){
         success: function(resp)
         {
             alert('Success!');
+            $('#menu-action').hide();
+        },
+        error: function(resp)
+        {
+            alert('Action Failed');
+        }
+    });
+});
+
+$('#mod-in-use').click(function(){
+    var upc = $('#upc').val();
+    $.ajax({
+        type: 'post',
+        url: 'AuditScanner.php',
+        data: 'upc='+upc+'&action=mod-in-use',
+        success: function(resp)
+        {
+            alert("Success\n"+resp);
             $('#menu-action').hide();
         },
         error: function(resp)

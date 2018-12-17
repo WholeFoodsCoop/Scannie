@@ -51,6 +51,9 @@ class AuditScanner extends ScancoordDispatch
         if ($action == 'mod-narrow') {
             $this->mod_narrow_handler($upc);
             die();
+        } elseif ($action == 'mod-in-use') {
+            $this->mod_inuse_handler($upc);
+            die();
         } elseif ($action == 'mod-edit') {
             $this->mod_edit_handler($upc);
             die();
@@ -99,6 +102,30 @@ class AuditScanner extends ScancoordDispatch
         } else {
             $prep = $dbc->prepare("UPDATE productUser SET narrow = 1 WHERE upc = ?");
             $res = $dbc->execute($prep, $args);
+        }
+
+        return false;
+    }
+
+    private function mod_inuse_handler($upc)
+    {
+        $dbc = scanLib::getConObj();
+        $store = scanLib::getStoreID();
+        $args = array($upc, $store);
+        $prep = $dbc->prepare("SELECT inUse FROM products WHERE upc = ? AND store_id = ?;");
+        $res = $dbc->execute($prep, $args);
+        while ($row = $dbc->fetchRow($res)) {
+            $inUse = $row['inUse'];
+        }
+        echo "\n";
+        if ($inUse == 0) {
+            $prep = $dbc->prepare("UPDATE products SET inUse = 1 WHERE upc = ? AND store_id = ?");
+            $res = $dbc->execute($prep, $args);
+            echo "Product now IN-use";
+        } else {
+            $prep = $dbc->prepare("UPDATE products SET inUse = 0 WHERE upc = ? AND store_id = ?");
+            $res = $dbc->execute($prep, $args);
+            echo "Product now NOT in-use";
         }
 
         return false;
@@ -905,7 +932,8 @@ CSS;
         return <<<HTML
 <div id="menu-action">
     <ul class="menu-list">
-        <li class="menu-list" id="mod-narrow">Change Narrow Status</li>
+        <li class="menu-list" id="mod-narrow">change narrow status</li>
+        <li class="menu-list" id="mod-in-use">change in-use status</li>
         <li class="menu-list edit-btn" data-table="products" data-column="brand"><span class="grey">Edit</span> POS-Brand</li>
         <li class="menu-list edit-btn" data-table="products" data-column="description"><span class="grey">Edit</span> POS-Description</li>
         <li class="menu-list edit-btn" data-table="products" data-column="size"><span class="grey">Edit</span> POS-Size</li>
