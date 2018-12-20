@@ -22,7 +22,8 @@ Class coreNav
         // $navbar = menu::nav_menu();
 
         return <<<HTML
-<nav class="navbar navbar-expand-md navbar-dark bg-dark mynav">
+<!--<nav class="navbar navbar-expand-md navbar-dark bg-dark mynav">-->
+<nav class="navbar navbar-expand-md navbar-dark bg-custom mynav">
   <a class="navbar-brand" href="http://{$MY_ROOTDIR}">ScannieV2</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>

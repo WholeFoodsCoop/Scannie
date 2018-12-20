@@ -72,8 +72,15 @@ img.icon {
 /*
     Core Navigation
 */
+.bg-custom {
+    //background: rgba(0,0,0,0.9);
+    background: repeating-linear-gradient(#343A40,  #565E66, #343A40 5px); 
+}
+.mr-sm-2 {
+    background: rgba(255,255,255,0.9);
+}
 .navbar {
-    background: orange;
+    //background: orange;
     // margin-bottom: 0px;
 }
 div.control-center {

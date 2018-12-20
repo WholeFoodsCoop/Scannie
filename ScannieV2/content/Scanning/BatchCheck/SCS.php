@@ -649,7 +649,7 @@ HTML;
                     <span class="smtext">Sale:</span>'.$sale.'
                 </div>
                 <div class="data">
-                    <span class="smtext">Batch:</span><span class="mdtext">'.$batch.'</span>
+                    <span class="smtext">Batch:</span><span class="mdtext" style="font-size: 12px;" >'.$batch.'</span>
                 </div>
             </div>';
         }

@@ -33,21 +33,11 @@ class TrackChangeNew extends PageLayoutA
     protected $description = "[Track Change] Track all changes made to an item in POS/OFFICE.";
     protected $ui = TRUE;
 
-    public function css_content()
+    public function cssContent()
     {
 return <<<HTML
 .green {
     color: green;
-}
-td.min {
-    min-width: 75px;
-}
-td.space {
-    min-width: 25px;
-    text-align: center;
-}
-input {
-    height: 20px;
 }
 .panel-noborder {
     border: 0;
@@ -55,6 +45,12 @@ input {
 }
 h5 {
     color: slategrey;
+}
+.navbar {
+    margin-bottom: 25px;
+}
+.table {
+    margin: 15px;
 }
 HTML;
     }
@@ -70,7 +66,8 @@ HTML;
         }
         $data = last_sold_check::getDates();
         $storename = array(1=>'Hillside',2=>'Denfeld');
-        $lastSold = '<h5>Product Last Sold</h5><table class="table table-small table-condensed"><tbody><tr>';
+        $lastSold = '<h5>Product Last Sold</h5>
+            <table class="table table-sm table-bordered"><tbody><tr>';
         foreach ($data as $k => $v) {
             $pipe = ($k == 1) ? " | " : "";
             if (is_numeric($k)) {
@@ -189,7 +186,7 @@ HTML;
                     if ($store_id[$i] == 'Hillside') {
                         $table .=  "<tr id='tr_$i'>";
                     } else {
-                        $table .=  "<tr id='tr_$i' class='warning'>";
+                        $table .=  "<tr id='tr_$i' class='alert-warning'>";
                     }
 
                     $switch = array(
@@ -270,7 +267,7 @@ HTML;
 HTML;
     }
 
-    public function javascript_content()
+    public function javascriptContent()
     {
         return <<<HTML
 var newCost = 0;
