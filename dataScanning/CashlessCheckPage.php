@@ -38,6 +38,7 @@ class CashlessCheckPage extends ScancoordDispatch
     {           
         $ret = '';
         $dbc = scanLib::getConObj('SCANTRANSDB');
+        include(__DIR__.'/../config.php');
         
         if ($_GET['store_id']) {
             $_SESSION['store_id'] = $_GET['store_id'];
@@ -116,7 +117,7 @@ class CashlessCheckPage extends ScancoordDispatch
         ';
         $issuers = array('American Express','AMEX','DCVR','DEBIT','Discover','EBT','M/C','MasterCard','Mercury','Visa');
         $cardTypes = array('Credit',' Debit', 'EBTFOOD', 'EMV', 'Gift');
-        $processors = array('GoEMerchant','MercuryE2E','MercuryGift');
+        $processors = array('GoEMerchant','MercuryE2E','MercuryGift','RapidConnect');
         $ret .= '<div id="processor" class="collapse"><strong>Processor : </strong>';
         foreach ($processors as $processor) {
             $ret .= '<button class="btn btn-default btn-xs" name="ext" value="'.$processor.'" >'.$processor.'</button>';
@@ -287,7 +288,7 @@ class CashlessCheckPage extends ScancoordDispatch
                 }
                 $transNo = $row['empNo'].'-'.$lane.'-'.$row['transNo'];
                 $transDate = $row['requestDatetime'];
-                $tCheckPath = '<a href="http:\\' . $CORE_POS_DIR .
+                $tCheckPath = '<a href="http://' . $FANNIEROOT_DIR.
                     '/admin/LookupReceipt/RenderReceiptPage.php?date='.$transDate.'&receipt='.$transNo.
                     '" target="_BLANK">' . $transNo . '</a>';
                 $ret .= '<tr>';

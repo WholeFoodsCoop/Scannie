@@ -31,8 +31,8 @@ if (!class_exists('SQLManager')) {
 class ExceptionSaleItemTracker extends ScancoordDispatch
 {
 
-    protected $title = "Exception Sales";
-    protected $description = "[Exception Sales] Monitor special prices of sale items.";
+    protected $title = "Pending Actions";
+    protected $description = "[Pending Actions] is a memory safety net.";
     protected $ui = TRUE;
 
     public function body_content()
@@ -42,7 +42,7 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
         $dbc = scanLib::getConObj();
 
         $ret .= '<div class="container">';
-        $ret .= '<h4>Exception Sale Items</h4>';
+        $ret .= '<h4>Pending Actions</h4>';
         $ret .= $this->form_content();
 
         if ($addItem = str_pad($_POST['addItem'], 13, 0, STR_PAD_LEFT)) {
@@ -117,13 +117,13 @@ class ExceptionSaleItemTracker extends ScancoordDispatch
                 <div class="row">
                     <div class="col-lg-3">
                         <div class="form-group"><div class="input-group">
-                            <span class="input-group-addon">Add</span>
+                            <span class="input-group-addon" title="Add an item to the list by entering a UPC here.">Add</span>
                             <input type="text" class="form-control" id="addItem" name="addItem" >
                         </div></div>
                     </div>
                     <div class="col-lg-3">
                         <div class="form-group"><div class="input-group">
-                            <span class="input-group-addon">Remove</span>
+                            <span class="input-group-addon" title="Remove an item to the list by entering the UPC here.">Remove</span>
                             <input type="text" class="form-control" id="rmItem" name="rmItem" >
                         </div></div>
                     </div>
