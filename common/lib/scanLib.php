@@ -284,6 +284,29 @@ class scanLib
         return $str;
     }
 
+    public function getSku($str, $dbc)
+    {
+        // if upc small enough to be sku, check if 
+        // there is a upc associated with that sku
+        echo $str;
+        $upc = "";
+        if ($int < 999999) {
+            echo "is sku";
+            $args = array($str);
+            $prep = $dbc->prepare("SELECT p.upc FROM products AS p 
+                INNER JOIN vendorItems AS v ON p.upc=v.upc 
+                AND p.default_vendor_id=v.vendorID where sku = ? GROUP BY p.upc;
+            ");
+            $res = $dbc->execute($prep, $args);
+            while ($row = $dbc->fetchRow($res)) {
+                $upc = $row['upc'];
+                echo $row['upc'];
+            }
+        }
+
+        return $upc;
+    }
+
     public function upcParse($str)
     {
         $rstr = str_replace(" ","",$str);

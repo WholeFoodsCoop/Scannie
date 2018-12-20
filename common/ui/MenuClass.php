@@ -97,7 +97,7 @@ class menu
                 <ul class="dropdown-menu" role="menu">
                 <li class="dropdown-header">Discrepancy Tasks</li>
                     <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/dataScanning/zeroPriceCheck.php">Bad Price Scan</a></li>
-                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/dataScanning/ExceptionSaleItemTracker.php">Exception Sale Items</a></li>
+                    <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/dataScanning/ExceptionSaleItemTracker.php">Pending Actions</a></li>
                     <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/dataScanning/MultiStoreDiscrepTable.php">Multi-Store Prod Discrep</a></li>
                     <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/dataScanning/CashlessCheckPage.php">Cashess Trans. Check</a></li>
                     <li><a class="menu-opt" href="http://{$SCANROOT_DIR}/misc/ProdUserChangeReport.php">Prod User Change</a></li>

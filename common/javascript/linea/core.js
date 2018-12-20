@@ -58,6 +58,8 @@ function enableLinea(selector, callback) {
     Device = new ScannerDevice({
         barcodeData: function(data, type) {
             var upc = data.substring(0,data.length-1);
+            var sku = data;
+            $('#sku').val(sku);
             if ($(selector).length > 0){
                 $(selector).val(upc);
                 if (typeof callback === 'function') {

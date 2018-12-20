@@ -486,11 +486,11 @@ HTML;
         }
         $ret .= '<input type="hidden" id="storeID" value="'.$OppoID.'" />';
 
-        $ret .= "<div class='form-group'><label>List of upcs</label><br/><textarea>";
+        $ret .= "<div class='col-md-3'><div class='form-group'><label>List of upcs</label><br/><textarea class='form-control' rows=5>";
         foreach ($upcs as $upc) {
             $ret .= "$upc\r\n";
         }
-        $ret .= "</textarea></div>";
+        $ret .= "</textarea></div></div>";
 
         $this->addScript('AuditScannerReport.js');
 

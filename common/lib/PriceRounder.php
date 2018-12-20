@@ -1,27 +1,27 @@
 <?php
 /*******************************************************************************
 
-    Copyright 2013 Whole Foods Community Co-op.
-    
-    This file is a part of CORE-POS.
-    
-    CORE-POS is free software; you can redistribute it and/or modify
+    Copyright 2015 Whole Foods Co-op, Duluth, MN
+
+    This file is part of CORE-POS.
+
+    IT CORE is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
     (at your option) any later version.
 
-    CORE-POS is distributed in the hope that it will be useful,
+    IT CORE is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    in the file LICENSE along with CORE-POS; if not, write to the Free Software
+    in the file license.txt along with IT CORE; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-    
+
 *********************************************************************************/
 
-class PriceRounder 
+class PriceRounder
 {
     /**
       The round function takes a numeric price and returns
@@ -37,108 +37,52 @@ class PriceRounder
     */
     public function round($price, $extra_parameters=array())
     {
-        // operate in cents
-        $price = floor($price * 100);    
-        if ($price % 10 == 0 ) $price--;            
-        
-        // if price < $1.00
-        if ($price < 100) {
-            while ($price % 100 != 29 && $price % 100 != 39 && $price % 100 != 49 && $price % 100 != 69 && $price % 100 != 79 && $price % 100 != 89 && $price % 100 != 99){
-                $price++;
+        $wholeP = floor($price);
+        $fractionP = $price - $wholeP;
+
+        $endings = array(
+            0 => array(0.29, 0.39, 0.49, 0.69, 0.79, 0.89, 0.99),
+            1 => array(0.19, 0.39, 0.49, 0.69, 0.89, 0.99),
+            2 => array(0.39, 0.69, 0.99),
+            3 => array(0.69, 0.99),
+            4 => array(0.99),
+        );
+        $endingCaps = array(0.99, 2.99, 5.99, 9.99, 9999.00);
+        $specialRound = array(
+            1 => 0.16,
+            2 => 0.16,
+            3 => 0.30,
+        );
+
+        foreach ($endingCaps as $level => $cap) {
+            if ($price <= $cap) {
+                foreach ($endings as $k => $endArray) {
+                    if ($k == $level ) {
+                        foreach ($endArray as $end) {
+                            if ($fractionP < $end) {
+                                if ($wholeP >= 10) {
+                                    if ($wholeP % 10 == 0) {
+                                        $wholeP--;
+                                        $end = 0.99;
+                                    } else {
+                                        $end = 0.99;
+                                    }
+                                } elseif ($fractionP <= $specialRound[$level]) {
+                                    $wholeP--;
+                                    $end = 0.99;
+                                }
+                                $price = $wholeP + $end;
+
+                                return $price;
+                            }
+                        }
+                    }
+                }
             }
         }
 
-        // if price $1.00 - 2.99
-        if ($price < 300 && $price > 100){
-            if ($price % 100 <= 15){
-                $price = $price - ($price % 100) - 1;
-            } elseif ($price % 100 != 19 && $price % 100 != 39 && $price % 100 != 49 && $price % 100 != 69 && $price % 100 != 89 && $price % 100 != 99) {
-                while ($price % 100 != 19 && $price % 100 != 39 && $price % 100 != 49 && $price % 100 != 69 && $price % 100 != 89 && $price % 100 != 99) {
-                    $price++;
-                }
-            }
-        }
-        
-        
-        // if price < $6.00 BUT > $2.99 
-        if ($price < 600 && $price >= 300) {
-            if ($price % 100 <= 19){
-                $price = $price - ($price % 100) - 1;
-            } elseif ($price % 100 != 39 && $price % 100 != 69 && $price % 100 != 99){
-                while ($price % 100 != 39 && $price % 100 != 69 && $price % 100 != 99) {
-                    $price++;
-                }
-            }
-            
-        }
-       
-        // if price >= 6.00 and cents < 30, round down to nearest x.99
-        if ($price >= 600) {
-            if ($price % 100 <= 29){
-                $price = $price - ($price % 100) - 1;
-            } elseif ($price % 100 > 29) {
-                while ($price % 100 != 69 && $price % 100 != 99) {
-                    $price++;
-                }
-            }
-        }
-        
-        // if price is >= $10.00 and the dollar amount is zero (20.99, 30.99, etc.) round down to nearest $xx.99
-        if ($price >= 1000){
-            if ( ($price - ($price % 100) ) % 1000 == 0 ){
-                $price = $price - ($price % 100) - 1;
-            } else {
-                while ($price % 100 != 99){
-                    $price++;
-                }
-            }
-        }
-        
-        return round($price/100.00, 2);
+        return false;
     }
 
-    /**
-      This is just an example of what a more complex rounding
-      scheme might look like. Nothing should be calling this 
-      method. 
-    private function example($price, $extra_parameters=array())
-    {
-        // operate in cents
-        $price = floor($price * 100);
-
-        // acceptable price ending digits vary
-        // depending what range the price falls in
-        $acceptable_endings = array(19, 29, 39, 49, 59, 69, 79, 89, 99);
-        if ($price > 1000) {
-            $acceptable_endings = array(99);
-        } elseif ($price > 600) {
-            $acceptable_endings = array(69, 99);
-        } elseif ($price > 300) {
-            $acceptable_endings = array(39, 69, 99);
-        } elseif ($price > 100) {
-            $acceptable_endings = array(19, 39, 49, 69, 89, 99);
-        } elseif ($price > 0) {
-            $acceptable_endings = array(29, 39, 49, 69, 79, 89, 99);
-        }
-        // find the next higher price w/ correct ending
-        $next = $price;
-        while (!in_array($next % 100, $acceptable_endings)) {
-            $next++;
-        }
-        // find the previous lower price w/ correct ending
-        $prev = $price;
-        while (!in_array($prev % 100, $acceptable_endings)) {
-            $prev--;
-        }
-
-        // return whichever price point is closest
-        // to the original price provided
-        if (($next-$price) <= ($price-$prev)) {
-            return round($next/100.00, 2);
-        } else {
-            return round($prev/100.00, 2);
-        }
-    }
-    */
 }
 

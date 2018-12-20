@@ -56,13 +56,17 @@ class MarginCalcNew extends ScancoordDispatch
         $ret .= '
             <form method="get">
             <div class="container-fluid">
-                <div class="input-group">
-                    <span class="input-group-addon input-sm">Cost</span>
-                    <input class="form-control" name="cost" value="'.$cost.'">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon input-sm">Cost</span>
+                        <input class="form-control" name="cost" value="'.$cost.'">
+                    </div>
                 </div>
-                <div class="input-group">
-                    <span class="input-group-addon input-sm">dMarg</span>
-                    <input class="form-control" name="dept_margin" value="'.$dept_marg.'">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon input-sm">dMarg</span>
+                        <input class="form-control" name="dept_margin" value="'.$dept_marg.'">
+                    </div>
                 </div>
                 <br />
                 <div align="right"><button class="btn  btn-xs">submit</button>&nbsp;&nbsp;</div>

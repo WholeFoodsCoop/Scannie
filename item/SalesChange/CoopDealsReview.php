@@ -277,15 +277,15 @@ class CoopDealsReview extends ScancoordDispatch
                 pu.brand,
                 p.description AS pDesc,
                 p.brand AS pBrand,
-				p.last_sold
+                p.last_sold
             FROM productUser AS pu
                 LEFT JOIN products AS p ON pu.upc=p.upc
                 LEFT JOIN batchList AS bl ON pu.upc=bl.upc
                 LEFT JOIN batches AS b ON bl.batchID=b.batchID
             WHERE (pu.description = '' OR pu.description IS NULL)
                 AND b.startDate = '{$startDate}'
-				AND b.batchType != 4
-				AND b.batchType != 11
+                AND b.batchType != 4
+                AND b.batchType != 11
             GROUP BY pu.upc
         ;");
 

@@ -118,12 +118,14 @@ class unfiBreakdowns extends ScancoordDispatch
         $ret .=  '<table class="table table-striped table-condensed small" style="width:250px;border:2px solid lightgrey">
                     <th></ht><th>Add UPC to Batch</th><th>batchID</th><th>saleprice</th>';
 
+        $prices = array();
         foreach ($batchList as $upc => $salePrice) {
             //  GET Child
             if (in_array($upc,$parents) && !in_array($upc,$child)) {
                 $curSize = $size[$upc];
                 $price = ($salePrice / $curSize);
-                $price = $rounder->round($price);
+                $prices[] = $price;
+                //$price = (!is_infinite($price)) ? $rounder->round($price) : "?";
                 $batch = '<a href="http://'.$FANNIEROOT_DIR.'/batches/newbatch/EditBatchPage.php?id=' . $batchIDs[$upc] . '" target="_blank">' . $batchIDs[$upc] . '</a>';
                 if ($curSize > 0.01) {
                     while ($price*$curSize < $salePrice) {
@@ -145,7 +147,8 @@ class unfiBreakdowns extends ScancoordDispatch
                 $parent = str_pad($parent,13,0,STR_PAD_LEFT);
                 $curSize = $size[$parent];
                 $price = ($salePrice * $curSize);
-                $price = $rounder->round($price);
+                $prices[] = $price;
+                //$price = ($price != 0) ? $rounder->round($price) : "?";
                 $batch = '<a href="http://'.$FANNIEROOT_DIR.'/batches/newbatch/EditBatchPage.php?id=' . $batchIDs[$upc] . '" target="_blank">' . $batchIDs[$upc] . '</a>';
                 while ($price > $salePrice*$curSize) {
                     $price--;
@@ -156,6 +159,7 @@ class unfiBreakdowns extends ScancoordDispatch
             }
             
         }
+        //var_dump($prices);
         $ret .=  '</table>';
         $ret .= '</div>';
         

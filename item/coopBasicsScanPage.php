@@ -44,7 +44,7 @@ class coopBasicsScanPage extends ScancoordDispatch
         $userhead =  ($username == false) ? '<div class="alert alert-danger">You must be logged in to use Audit Scan queue to check Coop Basics Signs.</div>'
             : "<div class='well'>You are logged in as $username</div>";
         $heading .=  '<h4>Coop Basics Review for <strong>'.$storename.'</strong></h4>';
-        $heading .=  "Don't forget to upload a Coop Basics checklist to <strong>Generic Upload</strong>.<br>";
+        $heading .=  "Don't forget to upload a Coop Basics checklist to <strong><a href='../../git/fannie/reports/Store-Specific/WFC/Basics/BasicsList.php' target='_blank'>Generic Upload</a></strong>.<br>";
 
         if (isset($_GET['session'])) {
             $session = substr($_GET['session'],0,-1);

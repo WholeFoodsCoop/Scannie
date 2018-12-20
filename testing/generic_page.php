@@ -42,10 +42,12 @@ class generic_page extends ScancoordDispatch
         include('../config.php');
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         
+        $card_no = 15952;
         $args = array();
-        $query = $dbc->prepare("select * from is4c_trans.dlog_90_view where card_no = 12259");
+        $query = $dbc->prepare("select * from is4c_trans.dlog_90_view where card_no = 15952");
         $result = $dbc->execute($query,$args);
         $data = array();
+        $amount = array();
         $skip = array('Discount','Change','Credit Card','Tax','Coupons','Donations');
         while ($row = $dbc->fetchRow($result)) {
             if (!in_array($row['description'],$skip)) {
@@ -54,14 +56,18 @@ class generic_page extends ScancoordDispatch
                 } else {
                     $data[$row['description']] += $row['quantity'];
                 }
+                $amount[$row['description']] = $row['total'];
             }
         }
         if ($dbc->error()) echo $dbc->error();
 
         asort($data,SORT_NUMERIC);
+        $ret .= "<h5>Purchases for Owner # $card_no</h4>";
+        $ret .= "<table class='table table-condensed small' style='max-width: 500px;'>";
         foreach ($data as $desc => $qty) {
-            $ret .= "$desc: $qty<br/>";
+            $ret .= "<tr><td>$desc</td><td>$qty</td><td>$$amount[$desc]</td></tr>";
         }
+        $ret .= "</table>";
         
         return $ret;
     }
