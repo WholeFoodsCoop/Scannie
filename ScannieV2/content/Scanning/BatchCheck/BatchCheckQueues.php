@@ -226,6 +226,7 @@ HTML;
                 AND p.store_id = ?
                 AND p.inUse = 1
                 AND sbm.storeID = ?
+                AND b.discountType >= 0
             GROUP BY p.upc 
             ORDER BY f.sections
         ";
