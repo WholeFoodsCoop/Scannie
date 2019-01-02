@@ -34,8 +34,11 @@ class BatchCheckMenu extends PageLayoutA
         $storeID = scanLib::getStoreID();
         $sessionName = FormLib::get('sessionName');
         $args = array($storeID,$sessionName);
+        $argsB = array($sessionName);
         $prep = $dbc->prepare("DELETE FROM woodshed_no_replicate.batchCheckQueues WHERE storeID = ? AND session = ?;");
-        $res = $dbc->execute($prep,$args);
+        $prepB = $dbc->prepare("DELETE FROM woodshed_no_replicate.batchCheckNotes WHERE session = ?;");
+        $dbc->execute($prep,$args);
+        $dbc->execute($prepB,$argsB);
         
     }
 
