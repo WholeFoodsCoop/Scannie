@@ -72,7 +72,8 @@ class BatchReviewPageMilk extends scancoordDispatch
                     vd.posDeptID,
                     vd.name AS vendorDeptName,
                     vd.deptID as unfiDeptId,
-                    d.margin
+                    d.margin,
+                    p.price_rule_id
                 FROM batchList as bl
                     LEFT JOIN products AS p ON p.upc = bl.upc
                     LEFT JOIN departments AS d ON d.dept_no = p.department
@@ -119,8 +120,10 @@ class BatchReviewPageMilk extends scancoordDispatch
                 $pipe = '<span style="color: lightgrey"> | </span>';
                 $curMargin = sprintf('%s %s %s',$curMargin,$pipe,$adjSpanA);
                 $newMargin = sprintf('%s %s %s',$newMargin,$pipe,$adjSpanB);
+
+                $tr = ($row['price_rule_id'] != 0) ? "<tr class='alert-warning'>" : "<tr>";
                 
-                $ret .= '<tr><td>' . $upc . '</td>';
+                $ret .= $tr . '<td>' . $upc . '</td>';
                 $ret .= '<td>' . $row['description'] . '</td>';
                 $ret .= '<td>' . $row['pdept'] . ' - ' . $row['dept_name'] . '</td>';
                 $ret .= "<td>$curMargin</td>";
