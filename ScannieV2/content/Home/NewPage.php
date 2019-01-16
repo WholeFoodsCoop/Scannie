@@ -74,7 +74,7 @@ class NewPage extends PageLayoutA
             ),
             array(
                 'handler' => self::getVendorSkuDiscrep($dbc),
-                'ranges' => array(0, 1, 9999),
+                'ranges' => array(0, 100, 9999),
             ),
             array(
                 'handler' => self::getProdsMissingLocation($dbc),
@@ -103,7 +103,8 @@ HTML;
 
     public function getReportHeader($data, $range)
     {
-        $count = number_format(count($data['data']), 0, '.', ',');
+        $pcount = number_format(count($data['data']), 0, '.', ',');
+        $count = count($data['data']);
         $alert = "";
         if ($count <= $range[0]) {
             $alert = 'alert-success';
@@ -114,7 +115,8 @@ HTML;
         }
         
         $ret = "";
-        $ret .= "<div class='count $alert'>$count</div>";
+
+        $ret .= "<div class='count $alert'>$pcount</div>";
         $ret .= "<div class='desc'>" . $data['desc'] . "</div>";
         return $ret;
     }
