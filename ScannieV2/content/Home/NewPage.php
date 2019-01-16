@@ -68,6 +68,19 @@ class NewPage extends PageLayoutA
                 'handler' => self::getVendorList($dbc), 
                 'ranges' => array(0, 1, 99),
             ),
+            array(
+                'handler' => self::getMissingSKU($dbc),
+                'ranges' => array(0, 50, 999999),
+            ),
+            array(
+                'handler' => self::getVendorSkuDiscrep($dbc),
+                'ranges' => array(0, 1, 9999),
+            ),
+            array(
+                'handler' => self::getProdsMissingLocation($dbc),
+                'ranges' => array(0, 100, 99999),
+            ),
+
         );
         $table = "";
         foreach ($reports as $row) {
@@ -82,7 +95,7 @@ class NewPage extends PageLayoutA
 
         return <<<HTML
 <div class="container-fluid">
-    <h4 > "Scanning" Department Home Page</h4>
+    <h4>Scanning Department Dashboard</h4>
     $table 
 </div>
 HTML;
@@ -90,7 +103,7 @@ HTML;
 
     public function getReportHeader($data, $range)
     {
-        $count = count($data['data']);
+        $count = number_format(count($data['data']), 0, '.', ',');
         $alert = "";
         if ($count <= $range[0]) {
             $alert = 'alert-success';
@@ -128,6 +141,110 @@ HTML;
         $table .= "</tbody></table></div>";
         
         return $table;
+    }
+
+    public function empty_template($dbc)
+    {
+        $desc = "";
+        $a = array();
+        $p = $dbc->prepare("");
+        $r = $dbc->execute($p, $a);
+        $cols = array('');
+        $data = array();
+        while ($row = $dbc->fetchRow($r)) {
+            foreach ($cols as $col) $data[$row['upc']][$col] = $row[$col];
+        }
+        if ($er = $dbc->error()) echo "<div class='alert alert-danger'>$er</div>";
+
+        return array('cols'=>$cols, 'data'=>$data, 'count'=>$count, 
+            'desc'=>$desc);
+    }
+
+    public function getProdsMissingLocation($dbc)
+    {
+        $desc = "Products missing physical locations";
+        $a = array();
+        $p = $dbc->prepare("
+            SELECT upc, brand, description, department, store_id
+            FROM products AS p
+                LEFT JOIN MasterSuperDepts AS m ON p.department=m.dept_ID
+            WHERE upc NOT IN (
+                SELECT f.upc
+                FROM FloorSectionProductMap AS f
+                    INNER JOIN products AS p ON p.upc=f.upc
+                    INNER JOIN FloorSections AS s ON f.floorSectionID=s.floorSectionID
+                        AND s.storeID=p.store_id
+            )
+                AND inUse = 1
+                AND m.superID IN (1,13,9,4,8,17,5) 
+        ");
+        $r = $dbc->execute($p, $a);
+        $cols = array('upc', 'brand', 'department', 'store_id');
+        $data = array();
+        while ($row = $dbc->fetchRow($r)) {
+            foreach ($cols as $col) $data[$row['upc']][$col] = $row[$col];
+        }
+        if ($er = $dbc->error()) echo "<div class='alert alert-danger'>$er</div>";
+
+        return array('cols'=>$cols, 'data'=>$data, 'count'=>$count, 
+            'desc'=>$desc);
+    }
+
+    public function getVendorSkuDiscrep($dbc)
+    {
+        $desc = "Items with multiple SKUs by Vendor";
+        $p = $dbc->prepare("SELECT vendorID FROM vendors
+            WHERE vendorID NOT IN (1, 2) ;");
+        $r = $dbc->execute($p);
+        $vendors = array();
+        while ($row = $dbc->fetchRow($r)) {
+            $vendors[] = $row['vendorID'];
+        }
+        $data = array();
+        foreach ($vendors as $vid) {
+            $a = array($vid, $vid);
+            $p = $dbc->prepare("
+                SELECT v.sku, v.upc, v.description, v.cost, v.modified, v.vendorID
+                FROM vendorItems AS v 
+                    INNER JOIN (SELECT * FROM vendorItems WHERE vendorID = ? GROUP BY upc HAVING COUNT(upc)>1) dup ON v.upc = dup.upc WHERE v.vendorID=?
+            ");
+            $r = $dbc->execute($p,$a);
+            $cols = array('upc', 'description', 'modified', 'sku', 'vendorID');
+            while ($row = $dbc->fetchRow($r)) {
+                foreach ($cols as $col) $data[$row['sku']][$col] = $row[$col];
+            }
+        }
+
+        return array('cols'=>$cols, 'data'=>$data, 'count'=>$count, 
+            'desc'=>$desc);
+    }
+
+    public function getMissingSKU($dbc)
+    {
+        $desc = "Items with recent sales missing SKU";
+        $p = $dbc->prepare("
+            SELECT p.upc, p.brand, p.description, p.department, p.default_vendor_id AS dvid
+            FROM products AS p 
+                LEFT JOIN vendorItems AS v ON v.vendorID=p.default_vendor_id
+                    AND p.upc=v.upc
+                LEFT JOIN MasterSuperDepts AS m ON p.department=m.dept_ID
+            WHERE (v.sku IS NULL OR v.sku=p.upc)
+                AND p.inUse = 1
+                AND m.superID IN (1,13,9,4,8,17,5) 
+                AND p.default_vendor_id NOT IN (0, 1, 2)
+                AND p.default_vendor_id > 0 
+                AND p.default_vendor_id IS NOT NULL
+            GROUP BY p.upc
+        ");
+        $r = $dbc->execute($p);
+        $data = array();
+        $cols = array('upc', 'brand', 'description', 'department', 'dvid');
+        while ($row = $dbc->fetchRow($r)) {
+            foreach ($cols as $col) $data[$row['upc']][$col] = $row[$col];
+        }
+
+        return array('cols'=>$cols, 'data'=>$data, 'count'=>$count, 
+            'desc'=>$desc);
     }
 
     public function getVendorList($dbc)
@@ -303,6 +420,10 @@ div.count {
 div.desc {
     display: inline-block;
     width: 400px;
+}
+h4 {
+    padding-top: 25px;
+    padding-bottom: 25px;
 }
 HTML;
     }
