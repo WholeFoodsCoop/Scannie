@@ -54,7 +54,7 @@ class NewPage extends PageLayoutA
             ),
             array(
                 'handler' => self::getProdMissingCost($dbc), 
-                'ranges' => array(10, 100, 999),
+                'ranges' => array(100, 200, 999),
             ),
             array(
                 'handler' => self::getProdMissingVendor($dbc), 
@@ -78,7 +78,7 @@ class NewPage extends PageLayoutA
             ),
             array(
                 'handler' => self::getProdsMissingLocation($dbc),
-                'ranges' => array(0, 100, 99999),
+                'ranges' => array(50, 100, 99999),
             ),
 
         );
@@ -194,7 +194,7 @@ HTML;
 
     public function getVendorSkuDiscrep($dbc)
     {
-        $desc = "Items with multiple SKUs by Vendor";
+        $desc = "Products with multiple SKUs by Vendor";
         $p = $dbc->prepare("SELECT vendorID FROM vendors
             WHERE vendorID NOT IN (1, 2) ;");
         $r = $dbc->execute($p);
@@ -223,9 +223,17 @@ HTML;
 
     public function getMissingSKU($dbc)
     {
-        $desc = "Items with recent sales missing SKU";
+        $desc = "Products with recent sales missing SKU";
+        // think about excluding vendorIDs since some vendors don't use SKUs
+        //select CONCAT('INSERT INTO MovementTags (upc, storeID, lastPar, modified) VALUES (\"', upc, '\", 1, 0.00, \"', NOW(), '\");')
+        //from products AS p
+        //    left join MasterSuperDepts AS m ON p.department=m.dept_ID
+        //    where upc not in (select upc from MovementTags where storeID = 1)
+        //        AND m.superID IN (1, 4, 5, 9, 13, 17)
+        //            AND p.store_id = 1
+        //            group by p.upc
         $p = $dbc->prepare("
-            SELECT p.upc, p.brand, p.description, p.department, p.default_vendor_id AS dvid
+            SELECT p.upc, p.brand, p.description, p.department, p.default_vendor_id AS dvid,
             FROM products AS p 
                 LEFT JOIN vendorItems AS v ON v.vendorID=p.default_vendor_id
                     AND p.upc=v.upc
@@ -307,8 +315,8 @@ HTML;
                 AND cost = 0 
                 AND default_vendor_id > 0
                 AND p.inUse = 1
+                AND p.department <> 240
             GROUP BY upc;");
-        //$pre = $dbc->prepare("select * from products limit 1");
         $res = $dbc->execute($pre);
         $count = $dbc->numRows($res);
         $cols = array('upc', 'brand', 'description', 'department',
@@ -354,10 +362,11 @@ HTML;
     {
         $desc = "Products missing movement tag rows";
         $data = array();
-        $argA = array(1, 2, 1);
-        $argB = array(2, 1, 2);
+        $argA = array(1, 1, 1, 1);
+        $argB = array(2, 2, 2, 2);
         $pre = $dbc->prepare("
-            SELECT upc, brand, description, created, ? AS store_id
+            SELECT upc, brand, description, created, ? AS store_id,
+                CONCAT('INSERT INTO MovementTags (upc, storeID, lastPar, modified) VALUES (\"', upc, '\", ',?,', 0.00, \"', NOW(), '\");') 
             FROM products AS p 
                 left join MasterSuperDepts AS m ON p.department=m.dept_ID
             WHERE upc not in (select upc from MovementTags where storeID = ?) 
@@ -368,19 +377,23 @@ HTML;
         ");
         $res = $dbc->execute($pre, $argA);
         $count = $dbc->numRows($res, $argA);
-        $cols = array('upc', 'brand', 'description', 'created', 'store_id');
+        //$cols = array('upc', 'brand', 'description', 'created', 'store_id');
+        $cols = array('sql');
         $i = 0;
         while ($row = $dbc->fetchRow($res)) {
-            foreach ($cols as $col) $data[$i][$col] = $row[$col];
+            foreach ($cols as $col) $data[$i]['sql'] = $row[5];
             $i++;
         }
+        if ($er = $dbc->error()) echo "<div class='alert alert-danger'>$er</div>";
         $res = $dbc->execute($pre, $argB);
         $count = $dbc->numRows($res, $argB);
-        $cols = array('upc', 'brand', 'description', 'created', 'store_id');
+        //$cols = array('upc', 'brand', 'description', 'created', 'store_id');
+        $cols = array('sql');
         while ($row = $dbc->fetchRow($res)) {
-            foreach ($cols as $col) $data[$i][$col] = $row[$col];
+            foreach ($cols as $col) $data[$i]['sql'] = $row[5];
             $i++;
         }
+        if ($er = $dbc->error()) echo "<div class='alert alert-danger'>$er</div>";
 
         return array('cols'=>$cols, 'data'=>$data, 'count'=>$count, 
             'desc'=>$desc);
