@@ -9,6 +9,30 @@ body {
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
+#nav-search-container {
+    position: relative;
+}
+#search-resp {
+    position: absolute;
+    background: grey;
+    background: repeating-linear-gradient(#343A40,  #565E66, #343A40 5px); 
+    color: white;
+    top: 46px;
+    left: 0px;
+    width: 195px;
+    //padding-bottom: 15px;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+a.search-resp {
+    color: #CACACA;
+    font-weight: bold;
+    text-shadow: 1px 1px darkslategrey;
+    padding-left: 5px;
+}
+a.search-resp:hover {
+    text-decoration: none;
+}
 #btnNext {
     position: absolute;
     bottom: 0px;
@@ -54,6 +78,13 @@ img.icon {
     border: 1px solid rgba(5,55,75,0.8);
     border-radius: 2px;
 }
+.triangle-down { 
+    width: 0;
+    height: 0;
+    border-left: 15px solid rgba(255,255,255,0);
+    border-right: 15px solid rgba(255,255,255,0);
+    border-top: 25px solid transparent; 
+}
 /*
     Scanicons
 */
@@ -72,6 +103,29 @@ img.icon {
 /*
     Core Navigation
 */
+.help-contents
+{
+    display: none;
+    position: absolute;
+    top: 55px;
+    right: 0px;
+    //height: 100%;
+    background: repeating-linear-gradient(#343A40,  #565E66, #343A40 5px); 
+    z-index: 999;
+    width: 50%;
+}
+.help-body {
+    padding: 25px;
+    margin: 25px;
+    background: rgba(255, 255, 255, 0.9);
+}
+.pre {
+    font-family: consolas;
+    padding: 5px;
+    margin-top: 25px;
+    font-size: 12px;
+    text-align: right;
+}
 .bg-custom {
     //background: rgba(0,0,0,0.9);
     background: repeating-linear-gradient(#343A40,  #565E66, #343A40 5px); 
@@ -153,6 +207,9 @@ div.infoContainer {
 */
 .input-default, .textarea-default {
     background-color: #b7b4cc;
+}
+.btn-default {
+    border: 1px solid lightgrey;
 }
 /*
     CoreNav

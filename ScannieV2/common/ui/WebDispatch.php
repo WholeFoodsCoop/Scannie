@@ -12,6 +12,8 @@ class WebDispatch
     protected $enable_linea = false;
     protected $ui = true;
     protected $deviceType = '';
+    protected $starttime = NULL;
+    protected $loadtime = NULL;
 
     function __construct() {}
 
@@ -24,6 +26,7 @@ class WebDispatch
             include(__DIR__.'/../lib/scanLib.php');
         }
         $obj = new $class();
+        $obj->starttime = microtime(true);
         $obj->draw_page();
     }
 
@@ -45,6 +48,11 @@ class WebDispatch
             echo coreNav::run();
         echo $this->body_content();
         echo $this->footer();
+        $diff = microtime(true) - $this->starttime;
+        $sec = intval($diff);
+        $micro = $diff - $sec;
+        $this->loadtime = strftime('%T', mktime(0, 0, $sec)) . str_replace('0.', '.', sprintf('%.3f', $micro));
+        echo $this->getHelpContent();
         echo $this->writeJS();
     }
 
@@ -94,6 +102,12 @@ class WebDispatch
             $this->addScript("http://{$MY_ROOTDIR}/common/lib/javascript/linea/WebHub.js");
             $this->addScript("http://{$MY_ROOTDIR}/common/lib/javascript/linea/core.js");
         }
+        if ($this->ui == true) {
+            $this->addScript("http://{$MY_ROOTDIR}/common/ui/search.js");
+        }
+        //if ($this->helpContent()) {
+        //    $this->addScript("http://{$MY_ROOTDIR}/common/javascript/helpContent.js");
+        //}
 
         return <<<HTML
 <html>
@@ -123,6 +137,33 @@ HTML;
        return <<<HTML
 </body>
 </html>
+HTML;
+    }
+
+    public function getHelpContent()
+    {
+        return <<<HTML
+<div class="help-contents" id="help-contents">
+    <div class="help-body" id="help-body">
+        {$this->helpContent()}
+        <div class="row">
+            <div class="col-md-8">
+            </div>
+            <div class="col-md-4">
+                <div class="pre">
+                    Page drawn in: {$this->loadtime}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+HTML;
+    }
+
+    protected function helpContent()
+    {
+        return <<<HTML
+Oops! No help contents exist for this page. 
 HTML;
     }
 

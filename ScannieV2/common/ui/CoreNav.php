@@ -2,6 +2,9 @@
 if (!class_exists('menu')) {
     require('MenuClass.php');
 }
+if (!class_exists('Search')) {
+    require('Search.php');
+}
 Class coreNav
 {
     public $ln = array(
@@ -19,6 +22,14 @@ Class coreNav
     public function navBar()
     {
         include(__DIR__.'/../../config.php');
+        $helptoggle = <<<JAVASCRIPT
+var hidden = $('#help-contents').is(':visible');
+if (hidden == false) {
+    $('#help-contents').show();
+} else {
+    $('#help-contents').hide();
+}
+JAVASCRIPT;
         // $navbar = menu::nav_menu();
 
         return <<<HTML
@@ -41,14 +52,27 @@ Class coreNav
       -->
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Item 
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="../Item/CheckScannedDate.php">Check PLU Queues</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Scan
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
           <a class="dropdown-item" href="../Scanning/BatchCheck/SCS.php">Batch Check Scanner</a>
           <a class="dropdown-item" href="../Scanning/BatchCheck/BatchCheckQueues.php?option=1">Batch Check Report</a>
+          <!--
           <div class="dropdown-divider"></div>
           <a class="dropdown-item" href="#"></a>
+          -->
         </div>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" onclick="{$helptoggle}" href="#">Help</a>
       </li>
       <!--
       <li class="nav-item">
@@ -56,19 +80,20 @@ Class coreNav
       </li>
       -->
     </ul>
+    <div id="nav-search-container">
     <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+      <input class="form-control mr-sm-2" type="search" id="nav-search" placeholder="Search" aria-label="Search">
+      <div id="search-resp"></div>
     </form>
+    </div>
     <div class="login-nav">
         Login options 
     </div>
   </div>
   <div class="toggle-control-center">
-    &nbsp;&nbsp;+&nbsp;
   </div>
 </nav>
 <div class="control-center">
-  This is where scannie alerts will be viewed.
 </div>
 HTML;
     }
