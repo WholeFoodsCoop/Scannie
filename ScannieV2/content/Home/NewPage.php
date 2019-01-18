@@ -225,15 +225,8 @@ HTML;
     {
         $desc = "Products with recent sales missing SKU";
         // think about excluding vendorIDs since some vendors don't use SKUs
-        //select CONCAT('INSERT INTO MovementTags (upc, storeID, lastPar, modified) VALUES (\"', upc, '\", 1, 0.00, \"', NOW(), '\");')
-        //from products AS p
-        //    left join MasterSuperDepts AS m ON p.department=m.dept_ID
-        //    where upc not in (select upc from MovementTags where storeID = 1)
-        //        AND m.superID IN (1, 4, 5, 9, 13, 17)
-        //            AND p.store_id = 1
-        //            group by p.upc
         $p = $dbc->prepare("
-            SELECT p.upc, p.brand, p.description, p.department, p.default_vendor_id AS dvid,
+            SELECT p.upc, p.brand, p.description, p.department, p.default_vendor_id AS dvid
             FROM products AS p 
                 LEFT JOIN vendorItems AS v ON v.vendorID=p.default_vendor_id
                     AND p.upc=v.upc
@@ -421,8 +414,7 @@ return <<<HTML
 .btn-collapse {
     background: rgba(0,0,0,0);
     color: #84B3FF;
-    padding: 0px;
-}
+    padding: 0px; }
 div.list {
     display: inline-block;
     width: 400px;
@@ -440,6 +432,42 @@ h4 {
     padding-top: 25px;
     padding-bottom: 25px;
 }
+HTML;
+    }
+
+    public function helpContent()
+    {
+        return <<<HTML
+<label>Scanning Department Dashboard</label>
+<ul>
+    <li>
+        <strong>Products using generic variable pricing rule</strong>
+        <p>Generig "Variable" pricing rules have been deprecated at WFC. All products
+            should fall into a specific pricing rule category.</p>
+    </li>
+    <li>
+        <strong>Products missing movement tag rows</strong>
+        <p>The data returned in this table is in sql format and is ready to be queries directly 
+            into the operational database, which is <i>currently handled manually.</i></p>
+    </li>
+    <li>
+        <strong>Vendors missing from Vendor Review Schedule</strong>
+        <p>There is a script in /home/csather/ (newScheduleVendor.sh) that will insert a new 
+            vendor into the operational database.</p>
+    </li>
+    <li>
+        <strong>Products with multiple SKUs by Vendor</strong>
+        <p>Eeach vendor should only have one SKU for each item. When updating vendors, make 
+            sure to remove the irrelevant SKUs before running the Vendor Pricing Batch Page, 
+            or there can be some discrepancies which may prohibit some items from showing
+            up in the list of desired changes.</p>
+    </li>
+    <li>
+        <strong>Products missing physical locations</strong>
+        <p>Use the product location editor <i>list of UPCs Update</i> to update physical 
+            product locations.</p> 
+    </li>
+</ul>    
 HTML;
     }
 
