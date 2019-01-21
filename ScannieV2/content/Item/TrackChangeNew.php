@@ -52,6 +52,9 @@ h5 {
 .table {
     margin: 15px;
 }
+.inactive {
+    background: white;
+}
 HTML;
     }
 
@@ -67,7 +70,7 @@ HTML;
         $data = last_sold_check::getDates();
         $storename = array(1=>'Hillside',2=>'Denfeld');
         $lastSold = '<h5>Product Last Sold</h5>
-            <table class="table table-sm table-bordered"><tbody><tr>';
+            <table class="table table-sm"><tbody><tr>';
         foreach ($data as $k => $v) {
             $pipe = ($k == 1) ? " | " : "";
             if (is_numeric($k)) {
@@ -137,14 +140,13 @@ HTML;
             $col1 .=  "
               <a value='back' onClick='history.go(-1);return false;'>BACK</a>
 			  <span class='pipe'>&nbsp;|&nbsp;</span>
-              <a href='http://$SCANROOT_DIR/item/last_sold_check.php?paste_list=1'>LAST SOLD PAGE</a>
+              <a href='last_sold_check.php?paste_list=1'>LAST SOLD PAGE</a>
                 <br>";
             $col1 .= scanLib::getDbcError($dbc);
 
-            $ret .=  "<div class='panel panel-default panelScroll table-responsive'>";
-            $ret .= '<span class="scrollRightIcon collapse" id="scrollRight"> </span>';
             $table = '';
-            $table .=  "<table class='table' id='mytable'>";
+            $table .=  "<div class='table-responsive'>
+                <table class='table table-sm' id='mytable'>";
             $table .=  "
                 <thead style='position: relative;'>
                 <th>Description</th>
@@ -203,7 +205,7 @@ HTML;
                     $table .=  "<td>" . $switch[$fs[$i]] . "</td>";
                     $table .=  "<td>" . $switch[$scale[$i]] . "</td>";
                     $table .=  "<td>" . $switch[$wic[$i]] . "</td>";
-                    $table .=  "<td>" . $store_id[$i] . "</td>";
+                    $table .=  "<td class=\"storeid\">" . $store_id[$i] . "</td>";
                     $table .=  "<td>" . $switch[$inUse[$i]] . "</td>";
                     $table .=  "<td class='modified'>" . $modified[$i] . "</td> ";
                     if ($realName[$i] == NULL) {
@@ -214,9 +216,8 @@ HTML;
                 }
 
             }
-            $table .=  "</tbody></table>";
+            $table .=  "</tbody></table></div>";
             $ret .= $table;
-            $ret .=  "</div>";    // <- panel / container
         }
 
         $pData = last_sold_check::getPurchase($upc,$dbc);
@@ -227,14 +228,18 @@ HTML;
         return <<<HTML
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-lg-3">
             {$col1}
             {$lastSold}
+            <div class='form-group'>
+                <button class='btn btn-default active filter'>Hillside</button>
+                <button class='btn btn-default active filter'>Denfeld</button>
+            </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-lg-3">
             {$pData[0]}
         </div>
-        <div class="col-md-7">
+        <div class="col-lg-6">
             <div class="panel panel-noborder table-responsive">
                 {$pData[1]}
             </div>
@@ -269,7 +274,7 @@ HTML;
 
     public function javascriptContent()
     {
-        return <<<HTML
+        return <<<JAVASCRIPT
 var newCost = 0;
 var oldCost = 0;
 var end = 0; 
@@ -312,7 +317,41 @@ $(function() {
          $('#dateCost').addClass('green').append(' *today*');
      }
 });
-HTML;
+$(function(){
+    $('.filter').on('click', function(){
+        var active = $(this).hasClass('active');
+        var store = $(this).text();
+        if (active == true) {
+            // make store inactive
+            $(this).removeClass('active')
+                .addClass('inactive');
+            $('td').each(function(){
+                $(this).closest('tr').show();
+            });
+            $('td').each(function(){
+                if ($(this).hasClass('storeid')) {
+                    var hide = $(this).text();
+                    if (hide == store) {
+                        $(this).closest('tr').hide();
+                    }
+                }
+            });
+        } else {
+            // make store active
+            $(this).removeClass('inactive')
+                .addClass('active');
+            $('td').each(function(){
+                if ($(this).hasClass('storeid')) {
+                    var show = $(this).text();
+                    if (show == store) {
+                        $(this).closest('tr').show();
+                    }
+                }
+            });
+        }
+    });
+});
+JAVASCRIPT;
     }
 
 }

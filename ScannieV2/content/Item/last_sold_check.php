@@ -39,19 +39,27 @@ class last_sold_check extends PageLayoutA
         $ret = "";
         include(__DIR__.'/../config.php');
         $ret .= '
-            <form method="get" class="form-inline">
-                <div class="input-group" style="width: 300px; float: left; float: left;">
-                    <textarea class="form-control" name="upcs" rows="5"></textarea>
-                    <button type="submit" class="sp btn btn-default btn-xs" style="width: 300px">
-                            go
-                    </button>
+            <div style="height: 25px;"></div>
+            <form method="get">
+                <div class="row">
+                    <div class="col-lg-2">
+                        <textarea class="form-control" name="upcs" rows="5"></textarea>
+                    </div>
+                    <input type="hidden" name="paste_list" value="1">
+                    <div class="col-lg-2">
+                        <textarea id="copyarea" class="form-control" rows="5">copy/paste
+                        </textarea>   
+                    </div>
                 </div>
-                <input type="hidden" name="paste_list" value="1">
+                <div class="row">
+                    <div class="col-lg-2">
+                        <button type="submit" class="sp btn btn-default btn-sm">Submit</button>
+                    </div>
+                    <div class="col-lg-2">
+                        <a href="TrackChangeNew.php" class="sp">Track Change</a>
+                    </div>
+                </div>
             </form>
-            <div style="float: left; margin-left: 15px;">
-                <textarea id="copyarea" class="form-control" rows="5">copy/paste
-                </textarea>   
-            </div>
         ';
 
         if ($_GET['upcs']) {
@@ -66,16 +74,15 @@ class last_sold_check extends PageLayoutA
         $link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
         $ret .= '
             <div align="right">
-                <button class="sp btn btn-default btn-xs" id="hideHill">Hide Hillside</button>
-                <button class="sp btn btn-default btn-xs" id="hideDenf">Hide Denfeld</button>
-                <button id="hideBlue" class="sp btn btn-info btn-xs">Hide Recent</button>
-                <button id="hideRed" class="sp btn btn-danger btn-xs">Hide Unsold</button>
-                <button id="showAll" class="sp btn btn-default btn-xs">Show All</button>
-                <a href="TrackChangeNew.php" class="sp">Track Change</a>
+                <button class="sp btn btn-default btn-sm" id="hideHill">Hide Hillside</button>
+                <button class="sp btn btn-default btn-sm" id="hideDenf">Hide Denfeld</button>
+                <button id="hideBlue" class="sp btn btn-info btn-sm">Hide Recent</button>
+                <button id="hideRed" class="sp btn btn-danger btn-sm">Hide Unsold</button>
+                <button id="showAll" class="sp btn btn-default btn-sm">Show All</button>
             </div><br>
         ';
 
-        $ret .= '<table class="table table-condensed small" id="dataTable"
+        $ret .= '<div class="table-responsive"><table class="table table-sm" id="dataTable"
             style="width:900 px;border:2px solid lightgrey"><tbody>';
         $ret .= '
             <th>UPC</th>
@@ -109,9 +116,9 @@ class last_sold_check extends PageLayoutA
                 $ret .= "</tr>";
             }
         }
-        $ret .= "</tbody></table>";
+        $ret .= "</tbody></table></div>";
 
-        return $ret;
+        return "<div class=\"container-fluid\">$ret</div>";
     }
 
     public function body_content()
