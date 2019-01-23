@@ -209,6 +209,7 @@ HTML;
                 SELECT v.sku, v.upc, v.description, v.cost, v.modified, v.vendorID
                 FROM vendorItems AS v 
                     INNER JOIN (SELECT * FROM vendorItems WHERE vendorID = ? GROUP BY upc HAVING COUNT(upc)>1) dup ON v.upc = dup.upc WHERE v.vendorID=?
+                AND v.upc <> 0 
             ");
             $r = $dbc->execute($p,$a);
             $cols = array('upc', 'description', 'modified', 'sku', 'vendorID');
