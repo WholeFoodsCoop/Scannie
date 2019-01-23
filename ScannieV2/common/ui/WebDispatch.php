@@ -177,6 +177,34 @@ HTML;
 
     protected function preprocess()
     {
+        foreach ($_GET as $name => $get) {
+            foreach ($this->__routes as $route) {
+                if (strpos($route, $name)) {
+                    $name = ucfirst($name);
+                    if (method_exists($this, 'get'.$name.'Handler')) {
+                        $this->{'get'.$name.'Handler'}();
+                        die();
+                    } elseif (method_exists($this, 'get'.$name.'View')) {
+                        $this->displayFunction = $this->{'get'.$name.'View'}();
+                    }
+                }
+            }
+        }
+        foreach ($_POST as $name => $post) {
+            foreach ($this->__routes as $route) {
+                if (strpos($route, $name)) {
+                    $name = ucfirst($name);
+                    if (method_exists($this, 'post'.$name.'Handler')) {
+                        $this->{'post'.$name.'Handler'}();
+                        die();
+                    } elseif (method_exists($this, 'post'.$name.'View')) {
+                        $this->displayFunction = $this->{'post'.$name.'View'}();
+                    }
+                }
+            }
+        }
+
+        return false;
     }
     
     protected function add_script($file_url,$type="text/javascript")
