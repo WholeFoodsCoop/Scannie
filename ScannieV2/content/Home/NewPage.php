@@ -80,8 +80,22 @@ class NewPage extends PageLayoutA
                 'handler' => self::getProdsMissingLocation($dbc),
                 'ranges' => array(50, 100, 99999),
             ),
-
+            array(
+                'handler' => self::getMissingScaleItems($dbc),
+                'ranges' => array(1, 2, 999),
+            ),
+            array(
+                'handler' => self::badPriceCheck($dbc),
+                'ranges' => array(1, 2, 999),
+            ),
         );
+
+        $muData = $this->multiStoreDiscrepCheck($dbc);
+        $multi = $this->getReportHeader(array('desc'=>'Discrepancies between stores', 'data'=>$muData['data']), array(5, 10, 999));
+        $multi .= " <button class='btn btn-default btn-collapse' data-target='#tableMulti'>view</button><br/>";
+        $multi .= "<div id='tableMulti'><table class='table table-sm table-bordered tablesorter'><thead>";
+        $multi .= $muData['table'];
+
         $table = "";
         foreach ($reports as $row) {
             $data = $row['handler'];
@@ -97,6 +111,7 @@ class NewPage extends PageLayoutA
 <div class="container-fluid">
     <h4>Scanning Department Dashboard</h4>
     $table 
+    $multi
 </div>
 HTML;
     }
@@ -155,6 +170,210 @@ HTML;
         $data = array();
         while ($row = $dbc->fetchRow($r)) {
             foreach ($cols as $col) $data[$row['upc']][$col] = $row[$col];
+        }
+        if ($er = $dbc->error()) echo "<div class='alert alert-danger'>$er</div>";
+
+        return array('cols'=>$cols, 'data'=>$data, 'count'=>$count, 
+            'desc'=>$desc);
+    }
+
+    public function multiStoreDiscrepCheck($dbc)
+    {
+        $desc = "Discrepancies with products between stores";
+        $fields = array('description','normal_price','cost','tax','foodstamp','wicable','discount','scale',
+            'department','brand','local','price_rule_id',);
+        $data = array();
+        $tempData = array();
+        foreach ($fields as $field) {
+            $tempData = $this->getDiscrepancies($dbc,$field);
+            foreach ($tempData as $k => $upc) {
+                $data[] = $upc;
+            }
+        }
+
+        $data = array_unique($data);
+        $ret .= $this->getProdInfo($dbc,$data,$fields);
+
+        return array('table'=>$ret, 'data'=>$data);
+    }
+
+    private function getProdInfo($dbc,$data)
+    {
+        $ret = '';
+        include(__DIR__.'/../config.php');
+        $fields = array(
+            'super_name',
+            'description',
+            'price',
+            'cost',
+            'dept',
+            'tax',
+            'fs',
+            'wic',
+            'scale',
+            'forceQty'
+        );
+        list($inClause,$args) = $dbc->safeInClause($data);
+        $queryH = 'SELECT p.*, m.super_name FROM prodUpdate AS p LEFT JOIN MasterSuperDepts AS m ON p.dept=m.dept_id WHERE storeID = 1 AND upc IN ('.$inClause.')';
+        $queryD = 'SELECT * FROM prodUpdate WHERE storeID = 2 AND upc IN ('.$inClause.')';
+        $itemH = array();
+        $itemD = array();
+
+        //  Get Hillside Prod. Info
+        $prepH = $dbc->prepare($queryH);
+        $resH = $dbc->execute($prepH,$args);
+        if ($dbc->error()) $ret .= '<div class="alert alert-danger">'.$dbc->error().'</div>';
+        while ($row = $dbc->fetchRow($resH)) {
+            foreach ($fields as $field) {
+                $itemH[$row['upc']][$field] = $row[$field];
+            }
+        }
+
+        //  Get Denfeld Prod. Info
+        $prepD = $dbc->prepare($queryD);
+        $resD = $dbc->execute($prepD,$args);
+        if ($dbc->error()) $ret .= '<div class="alert alert-danger">'.$dbc->error().'</div>';
+        while ($row = $dbc->fetchRow($resD)) {
+            foreach ($fields as $field) {
+                $itemD[$row['upc']][$field] = $row[$field];
+            }
+        }
+
+        $headers = array('Hill Desc','Den Desc','Hill Cost','Den Cost');
+        $ret .= '<div class="table-responsive">';
+        $ret .= '<table class="table table-condensed small table-responsive">';
+        $ret .= '<thead><tr><th>upc</th><th>chg</th><th>sup_dept</th>';
+        foreach ($fields as $field) {
+            if ($field != 'super_name') {
+                $ret .= '<th><b>[H]</b>'.$field.'</th><th><b>[D]</b>'.$field.'</th>';
+            }
+        }
+
+        $ret .= '</tr></thead><tbody>';
+        foreach ($itemH as $upc => $row) {
+            $ret .= '<tr>';
+            $ret .= '<td class="okay">
+                <a class="text" href="http://'.$FANNIEROOT_DIR.'/item/ItemEditorPage.php?searchupc=
+                    '.$upc.'" target="_blank">' . $upc . '</a></td>
+                    <td class="okay">
+                    <a class="text" href="http://'.$SCANROOT_DIR.'/item/TrackChangeNew.php?upc=
+                    ' . $upc . '" target="_blank">
+                    dx
+                </a></td>';
+            $ret .= '<td class="'.$row['super_name'].'">' . $row['super_name'] . '</td>';
+            foreach ($fields as $field) {
+                if ($field != 'super_name') {
+                    $td = '';
+                    if ($row[$field] == $itemD[$upc][$field]) {
+                        $td = '<td class="okay">';
+                    } else {
+                        $td = '<td class="bad alert alert-warning">';
+                    }
+                    $ret .= $td;
+                    $ret .= $row[$field] . '</td>';
+
+                    $ret .= $td;
+                    $ret .= $itemD[$upc][$field] . '</td>';
+                }
+
+            }
+            $ret .= '</tr>';
+        }
+        $ret .= '</tbody></table></div>';
+
+        return $ret;
+    }
+
+    private function getDiscrepancies($dbc, $field)
+    {
+
+        $data = array();
+        $diffR = $dbc->query("
+            SELECT upc, description
+            FROM products
+            WHERE inUse = 1
+                AND brand NOT IN (
+                    'BOLTHOUSE FARMS', 
+                    'BEETOLOGY',
+                    'COLUMBIA GORGE',
+                    'EVOLUTION FRESH',
+                    'WILD POPPY',
+                    'SUJA',
+                    'HONEYDROP',
+                    'SO GOOD SO YOU'
+                )
+            AND numflag & (1 << 19) = 0
+            GROUP BY upc
+            HAVING MIN({$field}) <> MAX({$field})
+            ORDER BY department
+        ");
+        $count = $dbc->numRows($diffR);
+        $msg = "";
+        if ($count > 0 ) {
+            while ($row = $dbc->fetchRow($diffR)) {
+                $data[] = $row['upc'];
+            }
+        }
+
+        if ($count > 0) {
+            return $data;
+        } else {
+            return false;
+        }
+    }
+
+    public function badPriceCheck($dbc)
+    {
+        $desc = "Products with bad prices";
+        $p = $dbc->prepare("
+            SELECT
+                p.upc,
+                p.normal_price AS price,
+                p.brand,
+                p.description,
+                p.store_id,
+                p.last_sold,
+                p.cost,
+                m.super_name
+            FROM products AS p
+                RIGHT JOIN MasterSuperDepts AS m ON p.department = m.dept_ID
+            WHERE inUse=1
+                AND upc NOT IN (0001440035017,0085068400634,0000000000114,0000000001092,0000000001108,0065801012014,0000000003361,0000000001138,0000000000114,0000000001101,0000000001997,0000000005005,0000009999904)
+                AND (normal_price = 0 OR normal_price > 99.99 OR normal_price < cost)
+                AND last_sold is not NULL
+                AND p.price_rule_id = 0
+                AND wicable = 0
+                AND m.superID IN (1,13,9,4,8,17,5) 
+            GROUP BY upc
+        "
+        );
+        $r = $dbc->execute($p);
+        $cols = array('upc', 'brand', 'description', 'cost', 'price');
+        $data = array();
+        while ($row = $dbc->fetchRow($r)) {
+            foreach ($cols as $col) $data[$row['upc']][$col] = $row[$col];
+        }
+        if ($er = $dbc->error()) echo "<div class='alert alert-danger'>$er</div>";
+
+        return array('cols'=>$cols, 'data'=>$data, 'count'=>$count, 
+            'desc'=>$desc);
+    }
+
+    public function getMissingScaleItems($dbc)
+    {
+        $desc = "Scale-items set to scale = 0";
+        $dontCheck = array(0, 5, 6, 40, 52, 103, 104, 105, 107, 109, 111, 112, 123, 160, 184, 
+            194, 195, 234, 237, 245, 247, 248, 250, 256, 265, 324, 549, 550, 666, 759, 799, 800, 
+            852, 868, 869, 918, 919, 920, 958, 983, 984, 985, 917, 154, 155, 193, 197, 198, 199,
+            211, 228, 189, 190);
+        $p = $dbc->prepare("SELECT upc, brand, description, normal_price FROM products WHERE upc < 1000 AND scale = 0 GROUP BY upc;");
+        $r = $dbc->execute($p);
+        $cols = array('upc', 'brand', 'description', 'normal_price');
+        $data = array();
+        while ($row = $dbc->fetchRow($r)) {
+            if (!in_array($row['upc'], $dontCheck)) {
+                foreach ($cols as $col) $data[$row['upc']][$col] = $row[$col];
+            }
         }
         if ($er = $dbc->error()) echo "<div class='alert alert-danger'>$er</div>";
 
