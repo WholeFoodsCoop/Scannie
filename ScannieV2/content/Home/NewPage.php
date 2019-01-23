@@ -200,7 +200,7 @@ HTML;
     private function getProdInfo($dbc,$data)
     {
         $ret = '';
-        include(__DIR__.'/../config.php');
+        include(__DIR__.'/../../config.php');
         $fields = array(
             'super_name',
             'description',
@@ -253,11 +253,9 @@ HTML;
         foreach ($itemH as $upc => $row) {
             $ret .= '<tr>';
             $ret .= '<td class="okay">
-                <a class="text" href="http://'.$FANNIEROOT_DIR.'/item/ItemEditorPage.php?searchupc=
-                    '.$upc.'" target="_blank">' . $upc . '</a></td>
+                <a class="text" href="../../../../'.$FANNIE_SERVE_DIR.'item/ItemEditorPage.php?searchupc='.$upc.'" target="_blank">' . $upc . '</a></td>
                     <td class="okay">
-                    <a class="text" href="http://'.$SCANROOT_DIR.'/item/TrackChangeNew.php?upc=
-                    ' . $upc . '" target="_blank">
+                    <a class="text" href="../Item/TrackChangeNew.php?upc=' . $upc . '" target="_blank">
                     dx
                 </a></td>';
             $ret .= '<td class="'.$row['super_name'].'">' . $row['super_name'] . '</td>';
