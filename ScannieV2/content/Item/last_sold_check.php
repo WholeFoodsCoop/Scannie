@@ -37,7 +37,7 @@ class last_sold_check extends PageLayoutA
     private function last_sold_check_list($dbc)
     {
         $ret = "";
-        include(__DIR__.'/../config.php');
+        include(__DIR__.'/../../config.php');
         $ret .= '
             <div style="height: 25px;"></div>
             <form method="get">
@@ -110,7 +110,7 @@ class last_sold_check extends PageLayoutA
                 } else {
                     $last_sold = '<span class="text-'.$class.'">' . $last_sold = substr($last_sold,0,10) . '</span>';
                 }
-                $upcLink = '<a href="http://'.$FANNIEROOT_DIR.'/item/ItemEditorPage.php?searchupc=' . $upc . '" target="_blank">' . $upc . '</a>';
+                $upcLink = '<a href="http://'.$FANNIE_ROOTDIR.'/item/ItemEditorPage.php?searchupc=' . $upc . '" target="_blank">' . $upc . '</a>';
                 $ret .= "<tr>";
                 $ret .= "<td class='clickToAdd'>" . $upcLink . "</td><td>" . $last_sold . "</td><td class='store_id'>" . $row['store_id'] . "</td><td>" . $row['description'] . "</td><td>" . $row['brand'] . "</td>";
                 $ret .= "</tr>";
