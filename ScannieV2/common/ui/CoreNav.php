@@ -31,6 +31,7 @@ if (hidden == false) {
 }
 JAVASCRIPT;
         // $navbar = menu::nav_menu();
+        $DIR = __DIR__;
 
         return <<<HTML
 <!--<nav class="navbar navbar-expand-md navbar-dark bg-dark mynav">-->
@@ -55,7 +56,7 @@ JAVASCRIPT;
             Item 
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" href="../Item/CheckScannedDate.php">Check PLU Queues</a>
+          <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Item/CheckScannedDate.php">Check PLU Queues</a>
         </div>
       </li>
       <li class="nav-item dropdown">
@@ -63,8 +64,9 @@ JAVASCRIPT;
             Scan
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" href="../Scanning/BatchCheck/SCS.php">Batch Check Scanner</a>
-          <a class="dropdown-item" href="../Scanning/BatchCheck/BatchCheckQueues.php?option=1">Batch Check Report</a>
+          <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Home/NewPage.php">Scan Dept. Dashboard</a>
+          <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Scanning/BatchCheck/SCS.php">Batch Check Scanner</a>
+          <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Scanning/BatchCheck/BatchCheckQueues.php?option=1">Batch Check Report</a>
           <!--
           <div class="dropdown-divider"></div>
           <a class="dropdown-item" href="#"></a>
