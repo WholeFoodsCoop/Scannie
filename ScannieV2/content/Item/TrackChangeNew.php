@@ -61,7 +61,7 @@ HTML;
     public function body_content()
     {
         $ret = '';
-        include(__DIR__.'/../config.php');
+        include(__DIR__.'/../../config.php');
         $dbc = scanLib::getConObj();
 
         if (!class_exists(last_sold_check)) {
@@ -74,7 +74,7 @@ HTML;
         foreach ($data as $k => $v) {
             $pipe = ($k == 1) ? " | " : "";
             if (is_numeric($k)) {
-                $lastSold .= "<td class='min'>$storename[$k]</td><td>$v</td><td class='space'>$pipe</td>";
+                $lastSold .= "<td class='min'>{$storename[$k]}</td><td>$v</td><td class='space'>$pipe</td>";
             }
         }
         $lastSold .= '</tr></tbody></table>';
@@ -134,21 +134,16 @@ HTML;
                 $store_id[] = $row['storeID'];
                 $inUse[] = $row['inUse'];
             }
-            $upcLink = "<a href='http://$FANNIEROOT_DIR/item/ItemEditorPage.php?searchupc="
-                    . $upc . "&ntype=UPC&searchBtn=' target='_blank'>{$upc}</a><br/>";
+            $upcLink = "<div><a href='http://$FANNIE_ROOTDIR/item/ItemEditorPage.php?searchupc="
+                . $upc . "&ntype=UPC&searchBtn=' target='_blank'>{$upc}</a></div>";
             $col1 .=  "<div>" . $upcLink . " <b>" . $desc[max(array_keys($desc))] . "</b></div>";
-            $col1 .=  "
-              <a value='back' onClick='history.go(-1);return false;'>BACK</a>
-			  <span class='pipe'>&nbsp;|&nbsp;</span>
-              <a href='last_sold_check.php?paste_list=1'>LAST SOLD PAGE</a>
-                <br>";
+            $col1 .=  "<div><a href='last_sold_check.php?paste_list=1'>LAST SOLD PAGE</a></div>";
             $col1 .= scanLib::getDbcError($dbc);
 
             $table = '';
-            $table .=  "<div class='table-responsive'>
-                <table class='table table-sm' id='mytable'>";
+            $table .=  "<div class='table-responsive-lg'><table class='table table-sm'>";
             $table .=  "
-                <thead style='position: relative;'>
+                <thead>
                 <th>Description</th>
                 <th>Price</th><th>Sale</th>
                 <th>Cost</th>
@@ -222,9 +217,6 @@ HTML;
 
         $pData = last_sold_check::getPurchase($upc,$dbc);
 
-        $this->addScript('../common/javascript/jquery.floatThead.min.js');
-        $this->addOnloadCommand("\$('.table-float').floatThead();\n");
-
         return <<<HTML
 <div class="container-fluid">
     <div class="row">
@@ -240,9 +232,7 @@ HTML;
             {$pData[0]}
         </div>
         <div class="col-lg-6">
-            <div class="panel panel-noborder table-responsive">
-                {$pData[1]}
-            </div>
+            {$pData[1]}
             <div id="costs">
                 <label>OldCost</label>: <span id="oldCost"></span> | 
                 <label>NewCost</label>: <span id="newCost"></span> | 
