@@ -46,6 +46,8 @@ class NewPage extends PageLayoutA
         $ret = '';
         $dbc = scanLib::getConObj();
         $data = "";
+        $d = new DateTime();
+        $datetime = $d->format('Y-m-d H:i');
 
         $reports = array(
             array(
@@ -93,8 +95,8 @@ class NewPage extends PageLayoutA
         $muData = $this->multiStoreDiscrepCheck($dbc);
         $multi = $this->getReportHeader(array('desc'=>'Discrepancies between stores', 'data'=>$muData['data']), array(5, 10, 999));
         $multi .= " <button class='btn btn-default btn-collapse' data-target='#tableMulti'>view</button><br/>";
-        $multi .= "<div id='tableMulti'><table class='table table-sm table-bordered tablesorter'><thead>";
-        $multi .= $muData['table'];
+        $multi .= "<div id='tableMulti' class='table-responsive-lg'>";
+        $multi .= $muData['table'] . "</div>";
 
         $table = "";
         foreach ($reports as $row) {
@@ -109,7 +111,7 @@ class NewPage extends PageLayoutA
 
         return <<<HTML
 <div class="container-fluid">
-    <h4>Scanning Department Dashboard</h4>
+    <h4>Scanning Department Dashboard <span class="smh4"><strong>Page last updated:</strong> $datetime</span></h4>
     $table 
     $multi
 </div>
@@ -240,8 +242,7 @@ HTML;
         }
 
         $headers = array('Hill Desc','Den Desc','Hill Cost','Den Cost');
-        $ret .= '<div class="table-responsive">';
-        $ret .= '<table class="table table-condensed small table-responsive">';
+        $ret .= '<table class="table small">';
         $ret .= '<thead><tr><th>upc</th><th>chg</th><th>sup_dept</th>';
         foreach ($fields as $field) {
             if ($field != 'super_name') {
@@ -277,7 +278,7 @@ HTML;
             }
             $ret .= '</tr>';
         }
-        $ret .= '</tbody></table></div>';
+        $ret .= '</tbody></table>';
 
         return $ret;
     }
@@ -621,7 +622,6 @@ $(document).ready(function(){
 $('.btn-collapse').click(function(){
     var target = $(this).attr('data-target');
     $(target).toggle();
-    //$(target).show();
 });
 JAVASCRIPT;
     }
@@ -629,6 +629,13 @@ JAVASCRIPT;
     public function cssContent()
     {
 return <<<HTML
+.smh4 {
+    font-size: 14px;
+    padding: 15px;
+}
+.small {
+    //font-size: 12px;
+}
 .btn-collapse {
     background: rgba(0,0,0,0);
     color: #84B3FF;
