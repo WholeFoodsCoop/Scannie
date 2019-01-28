@@ -23,12 +23,12 @@ function getSearchResults(search)
     });
 }
 
-$('.search-resp').click(function(){
-    alert('hi');
-    $('#nav-search').val('1');
-
-    return true;
-});
 $(function(){
     //alert('hi');
+});
+$('#nav-search').focusout(function(){
+    $(this).val("");
+});
+$('#search-resp').focusout(function(){
+    $(this).html("");
 });

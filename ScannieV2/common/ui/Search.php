@@ -52,7 +52,6 @@ class Search
         $s = $_GET['search'];
         $ret = $this->parser($s);
 
-        //$ret = '';
         foreach ($this->data as $name => $path) {
             if ( (strstr($name,$s) || strstr($name,ucwords($s))) && strlen($s) > 2 || is_numeric($s) ) {
                 $ret .= (is_numeric($s)) ? '<a class="search-resp" href="'.$path.'" target="_blank">' : '<a class="search-resp" href="'.$path.$name.'">';
@@ -71,8 +70,6 @@ HTML;
     }
 
 }
-//$obj = new search();
-//echo $obj->run();
 if ($_GET['search']) {
     $obj = new search();
     echo $obj->run();
