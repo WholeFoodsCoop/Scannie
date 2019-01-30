@@ -154,9 +154,26 @@ div.toggle-control-center {
     color: #CACACA;
     cursor: pointer;
 }
+/*
+    Auth
+*/
 div.login-nav {
-    background: darkgrey;
-    width: 100px;
+    //width: 100px;
+    //background: grey;
+    font-size: 12px;
+    padding-right: 15px;
+}
+a.nav-login {
+    color: lightblue;
+}
+.userSymbol {
+    color: white;
+    //font-family: consolas;
+    font-weight: bold;
+    text-shadow: 1px 1px solid grey;
+    background: rgba(255,255,255,0.3);
+    border-radius: 25%;
+    padding: 2px;
 }
 /*
     Page Style

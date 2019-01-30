@@ -68,7 +68,7 @@ HTML;
     private function view()
     {
         $links = array(
-            'Audie' => '../../../../item/AuditScanner.php',
+            'Audie' => '../AuditScanner/AuditScanner.php',
             'Batch Check Queues' => 'BatchCheckQueues.php',
             'Coop Deals Add' => '../../../../../git/IS4C/fannie/item/CoopDealsLookupPage.php',
             'Chat' => 'BatchCheckChat.php',

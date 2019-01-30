@@ -30,8 +30,25 @@ if (hidden == false) {
     $('#help-contents').hide();
 }
 JAVASCRIPT;
-        // $navbar = menu::nav_menu();
+
         $DIR = __DIR__;
+
+        $user = (!empty($_SESSION['user_name'])) ? $_SESSION['user_name'] : null;
+        $ud = '<span class="userSymbol"><b>'.strtoupper(substr($user,0,1)).'</b></span>';
+        if (empty($user)) {
+            $user = 'Generic User';
+            $logVerb = 'Login';
+            $link = "<a class='nav-login' href='http://{$MY_ROOTDIR}/auth/login.php'>[{$logVerb}]</a>";
+        } else {
+            $logVerb = 'Logout';
+            $link = "<a class='nav-login' href='http://{$MY_ROOTDIR}/auth/logout.php'>[{$logVerb}]</a>";
+        }
+        $loginText = '
+            <div style="color: #cacaca; margin-left: 25px; margin-top: 5px;" align="center">
+                <span style="color:#cacaca">'.$ud.'&nbsp;'.$user.'</span><br/>
+            '.$link.' 
+            </div>
+       ';
 
         return <<<HTML
 <img class="backToTop collapse" id="backToTop" src="http://$MY_ROOTDIR/common/src/img/upArrow.png" />
@@ -73,9 +90,11 @@ JAVASCRIPT;
             Scan
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Home/NewPage.php">Scan Dept. Dashboard</a>
+          <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Home/NewPage.php">Scan Dept. <strong>Dashboard</strong></a>
           <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Scanning/BatchCheck/SCS.php">Batch Check Scanner</a>
           <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Scanning/BatchCheck/BatchCheckQueues.php?option=1">Batch Check Report</a>
+          <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Scanning/AuditScanner/AuditScanner.php">Audit Scanner</a>
+          <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Scanning/AuditScanner/AuditScannerReport.php">Audit Report</a>
           <!--
           <div class="dropdown-divider"></div>
           <a class="dropdown-item" href="#"></a>
@@ -98,7 +117,7 @@ JAVASCRIPT;
     </form>
     </div>
     <div class="login-nav">
-        Login options 
+        $loginText
     </div>
   </div>
   <div class="toggle-control-center">

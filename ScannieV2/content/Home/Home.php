@@ -23,6 +23,7 @@ class Home extends PageLayoutA
         $this->addScript('Home.js');
         return <<<HTML
 <div align="center">Scannie Version 2.0 Home</div>
+<div><a href="../Scanning/AuditScanner/AuditScanner.php">TEMP audit scanner</a></div>
 HTML;
     }
 

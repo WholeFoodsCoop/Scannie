@@ -121,7 +121,7 @@ class WebDispatch
     <script src="http://{$MY_ROOTDIR}/common/bootstrap4/js/bootstrap.min.js"></script>
     <script src="http://{$MY_ROOTDIR}/common/ui/CoreNav.js"></script>
     <script src="http://{$MY_ROOTDIR}/common/javascript/webDispatch.js"></script>
-    <script src="http://{$MY_ROOTDIR}/common/lib/javascript/scannie.js"></script>
+    <script src="http://{$MY_ROOTDIR}/common/javascript/scannie.js"></script>
     <title>{$this->title}</title>
     <link rel="icon" href="http://{$MY_ROOTDIR}/common/src/icons/scannie_favicon.ico">
 <style>
