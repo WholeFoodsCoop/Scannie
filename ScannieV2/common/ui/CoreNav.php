@@ -34,13 +34,13 @@ JAVASCRIPT;
         $DIR = __DIR__;
 
         return <<<HTML
+<img class="backToTop collapse" id="backToTop" src="http://$MY_ROOTDIR/common/src/img/upArrow.png" />
 <!--<nav class="navbar navbar-expand-md navbar-dark bg-dark mynav">-->
 <nav class="navbar navbar-expand-md navbar-dark bg-custom mynav">
   <a class="navbar-brand" href="http://{$MY_ROOTDIR}">ScannieV2</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
-
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
@@ -57,6 +57,15 @@ JAVASCRIPT;
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
           <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Item/CheckScannedDate.php">Check PLU Queues</a>
+          <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Item/last_sold_check.php?paste_list=1">Last Sold</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Tables
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Tables/CoopDealsFile.php">Coop Deals File</a>
         </div>
       </li>
       <li class="nav-item dropdown">
