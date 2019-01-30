@@ -32,7 +32,7 @@ class specialPriceCheck extends ScancoordDispatch
         and Front End DBMS for products that are either erroneously 
         priced in respect to current sales batches or are erroneously 
         missing a special_price at the lanes.";
-    protected $ui = TRUE;
+    protected $ui = false;
     protected $upcs = array();
 
     public function body_content()
@@ -53,20 +53,25 @@ class specialPriceCheck extends ScancoordDispatch
         }
 
         return <<<HTML
-<h3>Sale Price Discrepancies </h3>
-<h4><b>OP</b><span style="font-size: 12px;"> Operational Data Conflicts</span></h4>
-<div style="border: 2px solid lightgrey"> </div>
-    {$opdb}
-<div style="height: 5px;">&nbsp;</div>
-<h4><b>POS</b><span style="font-size: 12px;"> Point of Sale Data Conflicts</span></h4>
-<div style="border: 2px solid lightgrey"> </div>
-<table class="table table-condensed small">
-    <thead><th>UPC</th><th>Brand</th><th>Description</th><th>[H] | [D]</th><th>Current Batches</th>
-        <th>Register</th></thead><tbody>
-        {$posdb}
-    </tbody>
-</table>
-<div style="height: 5px;">&nbsp;</div>
+<!--<h3>Sale Price Discrepancies </h3>-->
+<div id="salePriceDiscrepContainer">
+    <button type="button" class="close btn-default" aria-label="Close" onclick="$('#salePriceDiscrepContainer').hide();">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <h4><b>OP</b><span style="font-size: 12px;"> Operational Data Conflicts</span></h4>
+    <div style="border: 2px solid lightgrey"> </div>
+        {$opdb}
+    <div style="height: 5px;">&nbsp;</div>
+    <h4><b>POS</b><span style="font-size: 12px;"> Point of Sale Data Conflicts</span></h4>
+    <div style="border: 2px solid lightgrey"> </div>
+    <table class="table table-condensed small">
+        <thead><th>UPC</th><th>Brand</th><th>Description</th><th>[H] | [D]</th><th>Current Batches</th>
+            <th>Register</th></thead><tbody>
+            {$posdb}
+        </tbody>
+    </table>
+    <div style="height: 5px;">&nbsp;</div>
+</div>
 HTML;
     }
 

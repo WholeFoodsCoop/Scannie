@@ -111,9 +111,42 @@ class NewPage extends PageLayoutA
 
         return <<<HTML
 <div class="container-fluid">
-    <h4>Scanning Department Dashboard <span class="smh4"><strong>Page last updated:</strong> $datetime</span></h4>
-    $table 
-    $multi
+    <div style="margin-top: 20px;"></div>
+    <div class="card">
+        <div class="card-content">
+            <div class="card-body">
+                <div class="card-title">
+                    <h4>Scanning Department Dashboard <span class="smh4"><strong>Page last updated:</strong> $datetime</span></h4>
+                </div>
+                $table 
+                $multi
+            </div>
+        </div>
+    </div>
+    <div style="margin-top: 20px;"></div>
+    <div class="card">
+        <div class="card-content">
+            <div class="card-body">
+                <div class="card-title">
+                    <legend>Scan Utilities</legend>
+                </div>
+                <ul>
+                    <li>Scan POS for  
+                        <a href="#" onclick="
+                            $('#specIframe').css('display', 'block'); 
+                            $('#specIframe').attr('src', 'http://key/scancoord/dataScanning/specialPriceCheck.php');
+                            this.preventDefault;
+                        "
+                        >Sale Price Discrepancies</a>
+                    </li>
+                </ul>
+                <div>
+                    <iframe src="pleasewait.html" id="specIframe" style="width: 100%; height: auto; padding: 25px; border: 1px solid lightgrey; display:none;">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 HTML;
     }
@@ -629,6 +662,9 @@ JAVASCRIPT;
     public function cssContent()
     {
 return <<<HTML
+fieldset {
+    border: 1px solid lightgrey;
+}
 .smh4 {
     font-size: 14px;
     padding: 15px;
