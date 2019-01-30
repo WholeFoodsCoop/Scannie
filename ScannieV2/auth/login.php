@@ -72,7 +72,7 @@ class admin
                 }
                 if ($dbc->error()) echo $dbc->error();
                 echo "<br /><br /><div align='center'><div class='alert alert-success login-resp'>logging in <strong>".$curUser."</strong>, please wait.";
-                echo '</div>';
+                echo '</div></div>';
                 echo <<<JAVASCRIPT
 <script type="text/javascript">
 window.setTimeout(function(){
@@ -80,7 +80,6 @@ window.setTimeout(function(){
 }, 1000);
 </script>
 JAVASCRIPT;
-                //echo $this->jsRedirect();
             } else {
                 echo "<br /><br /><div align='center'><div class='alert alert-danger login-resp' >Username or Password is incorrect</div></div>";
             }
@@ -106,6 +105,10 @@ JAVASCRIPT;
                 }
                 @media only screen and (max-width: 600px) {
                     
+                }
+                body, html {
+                    background: black;
+                    background: repeating-linear-gradient(#343A40,  #565E66, #343A40 5px); 
                 }
             </style>
         ';
@@ -135,7 +138,6 @@ JAVASCRIPT;
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../common/bootstrap/bootstrap.min.css">
-  <!-- <link rel="stylesheet" href="../common/css/Scannie_css.css"> -->
   <script src="../common/bootstrap/jquery.min.js"></script>
   <script src="../common/bootstrap/bootstrap.min.js"></script>
   <script src="../common/javascript/jquery.cookie.js"></script>
@@ -149,7 +151,6 @@ html,body {
 body {
     display:table-cell;
     vertical-align:middle;
-    background-image: url('../common/src/img/bricks.png');
  }
 .login-form {
     display:block;
@@ -157,8 +158,8 @@ body {
     border-radius: 5px;
     margin:auto;
     box-shadow:0.7vw 0.7vw 0.7vw #272822;
-    background: linear-gradient(lightgrey,white);
-    opacity: 0.9;
+    background: linear-gradient(rgba(255,255,255,0.9), rgba(200,200,200,0.8));
+    //opacity: 0.9;
     padding: 20px;
     color: black;
 }
