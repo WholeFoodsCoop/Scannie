@@ -32,9 +32,12 @@ if (hidden == false) {
 JAVASCRIPT;
 
         $DIR = __DIR__;
-
-        $user = (!empty($_SESSION['user_name'])) ? $_SESSION['user_name'] : null;
-        $ud = '<span class="userSymbol"><b>'.strtoupper(substr($user,0,1)).'</b></span>';
+        $user = null;
+        $ud = "";
+        if (!empty($_SESSION['user_name'])) {
+            $user = $_SESSION['user_name'];
+            $ud = '<span class="userSymbol"><b>'.strtoupper(substr($user,0,1)).'</b></span>';
+        }
         if (empty($user)) {
             $user = 'Generic User';
             $logVerb = 'Login';
