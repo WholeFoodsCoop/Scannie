@@ -135,12 +135,15 @@ class NewPage extends PageLayoutA
                         <a href="#" onclick="
                             $('#specIframe').css('display', 'block'); 
                             $('#specIframe').attr('src', 'http://key/scancoord/dataScanning/specialPriceCheck.php');
+                            var h = $('#specIframe').outerHeight();
+                            h += parseInt(h, 10);
+                            $('#specIframe').css('height', h+'px');
                             this.preventDefault;
                         "
                         >Sale Price Discrepancies</a>
                     </li>
                 </ul>
-                <div>
+                <div id="iframeContainer" data-test="test">
                     <iframe src="pleasewait.html" id="specIframe" style="width: 100%; height: auto; padding: 25px; border: 1px solid lightgrey; display:none;">
                     </iframe>
                 </div>
@@ -334,6 +337,7 @@ HTML;
                     'HONEYDROP',
                     'SO GOOD SO YOU'
                 )
+            AND upc NOT IN (0000000001082, 0001136800238, 0001396436579, 0001396436582, 0002409407062, 0002409407091, 0003963200679, 0004122418310, 0004165252829, 0004973309101, 0004973395011, 0007105300001, 0007105300777, 0007215500005, 0007224821323, 0007224825064, 0007707523050, 0008775412005, 0008775412007, 0063172302830, 0063172302832, 0065428700002, 0065628517035, 0073402790126, 0073402790127, 0073402790414, 0078099900094, 0078099900206, 0078264300010, 0078264300020, 0078264300030, 0078506372236, 0082532515644, 0085055100511, 0085055100516, 0085055100517, 0086170500030, 0086170500032)
             AND numflag & (1 << 19) = 0
             GROUP BY upc
             HAVING MIN({$field}) <> MAX({$field})
