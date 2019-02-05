@@ -96,7 +96,8 @@ class NewPage extends PageLayoutA
         $multi = $this->getReportHeader(array('desc'=>'Discrepancies between stores', 'data'=>$muData['data']), array(5, 10, 999));
         $multi .= " <button class='btn btn-default btn-collapse' data-target='#tableMulti'>view</button><br/>";
         $multi .= "<div id='tableMulti' class='table-responsive-lg'>";
-        $multi .= $muData['table'] . "</div>";
+        $multi .= "<div class='card'><div class='card-body' style='overflow-x: scroll'>";
+        $multi .= $muData['table'] . "</div></div></div>";
 
         $table = "";
         foreach ($reports as $row) {
@@ -460,6 +461,16 @@ HTML;
         $data = array();
         foreach ($vendors as $vid) {
             $a = array($vid, $vid);
+            /** query to get vendorItemID of items with 2+ skus and one sku matches the UPC. 
+            $p = $dbc->prepare("
+                SELECT v.sku, v.upc, v.description, v.cost, v.modified, v.vendorID, v.vendorItemID
+                FROM vendorItems AS v 
+                    LEFT JOIN products AS p ON p.upc=v.upc
+                    INNER JOIN (SELECT * FROM vendorItems WHERE vendorID = ? GROUP BY upc HAVING COUNT(upc)>1) dup ON v.upc = dup.upc WHERE v.vendorID=?
+                AND v.upc <> 0 
+                AND p.upc=v.sku
+            ");
+            */
             $p = $dbc->prepare("
                 SELECT v.sku, v.upc, v.description, v.cost, v.modified, v.vendorID
                 FROM vendorItems AS v 
