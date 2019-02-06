@@ -131,7 +131,7 @@ class CoopDealsFile extends PageLayoutA
             }
             if ($dbc->error()) echo $dbc->error();
             $table = "";
-            $table .= '<div class="card"><div class="card-body">
+            $table .= '<div class="card"><div class="card-body
                 <div class="table-responsive">
                 <table class="table table-sm small">';
                 $table .= '<thead><th>UPC</th><th>Period</th><th>Department</th><th>SKU</th><th>Brand</th>
@@ -258,12 +258,64 @@ $(document).ready(function() {
         }
     });
 });
-    $('#dealSet').on('change', function(){
-        document.forms['dealSet'].submit();
+
+$('#dealSet').on('change', function(){
+    document.forms['dealSet'].submit();
+});
+$('#brandselect').on('change', function(){
+    document.forms['brandform'].submit();
+});
+
+$('table').each(function(){
+    var tableID = $(this).attr('id');
+    var i = 1;
+    $('th').each(function(){
+        var columnName = $(this).text();
+        $(this).attr('data-columnName', columnName)
+            .attr('data-tableID', tableID)
+            .attr('data-i', i);
+        $(this).attr('contentEditable', true);
+        i++;
     });
-    $('#brandselect').on('change', function(){
-        document.forms['brandform'].submit();
+});
+$('th').keyup(function(e){
+    var str = $(this).text();
+    str = str.toUpperCase();
+    var columnName = $(this).attr('data-columnName');
+    var i = $(this).attr('data-i');
+    $('tr').each(function(){
+        var checked = $(this).find('[type=checkbox]').prop('checked')?true:false;
+        if (!checked) {
+            $(this).show();
+        }
     });
+    $('tr td:nth-child('+i+')').each(function(){
+        var checked = $(this).find('[type=checkbox]').prop('checked')?true:false;
+        var curtext = $(this).text();
+        curtext = curtext.toUpperCase();
+        if (!curtext.includes(str)) {
+            if (!checked) {
+                $(this).closest('tr').hide();
+            }
+        }
+    });
+});
+$('th').focus(function(){
+    $(this).text("");
+});
+$('th').focusout(function(){
+    var columnName = $(this).attr('data-columnName');
+    var str = $(this).text();
+    if (str == '') {
+        $(this).text(columnName);    
+        $('tr').each(function(){
+            var checked = $(this).find('[type=checkbox]').prop('checked')?true:false;
+            if (!checked) {
+                $(this).show();
+            }
+        });
+    }
+});
 JAVASCRIPT;
     }
 
