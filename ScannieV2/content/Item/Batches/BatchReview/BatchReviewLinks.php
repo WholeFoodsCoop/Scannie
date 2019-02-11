@@ -1,36 +1,34 @@
 <?php
+$curPage = basename($_SERVER['PHP_SELF']);
 $id = $_GET['id'];
 if ($id) {
     $curID = "?id=$id";
 } else {
     $curID = '';
 }
-$curRet = '
+$pages = array(
+    "Non-UNFI Review" => "BatchReviewPage.php",
+    "UNFI Review" => "BatchReviewPageUNFI.php",
+    "UNFI-Milk Review" => "BatchReviewPageMilk.php",
+    "Sales Batch Review" => "BatchSaleReviewPage.php",
+    "Wic Batch Review" => "WicReviewPage.php",
+);
+$nav = <<<HTML
 <div class="container" style="padding-top: 25px; padding-bottom: 25px;">
     <nav class="navbar navbar-expand-lg navbar-transparent bg-transparent">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item '.get_active_tab($curPage,'BatchReviewPage.php').'">
-                <a class="nav-link" href="BatchReviewPage.php'.$curID.'">Non-UNFI Review</a></li>
-            <li class="nav-item '.get_active_tab($curPage,'BatchReviewPageUNFI.php').'">
-                <a class="nav-link" href="BatchReviewPageUNFI.php'.$curID.'">UNFI Reivew</a></li>
-            <li class="nav-item '.get_active_tab($curPage,'BatchReviewPageMilk.php').'">
-                <a class="nav-link" href="BatchReviewPageMilk.php'.$curID.'">UNFI-MILK Review</a></li>
-            <li class="nav-item '.get_active_tab($curPage,'BatchSaleReviewPage.php').'">
-                <a class="nav-link" href="BatchSaleReviewPage.php'.$curID.'">Sales Batch Review</a></li>
-            <li class="nav-item '.get_active_tab($curPage,'WicReviewPage.php').'">
-                <a class="nav-link" href="WicReviewPage.php'.$curID.'">Wic Batch Review</a></li>
+HTML;
+foreach ($pages as $name => $path) {
+    $active = ($path == $curPage) ? "btn btn-primary btn-sm" : "";
+    $nav .= <<<HTML
+            <li class="nav-item">
+                <a class="nav-link $active" href="$path$curID">$name</a></li>
+HTML;
+}
+$nav .= <<<HTML
         </ul>
     </nav>
 </div>
-';
-echo $curRet;
+HTML;
 
-function get_active_tab($curPage,$reqPage)
-{
-    if ($curPage === $reqPage) { 
-        return 'active';
-    } else {
-        return '';
-    }
-}
-
+echo $nav;
