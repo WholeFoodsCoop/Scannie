@@ -373,7 +373,7 @@ HTML;
 
         $ret .= '<div style="font-size: 12px; padding-bottom: 10px;"><b>Filter by Notes</b>:'.$noteStr.'</div>';
         $ret .=  '<div class="panel panel-default table-responsive">
-            <table class="table table-condensed table-sm small tablesorter" id="dataTable">';
+            <table class="table table-condensed table-sm small table-bordered tablesorter" id="dataTable">';
         $ret .=  '<thead class="key" id="dataTableThead">
             <tr class="key">';
         foreach ($headers as $v) {
@@ -511,37 +511,44 @@ HTML;
         return $options;
     }
 
+    public function cssContent()
+    {
+        return <<<HTML
+form {
+    display: inline;
+}
+.btn {
+    margin-top: 5px;
+    margin-left: 5px;
+}
+.alert {
+    margin: 5px;
+}
+HTML;
+    }
+
+
+
     private function form_content()
     {
 
         $ret = '';
         $ret .= '
-            <div style="float: right; margin-top: 5px; margin-right: 5px;">
-                <div class="table-responsive">
-                <table class="buttonbox key">
-                    <thead></thead>
-                    <tbody>
-                        <tr class="buttonbox key">
-                            <form method="post" id="clearNotesForm">
-                                <td id="clearNotesInput" class="btn btn-default btn-sm">Clear Notes</td>
-                                <input type="hidden" name="clearNotes" value="1" />
-                            </form>
-                            <form method="post" id="clearAllForm">
-                                <td id="clearAllInput" class="btn btn-default btn-sm">Clear ALL</td>
-                                <input type="hidden" name="cleardata" value="1" />
-                            </form>
+                <form method="post" id="clearNotesForm">
+                    <button id="clearNotesInput" class="btn btn-secondary btn-sm">Clear Notes</button>
+                    <input type="hidden" name="clearNotes" value="1" />
+                </form>
+                <form method="post" id="clearAllForm">
+                    <button id="clearAllInput" class="btn btn-secondary btn-sm">Clear ALL</button>
+                    <input type="hidden" name="cleardata" value="1" />
+                </form>
 
-                            <form method="post" id="updateForm">
-                                <td id="updateInput" class="btn btn-default btn-sm">Update from POS</td>
-                                <input type="hidden" name="update" value="1">
-                            </form>
-                            <td class="btn btn-default btn-sm" data-toggle="modal" data-target="#upcs_modal">Upload a List</td>
-                    <td><a class="btn btn-info btn-sm" href="AuditScanner.php ">Goto Scanner</a></td>
-                    </tbody>
-                </table>
-                </div>
-
-            </div>
+                <form method="post" id="updateForm">
+                    <button id="updateInput" class="btn btn-secondary btn-sm">Update from POS</button>
+                    <input type="hidden" name="update" value="1">
+                </form>
+                <button class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#upcs_modal">Upload a List</button>
+                <a class="btn btn-info btn-sm" href="AuditScanner.php ">Scanner</a>
         ';
 
         $ret .= '
