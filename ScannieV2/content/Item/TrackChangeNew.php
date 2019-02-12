@@ -249,14 +249,20 @@ HTML;
     private function form_content()
     {
         return <<<HTML
-<form class ="form-inline"  method="get" >
-    <div class="form-group">
-        <div class="input-group">
-            <input type="text" class="form-control" name="upc" placeholder="Enter a PLU" autofocus>
-                <input type="submit" class="btn btn-defualt" value="go">
+<form class =""  method="get" >
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="form-group">
+                <input type="text" class="form-control" name="upc" placeholder="Enter a PLU" autofocus />
+            </div>
         </div>
-    </div>
-    <div class="form-group">
+        <div class="col-lg-2">
+            <div class="form-group">
+                <div class="form-group">
+                    <input type="submit" class="btn btn-defualt" value="submit" />
+                </div>
+            </div>
+        </div>
     </div>
 </form>
 HTML;
