@@ -74,6 +74,7 @@ JAVASCRIPT;
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
           <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Item/Batches/BatchReview/BatchReviewPage.php">Review Batches</a>
+          <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Item/Batches/CoopDeals/CoopDealsReview.php">Q.A. & Breakdowns</a>
         </div>
       </li>
       <li class="nav-item dropdown">
@@ -107,9 +108,9 @@ JAVASCRIPT;
             Tables
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <div class="nav-item" align="center" style="background: lightgrey;">Tables</div>
+          <div class="nav-item nav-label" align="center">Tables</div>
           <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Tables/CoopDealsFile.php">Coop Deals File</a>
-          <div class="nav-item" align="center" style="background: lightgrey;">Reports</div>
+          <div class="nav-item nav-label" align="center">Reports</div>
           <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Reports/WeeklySalesByWeek.php">Weekly Sales By Week</a>
         </div>
       </li>

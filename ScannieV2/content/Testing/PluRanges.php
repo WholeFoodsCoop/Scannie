@@ -23,7 +23,6 @@ class PluRanges extends PageLayoutA
     {
         $ret = '';
         include(__DIR__.'/../../config.php');
-
         $dbc = scanLib::getConObj();
 
         $prep = $dbc->prepare("select upc from products WHERE upc LIKE '002%000000'");
@@ -31,7 +30,6 @@ class PluRanges extends PageLayoutA
         $upcs = array();
         while ($row = $dbc->fetchRow($res)) {
             $upc = $row['upc'];
-            //echo "$upc<br/>";
             $upcs[] = $upc;
         }
 
@@ -46,10 +44,9 @@ class PluRanges extends PageLayoutA
             }
         }
         foreach ($pockets as $upc => $pocket) {
-            //echo "$upc: $pocket<br/>";
             $size = $pocket-1;
             if ($pocket > 30 && $pocket < 99) {
-                echo "starting upc: $upc, pocket: $pocket<span class='size' style='width: $size;'></span><br/>";
+                $ret .= "starting upc: $upc, pocket: $pocket<span class='size' style='width: $size;'></span><br/>";
             }
         }
         /*
@@ -67,7 +64,9 @@ class PluRanges extends PageLayoutA
         */
         
         return <<<HTML
-        no fatal errors
+<div class="container-fluim">
+$ret
+</div>
 HTML;
     }
 
@@ -80,25 +79,6 @@ HTML;
     public function cssContent()
     {
         return <<<HTML
-p {
-    margin-top: 50px;
-    font-size: 38px;
-    color: white;
-    color: rgba(0,0,0,0.2);
-}
-a {
-    color: lightgreen;
-}
-div {
-    font-size: 42px;
-    color: rgba(0,0,0,0.2);
-}
-span.size {
-    display: inline-block;
-    border: 1px solid white;
-    height: 25px;
-    width: 100px;
-}
 HTML;
     }
 

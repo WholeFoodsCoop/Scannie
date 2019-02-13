@@ -36,10 +36,6 @@ class WebDispatch
         if (!class_exists('coreNav')) {
             include(__DIR__.'/CoreNav.php');
         }
-        if(!class_exists('Footer')) {
-            //don't include the footer in scannieV2
-            //include(__DIR__.'/Footer.php');
-        }
 
         $this->preflight();
         $this->preprocess();

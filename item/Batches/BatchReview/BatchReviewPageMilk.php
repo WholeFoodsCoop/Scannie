@@ -120,8 +120,8 @@ class BatchReviewPageMilk extends scancoordDispatch
                 $pipe = '<span style="color: lightgrey"> | </span>';
                 $curMargin = sprintf('%s %s %s',$curMargin,$pipe,$adjSpanA);
                 $newMargin = sprintf('%s %s %s',$newMargin,$pipe,$adjSpanB);
-
-                $tr = ($row['price_rule_id'] != 0) ? "<tr class='alert-warning'>" : "<tr>";
+                // hide variable items 
+                $tr = ($row['price_rule_id'] != 0) ? "<tr style='display:none'>" : "<tr>";
                 
                 $ret .= $tr . '<td>' . $upc . '</td>';
                 $ret .= '<td>' . $row['description'] . '</td>';

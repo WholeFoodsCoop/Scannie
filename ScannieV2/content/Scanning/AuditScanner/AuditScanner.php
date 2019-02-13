@@ -582,7 +582,7 @@ HTML;
         $ret .= '<br /><br /><br /><br /><br /><br />';
         $this->addOnloadCommand("$('#progressBar').hide();");
         $timestamp = time();
-        $this->addScript('AuditScanner.js?unique='.$timestamp);
+        $this->addScript('auditScanner.js?unique='.$timestamp);
         $ret .= "<input type='hidden' id='isOnSale' name='isOnSale' value=$isOnSale/>";
         $hiddenContent = $this->hiddenContent();
 

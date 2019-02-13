@@ -50,8 +50,8 @@ class mobile extends ScancoordDispatch
         $ret .= '
             <div style="width: 100%;" align="center">
                 <h1>Mobile Scannie</h1>
-                <a class="btn btn-default btn-mobile-menu" href="http://'.$HTTP_HOST.'/scancoord/item/AuditScanner.php">Audie <i>Scanner</i></a><br /><br />
-                <a class="btn btn-default btn-mobile-menu" href="http://'.$HTTP_HOST.'/scancoord/item/AuditScannerReport.php">Audie <i>Report</i></a><br /><br />
+                <a class="btn btn-default btn-mobile-menu" href="http://'.$HTTP_HOST.'/scancoord/ScannieV2/content/Scanning/AuditScanner/AuditScanner.php">Audie <i>Scanner</i></a><br /><br />
+                <a class="btn btn-default btn-mobile-menu" href="http://'.$HTTP_HOST.'/scancoord/ScannieV2/content/Scanning/AuditScanner/AuditScannerReport.php">Audie <i>Report</i></a><br /><br />
                 <a class="btn btn-default btn-mobile-menu" 
                     href="http://'.$HTTP_HOST.'/scancoord/ScannieV2/content/Scanning/BatchCheck/BatchCheckMenu.php">
                     <span class="new">NEW</span> Batch Check</a><br /><br />

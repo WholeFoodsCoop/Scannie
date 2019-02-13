@@ -277,6 +277,7 @@ HTML;
             text-align: right; 
             color: #CACACA;
             text-shadow: 1px 1px grey;
+            margin-right: 10px;
         \">$username</h1>";
 
         $routes = array(
@@ -482,7 +483,7 @@ HTML;
                 </style>
             ';
 
-        // $OppoID tells AuditScannerReport.js which store's scans to igore.
+        // $OppoID tells auditScannerReport.js which store's scans to igore.
         if ($storeID == 1) {
             $OppoID = 2;
         } else {
@@ -496,7 +497,7 @@ HTML;
         }
         $ret .= "</textarea></div></div>";
 
-        $this->addScript('AuditScannerReport.js');
+        $this->addScript('auditScannerReport.js');
 
         return $ret;
     }

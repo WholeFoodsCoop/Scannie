@@ -55,7 +55,12 @@ class specialPriceCheck extends ScancoordDispatch
         return <<<HTML
 <!--<h3>Sale Price Discrepancies </h3>-->
 <div id="salePriceDiscrepContainer">
-    <button type="button" class="close btn-default" aria-label="Close" onclick="$('#salePriceDiscrepContainer').hide();">
+    <button type="button" class="close btn-default" aria-label="Close" onclick="
+        $('#salePriceDiscrepContainer').hide();
+        var elm = parent.document.getElementById('specIframe');
+        elm.style.height = '202px';
+        elm.style.display = 'none';
+    ">
         <span aria-hidden="true">&times;</span>
     </button>
     <h4><b>OP</b><span style="font-size: 12px;"> Operational Data Conflicts</span></h4>

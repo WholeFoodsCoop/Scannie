@@ -58,7 +58,7 @@ HTML;
         foreach ($cols as $col) 
             $thead .= "<th>$col</th>";
         $table = "<div class='table-responsive'>
-            <table class='table table-condensed table-bordered small'>
+            <table class='table table-condensed table-bordered table-sm small'>
             <thead>$thead</thead>";
         $data = array();
         for ($i=162; $i<215; $i++) {

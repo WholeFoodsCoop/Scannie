@@ -6,6 +6,12 @@ if (!class_exists('SQLManager')) {
     include_once(__DIR__.'/../../common/sqlconnect/SQLManager.php');
 }
 
+/*
+**  @class FindPurchaseOrders
+**
+**  A tool for tracking down (most) recent purchase
+**  orders for a list of items. Used for financial audits. 
+*/
 class FindPurchaseOrders extends PageLayoutA 
 {
     
