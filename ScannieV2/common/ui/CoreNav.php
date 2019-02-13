@@ -94,9 +94,9 @@ JAVASCRIPT;
           <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Home/NewPage.php">Scan Dept. <strong>Dashboard</strong></a>
           <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Scanning/BatchCheck/SCS.php"><strong style="color: green">Batch Check</strong> Scanner</a>
           <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Scanning/BatchCheck/BatchCheckQueues.php?option=1"><strong style="color: green">Batch Check</strong> Report</a>
-          <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Scanning/AuditScanner/AuditScanner.php"><strong>Audit</strong> Scanner</a>
-          <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Scanning/AuditScanner/AuditScannerReport.php"><strong>Audit</strong> Report</a>
-          <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Scanning/AuditScanner/BasicsScan.php">Basics Scan</a>
+          <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Scanning/AuditScanner/AuditScanner.php"><strong style="color: #4286f4">Audit</strong> Scanner</a>
+          <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Scanning/AuditScanner/AuditScannerReport.php"><strong style="color: #4286f4">Audit</strong> Report</a>
+          <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Scanning/AuditScanner/BasicsScan.php"><strong style="color: purple">Basics</strong> Scan</a>
           <!--
           <div class="dropdown-divider"></div>
           <a class="dropdown-item" href="#"></a>
