@@ -70,6 +70,8 @@ class WebDispatch
     {
         // re-rout client to loggin page if user not logged in. 
         if ( WebDispatch::is_session_started() === FALSE ) session_start();
+        session_id();
+
         if (!isset($_SESSION['user_type'])) $_SESSION['user_type'] = null;
         $userType = $_SESSION['user_type'];
         if ($userType != 1) {
