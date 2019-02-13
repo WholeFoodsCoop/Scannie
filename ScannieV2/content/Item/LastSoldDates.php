@@ -26,11 +26,11 @@ if (!class_exists('PageLayoutA')) {
 if (!class_exists('SQLManager')) {
     include_once(__DIR__.'/../../common/sqlconnect/SQLManager.php');
 }
-class last_sold_check extends PageLayoutA 
+class LastSoldDates extends PageLayoutA 
 {
 
-    protected $title = "Last Sold Check";
-    protected $description = "[Last Sold Check] Tracks last sale date, most
+    protected $title = "Last Sold Dates";
+    protected $description = "[Last Sold Dates] Tracks last sale date, most
         recent purchase order and displays Vendor Item information relavant
         to the matching SKU in relation to the purchase order.";
 

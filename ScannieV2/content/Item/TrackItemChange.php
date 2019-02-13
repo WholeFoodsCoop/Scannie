@@ -26,7 +26,7 @@ if (!class_exists('PageLayoutA')) {
 if (!class_exists('SQLManager')) {
     include_once(__DIR__.'/../../common/sqlconnect/SQLManager.php');
 }
-class TrackChangeNew extends PageLayoutA 
+class TrackItemChange extends PageLayoutA 
 {
 
     protected $title = "Track Change";
@@ -64,10 +64,10 @@ HTML;
         include(__DIR__.'/../../config.php');
         $dbc = scanLib::getConObj();
 
-        if (!class_exists(last_sold_check)) {
-            include('last_sold_check.php');
+        if (!class_exists(LastSoldDates)) {
+            include('LastSoldDates.php');
         }
-        $data = last_sold_check::getDates();
+        $data = LastSoldDates::getDates();
         $storename = array(1=>'Hillside',2=>'Denfeld');
         $lastSold = '<h5>Product Last Sold</h5>
             <table class="table table-sm"><tbody><tr>';
@@ -137,7 +137,7 @@ HTML;
             $upcLink = "<div><a href='http://$FANNIE_ROOTDIR/item/ItemEditorPage.php?searchupc="
                 . $upc . "&ntype=UPC&searchBtn=' target='_blank'>{$upc}</a></div>";
             $col1 .=  "<div>" . $upcLink . " <b>" . $desc[max(array_keys($desc))] . "</b></div>";
-            $col1 .=  "<div><a href='last_sold_check.php?paste_list=1'>LAST SOLD PAGE</a></div>";
+            $col1 .=  "<div><a href='LastSoldDates.php?paste_list=1'>LAST SOLD PAGE</a></div>";
             $col1 .= scanLib::getDbcError($dbc);
 
             $table = '';
@@ -215,7 +215,7 @@ HTML;
             $ret .= $table;
         }
 
-        $pData = last_sold_check::getPurchase($upc,$dbc);
+        $pData = LastSoldDates::getPurchase($upc,$dbc);
 
         return <<<HTML
 <div class="container-fluid">

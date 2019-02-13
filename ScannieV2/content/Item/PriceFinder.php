@@ -29,6 +29,9 @@ if (!class_exists('SQLManager')) {
 /*
 **  @class PriceFinder
 **  Get a list of price changes for an array of UPCs.
+**
+**  This script was used in 2018 to assist with 
+**  financial audits.
 */
 class PriceFinder extends PageLayoutA 
 {
