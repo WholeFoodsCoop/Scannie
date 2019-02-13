@@ -101,9 +101,6 @@ class WebDispatch
         if ($this->ui == true) {
             $this->addScript("http://{$MY_ROOTDIR}/common/ui/search.js");
         }
-        //if ($this->helpContent()) {
-        //    $this->addScript("http://{$MY_ROOTDIR}/common/javascript/helpContent.js");
-        //}
 
         return <<<HTML
 <html>
