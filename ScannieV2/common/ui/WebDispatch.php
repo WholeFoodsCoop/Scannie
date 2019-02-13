@@ -119,7 +119,6 @@ class WebDispatch
     <script src="http://{$MY_ROOTDIR}/common/bootstrap/jquery.min.js"></script>
     <script src="http://{$MY_ROOTDIR}/common/javascript/popper.min.js"></script>
     <script src="http://{$MY_ROOTDIR}/common/bootstrap4/js/bootstrap.min.js"></script>
-    <script src="http://{$MY_ROOTDIR}/common/ui/CoreNav.js"></script>
     <script src="http://{$MY_ROOTDIR}/common/javascript/webDispatch.js"></script>
     <script src="http://{$MY_ROOTDIR}/common/javascript/scannie.js"></script>
     <title>{$this->title}</title>

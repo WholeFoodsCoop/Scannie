@@ -31,7 +31,8 @@ class Search
         if (is_numeric($input)) {
             $pages = array(
                 '<i>CORE</i> Item Editor' => '/../../../../git/IS4C/fannie/item/ItemEditorPage.php?searchupc='.$input.'&ntype=UPC&searchBtn=',
-                '<i>SCAN</i> Track Change' => '/../scancoord/ScannieV2/content/Item/TrackChangeNew.php?upc='.$input,
+                '<i>CORE</i> Coop Deals Add' => '/../../../../git/IS4C/fannie/item/CoopDealsLookupPage.php?upc='.$input,
+                '<i>SCAN</i> Track Change' => '/../scancoord/ScannieV2/content/Item/TrackItemChange.php?upc='.$input,
                 //'Batch Edit' => 'http://'.$FANNIEROOT_DIR.'/batches/newbatch/EditBatchPage.php?id='.$input,
                 //'Item Batch History' => 'http://'.$FANNIEROOT_DIR.'/reports/ItemBatches/ItemBatchesReport.php?upc='.$input,
                 //'Batch Review' => 'http://'.$SCANROOT_DIR.'/item/Batches/BatchReview/BatchReviewPage.php?id='.$input,
@@ -54,7 +55,7 @@ class Search
 
         foreach ($this->data as $name => $path) {
             if ( (strstr($name,$s) || strstr($name,ucwords($s))) && strlen($s) > 2 || is_numeric($s) ) {
-                $ret .= (is_numeric($s)) ? '<a class="search-resp" href="'.$path.'" target="_blank">' : '<a class="search-resp" href="'.$path.$name.'">';
+                $ret .= (is_numeric($s)) ? '<a class="search-resp" href="'.$path.'">' : '<a class="search-resp" href="'.$path.$name.'">';
                 $replace = '<b>'.$s.'</b>';
                 $newstring = str_replace($s,$replace,$name);
                 $ret .= $newstring;
