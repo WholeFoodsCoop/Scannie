@@ -272,7 +272,12 @@ HTML;
         //$dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         $dbc = ScanLib::getConObj();
         $storeID = scanLib::getStoreID();
-        $username = scanLib::getUser();
+        $username = ($un = scanLib::getUser()) ? $un : "Generic User";
+        echo "<h1 style=\"
+            text-align: right; 
+            color: #CACACA;
+            text-shadow: 1px 1px grey;
+        \">$username</h1>";
 
         $routes = array(
             'cleardata' => 'clear_scandata_hander',
