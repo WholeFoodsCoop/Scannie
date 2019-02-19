@@ -293,7 +293,7 @@ HTML;
             $ret .= '<td class="okay">
                 <a class="text" href="../../../../'.$FANNIE_SERVE_DIR.'item/ItemEditorPage.php?searchupc='.$upc.'" target="_blank">' . $upc . '</a></td>
                     <td class="okay">
-                    <a class="text" href="../Item/TrackChangeNew.php?upc=' . $upc . '" target="_blank">
+                    <a class="text" href="../Item/TrackItemChange.php?upc=' . $upc . '" target="_blank">
                     dx
                 </a></td>';
             $ret .= '<td class="'.$row['super_name'].'">' . $row['super_name'] . '</td>';

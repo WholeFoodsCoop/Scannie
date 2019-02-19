@@ -70,7 +70,7 @@ JAVASCRIPT;
       -->
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Batches 
+            Sales & Pricing
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
           <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Item/Batches/BatchReview/BatchReviewPage.php">Review Batches</a>
@@ -79,7 +79,7 @@ JAVASCRIPT;
       </li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Item 
+            Products 
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
           <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Item/CheckScannedDate.php">Check PLU Queues</a>
@@ -88,7 +88,7 @@ JAVASCRIPT;
       </li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Scan
+            Scanning
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
           <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Home/NewPage.php">Scan Dept. <strong>Dashboard</strong></a>
@@ -105,12 +105,12 @@ JAVASCRIPT;
       </li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Tables
+            Reports 
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <div class="nav-item nav-label" align="center">Tables</div>
+          <div class="nav-item nav-label" align="">Tables</div>
           <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Tables/CoopDealsFile.php">Coop Deals File</a>
-          <div class="nav-item nav-label" align="center">Reports</div>
+          <div class="nav-item nav-label" align="">Reports</div>
           <a class="dropdown-item" href="http://{$MY_ROOTDIR}/content/Reports/WeeklySalesByWeek.php">Weekly Sales By Week</a>
         </div>
       </li>

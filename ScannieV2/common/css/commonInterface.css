@@ -24,8 +24,12 @@ body {
 }
 div.nav-label {
     background: repeating-linear-gradient(white,  lightgrey, white 5px); 
-    color: #343A40;
-    text-shadow: 1px 1px lightgrey;
+    //color: #343A40;
+    color: white;
+    font-weight: bold;
+    //text-shadow: 1px 1px black;
+    text-shadow: -1px 0 lightgrey, 0 1px lightgrey, 1px 0 lightgrey, 0 -1px lightgrey;
+    padding-left: 15px;
 }
 a.search-resp {
     color: #CACACA;
