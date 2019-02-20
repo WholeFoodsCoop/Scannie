@@ -51,9 +51,9 @@ JAVASCRIPT;
        ';
 
         return <<<HTML
-<img class="backToTop collapse" id="backToTop" src="http://$MY_ROOTDIR/common/src/img/upArrow.png" />
+<img class="backToTop collapse no-print" id="backToTop" src="http://$MY_ROOTDIR/common/src/img/upArrow.png" />
 <!--<nav class="navbar navbar-expand-md navbar-dark bg-dark mynav">-->
-<nav class="navbar navbar-expand-md navbar-dark bg-custom mynav">
+<nav class="navbar navbar-expand-md navbar-dark bg-custom mynav no-print">
   <a class="navbar-brand" href="http://{$MY_ROOTDIR}">ScannieV2</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
