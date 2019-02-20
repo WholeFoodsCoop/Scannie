@@ -14,7 +14,7 @@ $pages = array(
     "Wic Batch Review" => "WicReviewPage.php",
 );
 $nav = <<<HTML
-<div class="container" style="padding-top: 25px; padding-bottom: 25px;">
+<div class="container no-print" style="padding-top: 25px; padding-bottom: 25px;">
     <nav class="navbar navbar-expand-lg navbar-transparent bg-transparent">
         <ul class="navbar-nav mr-auto">
 HTML;

@@ -52,12 +52,12 @@ class BatchReviewPageMilk extends PageLayoutA
             $batchname = $row['batchName'];
         }
         $ret = '';
-        $ret .= '<div class="container">';
+        $ret .= '<div class="container-fluid">';
         include('BatchReviewLinks.php');
         $ret .= $this->form_content($id, $batchname);
         
         $ret .= '<a href="http://key/git/fannie/batches/newbatch/EditBatchPage.php?id=' 
-            . $id . '" target="_blank"><span class="text-primary">View Batch</span></a>';
+            . $id . '" target="_blank"><span class="text-primary no-print">View Batch</span></a>';
         $nextBatch = $_SERVER['PHP_SELF'] . '?id=' . ($id + 1);
         $prevBatch = $_SERVER['PHP_SELF'] . '?id=' . ($id - 1);
         $ret .= '&nbsp;<a class="btn btn-default btn-sm" href="' . $prevBatch .'">prev</a>';
@@ -160,10 +160,10 @@ class BatchReviewPageMilk extends PageLayoutA
         if ($id) $ret .= ' Batch ID # ' . $id . ' - ' . $batchname;
         
         $ret .= '
-            <form method="get" class="form-inline">
+            <form method="get" class="form-inline no-print">
                 <input type="text" class="form-control" name="id" placeholder="Enter Batch  ID" autofocus>
-				<button class="btn btn-default" type="submit">Submit</button> | 
-				<a class="" href="#" onClick="hideZero(); return false;">Hide No-Change Rows</a>
+                    <button class="btn btn-default" type="submit">Submit</button> | 
+                    <a class="" href="#" onClick="hideZero(); return false;">Hide No-Change Rows</a>
             </form>
         ';
         

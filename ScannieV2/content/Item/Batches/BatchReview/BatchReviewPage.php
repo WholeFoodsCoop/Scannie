@@ -50,12 +50,12 @@ class BatchReviewPage extends PageLayoutA
             $batchname = $row['batchName'];
         }
         $ret = '';
-        $ret .= '<div class="container">';
+        $ret .= '<div class="container-fluid">';
         include('BatchReviewLinks.php');
         $ret .= $this->form_content($id, $batchname);
         
         $ret .= '<a href="http://key/git/fannie/batches/newbatch/EditBatchPage.php?id=' 
-            . $id . '" target="_blank"><span class="text-primary">View Batch</span></a>';
+            . $id . '" target="_blank"><span class="text-primary no-print">View Batch</span></a>';
         $nextBatch = $_SERVER['PHP_SELF'] . '?id=' . ($id + 1);
         $prevBatch = $_SERVER['PHP_SELF'] . '?id=' . ($id - 1);
         $ret .= '&nbsp;<a class="btn btn-default btn-sm" href="' . $prevBatch .'">prev</a>';
@@ -75,7 +75,9 @@ class BatchReviewPage extends PageLayoutA
                     vd.name AS vendorDeptName,
                     vd.deptID as unfiDeptId,
                     d.margin,
-                    v.discountRate
+                    v.discountRate,
+                    p.normal_price,
+                    p.brand 
                 FROM batchList as bl
                     LEFT JOIN products AS p ON p.upc = bl.upc
                     LEFT JOIN departments AS d ON d.dept_no = p.department
@@ -90,10 +92,12 @@ class BatchReviewPage extends PageLayoutA
             $ret .= '
                 <div class=""><table class="table table-bordered table-condensed small">
                     <th>UPC</th>
+                    <th>Brand</th>
                     <th>Description</th>
                     <th>POS Dept.</th>
                     <th>Cost</th>
-                    <th>Price</th>
+                    <th>Cur.Price</th>
+                    <th>New Price</th>
                     <th>New Marg.</th>
                     <th>Desired Marg.</th>
                     <th title="Difference between New Margin and Desired Margin.">Diff.</th>
@@ -111,9 +115,11 @@ class BatchReviewPage extends PageLayoutA
                 $discountRate = $row['discountRate'];
                 
                 $ret .= '<tr><td>' . $upc . '</td>';
+                $ret .= '<td>' . $row['brand'] . '</td>';
                 $ret .= '<td>' . $row['description'] . '</td>';
                 $ret .= '<td>' . $row['pdept'] . ' - ' . $row['dept_name'] . '</td>';
                 $ret .= '<td>' . $row['cost'] . '</td>';
+                $ret .= '<td>' . $row['normal_price'] . '</td>';
                 $ret .= '<td><span class="text-warning">' . $row['price'] . '</span></td>';
                 $ret .= '<td>' . $newMargin . '</td>';
                 $ret .= '<td>' . $row['margin'] . '</td>';
@@ -141,7 +147,7 @@ class BatchReviewPage extends PageLayoutA
         if ($id) $ret .= ' Batch ID # ' . $id . ' - ' . $batchname;
         
         $ret .= '
-            <form method="get" class="form-inline">
+            <form method="get" class="form-inline no-print">
                 <input type="text" class="form-control" name="id" placeholder="Enter Batch  ID" autofocus>
                 <button class="btn btn-default" type="submit">Submit</button>
             </form>
