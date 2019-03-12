@@ -71,7 +71,7 @@ class admin
                     $_SESSION['user_name'] = $row[0];
                 }
                 if ($dbc->error()) echo $dbc->error();
-                echo "<br /><br /><div align='center'><div class='alert alert-success login-resp'>logging in <strong>".$curUser."</strong>, please wait.";
+                echo "<br /><br /><div align='center' ><div class='alert alert-success login-resp' style='max-width: 90vw;'>logging in <strong>".$curUser."</strong>, please wait.";
                 echo '</div></div>';
                 echo <<<JAVASCRIPT
 <script type="text/javascript">
