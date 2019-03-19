@@ -130,7 +130,7 @@ JAVASCRIPT;
                     <div class="col-lg-3">
                         <div class="form-group"><div class="input-group">
                             <span class="input-group-addon" title="Add an item to the list by entering a UPC here.">Add</span>
-                            <input type="text" class="form-control" id="addItem" name="addItem" >
+                            <input type="text" class="form-control" id="addItem" name="addItem" autofocus>
                         </div></div>
                     </div>
                     <div class="col-lg-7">
