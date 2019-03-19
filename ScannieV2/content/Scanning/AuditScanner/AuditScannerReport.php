@@ -424,7 +424,7 @@ HTML;
                     $ret .=  '<td>' . $v . '</td>';
                 }
             }
-            $ret .= '<td  id="upc'.$curUpc.'"><span class="delete-icon">del</span></td>';
+            $ret .= '<td  id="upc'.$curUpc.'"><span class="scanicon scanicon-trash"></span></td>';
             $ret .= '</tr>';
 
             if($prevKey != $k) {
