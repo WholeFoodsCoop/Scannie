@@ -402,7 +402,7 @@ HTML;
         $dontCheck = array(0, 5, 6, 40, 52, 103, 104, 105, 107, 109, 111, 112, 123, 160, 184, 
             194, 195, 234, 237, 245, 247, 248, 250, 256, 265, 324, 549, 550, 666, 759, 799, 800, 
             852, 868, 869, 918, 919, 920, 958, 983, 984, 985, 917, 154, 155, 193, 197, 198, 199,
-            211, 228, 189, 190);
+            211, 228, 189, 190, 262);
         $p = $dbc->prepare("SELECT upc, brand, description, normal_price FROM products WHERE upc < 1000 AND scale = 0 GROUP BY upc;");
         $r = $dbc->execute($p);
         $cols = array('upc', 'brand', 'description', 'normal_price');
@@ -474,6 +474,7 @@ HTML;
             $p = $dbc->prepare("
                 SELECT v.sku, v.upc, v.description, v.cost, v.modified, v.vendorID
                 FROM vendorItems AS v 
+                    INNER JOIN products AS p ON v.upc=p.upc AND p.default_vendor_id = v.vendorID
                     INNER JOIN (SELECT * FROM vendorItems WHERE vendorID = ? GROUP BY upc HAVING COUNT(upc)>1) dup ON v.upc = dup.upc WHERE v.vendorID=?
                 AND v.upc <> 0 
             ");
