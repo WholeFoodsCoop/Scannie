@@ -57,28 +57,35 @@ class PendingAction extends PageLayoutA
             $dbc->execute($prep,$rmItem);
             unset($_POST['rmItem']);
         }
+        
+        $data = array();
+        $p = $dbc->prepare("SELECT upc, note FROM woodshed_no_replicate.exceptionItems;");
+        $r = $dbc->execute($p);
+        while ($row = $dbc->fetchRow($r)) {
+            $data[$row['upc']]['note'] = $row['note'];
+        }
 
-        list($in_sql, $args) = $dbc->safeInClause($items);
         $query = '
             SELECT
-                p.upc,
+                e.upc,
                 p.brand,
                 p.description,
                 p.special_price,
                 e.note
-            FROM products AS p
-                LEFT JOIN woodshed_no_replicate.exceptionItems AS e ON e.upc=p.upc
-            WHERE p.upc IN (SELECT upc FROM woodshed_no_replicate.exceptionItems)
+            FROM woodshed_no_replicate.exceptionItems AS e
+                INNER JOIN products AS p ON p.upc=e.upc
         ';
         $prep = $dbc->prepare($query);
         $result = $dbc->execute($prep,$args);
-        $data = array();
         while ($row = $dbc->fetch_row($result)) {
             $data[$row['upc']]['brand'] = $row['brand'];
             $data[$row['upc']]['desc'] = $row['description'];
             $data[$row['upc']]['salePrice'][] = $row['special_price'];
-            $data[$row['upc']]['note'] = $row['note'];
+            if (!isset($data[$row['upc']]['note'])) {
+                $data[$row['upc']]['note'] = $row['note'];
+            }
         }
+        unset($data['0000000000000']);
         if ($dbc->error()) $ret .=  $dbc->error();
 
         $ret .=  '<form method="post" name="rmbtn" id="rmbtn">
@@ -93,8 +100,8 @@ class PendingAction extends PageLayoutA
             </thead>';
 
         foreach ($data as $upc => $array) {
-            $batchLink = '<a id="upcLink" href="http://'.$FANNIEROOT_DIR.'/reports/ItemBatches/ItemBatchesReport.php?upc=' . $upc . '" target="_blank">view</a>';
-            $upcLink = '<a id="upcLink" href="http://'.$FANNIEROOT_DIR.'/item/ItemEditorPage.php?searchupc=' . $upc . '" target="_blank">' . $upc . '</a>';
+            $batchLink = '<a id="upcLink" href="http://'.$FANNIE_ROOTDIR.'/reports/ItemBatches/ItemBatchesReport.php?upc=' . $upc . '" target="_blank">view</a>';
+            $upcLink = '<a id="upcLink" href="http://'.$FANNIE_ROOTDIR.'/item/ItemEditorPage.php?searchupc=' . $upc . '" target="_blank">' . $upc . '</a>';
             $ret .= '<tr>';
             $ret .= '<td>' . $upcLink . '</td>';
             $ret .= '<td>' . $array['brand'] . '</td>';
