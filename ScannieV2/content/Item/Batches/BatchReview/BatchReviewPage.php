@@ -148,12 +148,25 @@ class BatchReviewPage extends PageLayoutA
         
         $ret .= '
             <form method="get" class="form-inline no-print">
-                <input type="text" class="form-control" name="id" placeholder="Enter Batch  ID" autofocus>
-                <button class="btn btn-default" type="submit">Submit</button>
+                <div class="form-group">
+                    <input type="text" class="form-control" name="id" placeholder="Enter Batch  ID" autofocus>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-default" type="submit">Submit</button>
+                </div>
             </form>
         ';
         
         return $ret;
+    }
+
+    public function cssContent()
+    {
+        return <<<HTML
+.form-group {
+    margin-right: 5px;
+}
+HTML;
     }
     
     public function helpContent()
