@@ -196,7 +196,23 @@ HTML;
     {
 
         $ret = '';
-        $this->addOnloadCommand("$('#progressBar').show();");
+        $dbc = scanLib::getConObj('SCANALTDB');
+        $p = $dbc->prepare("SELECT scanBeep FROM ScannieConfig WHERE session_id = ?");
+        $r = $dbc->execute($p, session_id());
+        $beep = $dbc->fetchRow($r);
+        $beep = $beep[0];
+        if ($beep == true) {
+            $this->addOnloadCommand("
+                WebBarcode.Linea.emitTones(
+                    [
+                        { 'tone':300, 'duration':50 },
+                        { 'tone':600, 'duration':50 },
+                        { 'tone':300, 'duration':50 },
+                    ] 
+                );
+            ");
+        }
+        $dbc = scanLib::getConObj();
         $username = scanLib::getUser();
         $response = $_GET['success'];
         $newscan = $_POST['success'];
@@ -215,8 +231,6 @@ HTML;
         include(__DIR__.'/../../../config.php');
         include(__DIR__.'/../../../common/lib/PriceRounder.php');
         $rounder = new PriceRounder();
-        //$dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
-        $dbc = scanLib::getConObj();
         $storeID = scanLib::getStoreID();
         $upc = scanLib::upcParse($_POST['upc']);
         // echo $int = scanLib::getSku($_POST['upc'], $dbc);
@@ -678,7 +692,7 @@ HTML;
 .menu-list-space {
     background-color: rgba(0,0,0,0);
     list-style-type: none;
-    height: 25px;
+    height: 10px;
 }
 .menu-exit {
 }
@@ -694,13 +708,13 @@ HTML;
     left: 0px;
 }
 ul.menu-list {
-     padding: 25px;
+     padding: 15px;
 }
 li.menu-list {
     background-color: rgba(255, 255, 255, 0.5);
     list-style-type: none;
     margin-top: 15px;
-    padding: 15px;
+    padding: 10px;
     color: black;
     font-weight: #CACACA;
     cursor: pointer;
@@ -930,16 +944,18 @@ HTML;
     private function hiddenContent()
     {
         return <<<HTML
-<div id="menu-action">
+<div id="menu-action" style="margin-top: -10px">
     <ul class="menu-list">
-        <li class="menu-list" id="mod-narrow">change narrow status</li>
-        <li class="menu-list" id="mod-in-use">change in-use status</li>
+        <li class="menu-list" id="mod-narrow">change <b>narrow</b> status</li>
+        <li class="menu-list" id="mod-in-use">change <b>in-use</b> status</li>
         <li class="menu-list edit-btn" data-table="products" data-column="brand"><span class="grey">Edit</span> POS-Brand</li>
         <li class="menu-list edit-btn" data-table="products" data-column="description"><span class="grey">Edit</span> POS-Description</li>
         <li class="menu-list edit-btn" data-table="products" data-column="size"><span class="grey">Edit</span> POS-Size</li>
         <li class="menu-list edit-btn" data-table="productUser" data-column="brand"><span class="grey">Edit</span> SIGN-Brand</li>
         <li class="menu-list edit-btn" data-table="productUser" data-column="description"><span class="grey">Edit</span> SIGN-Description</li>
-        <li class="menu-list-space"></li>
+        <li class="menu-list" data-table="productUser" data-column="description">
+            <a href="../../">Scannie Menu</a>
+        </li>
         <li class="menu-list menu-exit" id="exit-action-menu">Exit Menu</li>
     </ul>
 </div>

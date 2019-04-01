@@ -73,6 +73,7 @@ HTML;
             'Coop Deals Add' => '../../../../../git/IS4C/fannie/item/CoopDealsLookupPage.php',
             'Chat' => 'BatchCheckChat.php',
             'Scanner' => 'SCS.php',
+            'ScannieV2.0' => '../../',
             'Sign Out' => 'SCS.php?signout=1',
             '*Cleanup*<br>Delete Sessions' => 'BatchCheckMenu.php?delete=1',
             '*Cleanup*<br>Delete Chat' => 'BatchCheckChat.php?delete=1',

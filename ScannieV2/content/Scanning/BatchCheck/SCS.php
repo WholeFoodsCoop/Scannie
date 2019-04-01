@@ -576,6 +576,23 @@ HTML;
             $this->addOnloadCommand("$('#msgBtn').show();");
         }
 
+        // set scanner beep after page loads
+        $p = $dbc->prepare("SELECT scanBeep FROM woodshed_no_replicate.ScannieConfig WHERE session_id = ?");
+        $r = $dbc->execute($p, session_id());
+        $beep = $dbc->fetchRow($r);
+        $beep = $beep[0];
+        if ($beep == true) {
+            $this->addOnloadCommand("
+                WebBarcode.Linea.emitTones(
+                    [
+                        { 'tone':300, 'duration':50 },
+                        { 'tone':600, 'duration':50 },
+                        { 'tone':300, 'duration':50 },
+                    ] 
+                );
+            ");
+        }
+
         $upc = FormLib::get('upc');
         // fix: confirmed, this does not work.
         // scans should also be able to convert UPCs to
@@ -587,6 +604,7 @@ HTML;
         }
         $upc = scanLib::padUPC($upc);
         $store = '<i>no store selected</i>';
+        $touchicon = "<img class=\"scanicon-pointer\" src=\"../../../common/src/img/icons/pointer.png\"/>";
         $stores = array(1=>'[H]',2=>'[D]');
         $store = $stores[$_SESSION['storeID']];
         $storeID = $_SESSION['storeID'];
@@ -660,6 +678,7 @@ HTML;
         $this->addScript('scs.js?time='.$timestamp);
 
         return <<<HTML
+<audio id="sound-beep" src="../../../common/src/sound/beep-complete.ogg" type="audio/ogg">Your browser does not support the &#60;audio&#62; element.</audio>    
 <div id="response"></div>
 {$this->hiddenContent()}
 <div id="menuBtn"></div>
@@ -736,11 +755,10 @@ HTML;
             <span class='editable' name='Notes' 
                 id='editnotes' value='$notes'>$notes</span>
         </div>
-        
     </div>
 </div>
 
-<div class='header' id='submitUpc'><h5>$store $session</h5></div>
+<div class='header' id='submitUpc'><h5>$store $touchicon $session</h5></div>
 
 <a id="reload" href="SCS.php">reload</a>
 HTML;
@@ -748,11 +766,15 @@ HTML;
 
     public function javascriptContent()
     {
-        return <<<HTML
+        return <<<JAVASCRIPT
+var beepOn = 1;
+var beep = $('#sound-beep')[0];
 $(document).ready(function(){
-    //alert('hello');
+    if (beepOn == 1) {
+        beep.play();
+    }
 });
-HTML;
+JAVASCRIPT;
     }
 
     public function cssContent()
