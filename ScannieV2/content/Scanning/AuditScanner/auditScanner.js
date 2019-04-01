@@ -196,20 +196,23 @@ $('#mod-in-use').click(function(){
 $('.edit-btn').click(function(){
     var table = $(this).attr('data-table');
     var column = $(this).attr('data-column');
-    var newtext = prompt('Enter new '+column);
+    var c = confirm('Edit '+column+'?');
     var upc = $('#upc').val();
-    $.ajax({
-        type: 'post',
-        url: 'AuditScanner.php',
-        data: 'upc='+upc+'&action=mod-edit&newtext='+newtext+'&table='+table+'&column='+column,
-        success: function(resp)
-        {
-            alert('Success!');
-            $('#menu-action').hide();
-        },
-        error: function(resp)
-        {
-            alert('Action Failed');
-        }
-    });
+    if (c == true) {
+        var newtext = prompt('Enter new '+column);
+        $.ajax({
+            type: 'post',
+            url: 'AuditScanner.php',
+            data: 'upc='+upc+'&action=mod-edit&newtext='+newtext+'&table='+table+'&column='+column,
+            success: function(resp)
+            {
+                alert('Success!');
+                $('#menu-action').hide();
+            },
+            error: function(resp)
+            {
+                alert('Action Failed');
+            }
+        });
+    }
 });
