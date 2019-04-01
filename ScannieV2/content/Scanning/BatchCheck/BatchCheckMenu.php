@@ -68,13 +68,13 @@ HTML;
     private function view()
     {
         $links = array(
-            'Audie' => '../AuditScanner/AuditScanner.php',
-            'Batch Check Queues' => 'BatchCheckQueues.php',
-            'Coop Deals Add' => '../../../../../git/IS4C/fannie/item/CoopDealsLookupPage.php',
-            'Chat' => 'BatchCheckChat.php',
-            'Scanner' => 'SCS.php',
-            'ScannieV2.0' => '../../',
-            'Sign Out' => 'SCS.php?signout=1',
+            'Scan More Items'  => 'SCS.php',
+            'Audit (Alt.) Scanner' => '../AuditScanner/AuditScanner.php',
+            'View Queues' => 'BatchCheckQueues.php',
+            'Coop Deals Item Check' => '../../../../../git/IS4C/fannie/item/CoopDealsLookupPage.php',
+            'Chat IM' => 'BatchCheckChat.php',
+            'ScannieV2.0 Home' => '../../',
+            'Sign Out of Batch Check' => 'SCS.php?signout=1',
             '*Cleanup*<br>Delete Sessions' => 'BatchCheckMenu.php?delete=1',
             '*Cleanup*<br>Delete Chat' => 'BatchCheckChat.php?delete=1',
         );
