@@ -36,7 +36,7 @@ class PendingAction extends PageLayoutA
     public function body_content()
     {
         $ret = '';
-        include(__DIR__.'/../config.php');
+        include(__DIR__.'/../../config.php');
         $dbc = scanLib::getConObj();
 
         $ret .= '<div class="container">';
@@ -100,7 +100,6 @@ class PendingAction extends PageLayoutA
             </thead>';
 
         foreach ($data as $upc => $array) {
-            $batchLink = '<a id="upcLink" href="http://'.$FANNIE_ROOTDIR.'/reports/ItemBatches/ItemBatchesReport.php?upc=' . $upc . '" target="_blank">view</a>';
             $upcLink = '<a id="upcLink" href="http://'.$FANNIE_ROOTDIR.'/item/ItemEditorPage.php?searchupc=' . $upc . '" target="_blank">' . $upc . '</a>';
             $ret .= '<tr>';
             $ret .= '<td>' . $upcLink . '</td>';
