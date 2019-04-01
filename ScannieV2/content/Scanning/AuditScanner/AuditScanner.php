@@ -590,8 +590,10 @@ HTML;
         $ret .= '
                 </div>
             </div>';
+        $touchicon = "<img class=\"scanicon-pointer\" src=\"../../../common/src/img/icons/pointer-light.png\"
+            style=\"margin-left: 20px; margin-top: -5px;\"/>";
         $count = $this->getCount($dbc,$storeID,$username);
-        $ret .= '<div class="counter"><span id="counter">'.$count.'</span></div>';
+        $ret .= '<div class="counter"><span id="counter">'.$count.'</span>'.$touchicon.'</div>';
 
         $ret .= '<br /><br /><br /><br /><br /><br />';
         $this->addOnloadCommand("$('#progressBar').hide();");
