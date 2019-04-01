@@ -60,7 +60,7 @@ function linksToText() {
 }
 
 function deleteRow() {
-    $('.delete-icon').click( function(event) {
+    $('.scanicon-trash').click( function(event) {
         var upc = $(this).closest('td').attr('id');
         var store_id = $(this).closest('tr').find('.store_id').text();
         var username = $(this).closest('tr').find('.username').text();
@@ -73,6 +73,7 @@ function deleteRow() {
                 data: 'store_id='+store_id+'&upc='+upc+'&username='+username+'&deleteRow=true',
                 success: function(response)
                 {
+                    alert(store_id+', '+upc+', '+username);
                     if($('#'+rowclicked).length == 0) {
                         $('#firstTr').hide();
                     } else {

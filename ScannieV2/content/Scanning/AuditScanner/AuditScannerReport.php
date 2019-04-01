@@ -491,7 +491,7 @@ HTML;
         }
         $ret .= '<input type="hidden" id="storeID" value="'.$OppoID.'" />';
 
-        $ret .= "<div class='col-md-3'><div class='form-group'><label>List of upcs</label><br/><textarea class='form-control' rows=5>";
+        $ret .= "<div class='col-md-3'><div class='form-group'><label>List of upcs</label><br/><textarea id='upclist' class='form-control' rows=5>";
         foreach ($upcs as $upc) {
             $ret .= "$upc\r\n";
         }

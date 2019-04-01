@@ -29,7 +29,7 @@ class AuditScannerReportAjax
         $upc = substr($_POST['upc'], 3);
         $rowclicked = $_POST['rowclicked'];
 
-        include('../../../config.php');
+        include(__DIR__.'/../../../config.php');
         $dbc = new SQLManager($SCANHOST, 'pdo_mysql', $SCANDB, $SCANUSER, $SCANPASS);
         $args = array($upc,$store_id,$username);
         $prep = $dbc->prepare('DELETE FROM woodshed_no_replicate.AuditScanner WHERE upc = ? AND store_id = ? AND username = ?');
@@ -44,7 +44,7 @@ class AuditScannerReportAjax
 
     public function run()
     {
-        if ($_POST['deleteRow'] == true) {
+        if ($_POST['deleteRow'] == 'true') {
             return $this->deleteRow();
         }
 
