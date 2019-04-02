@@ -46,12 +46,6 @@ return <<<HTML
 h5 {
     color: slategrey;
 }
-.navbar {
-    margin-bottom: 25px;
-}
-.table {
-    margin: 15px;
-}
 .inactive {
     background: white;
 }
@@ -141,7 +135,7 @@ HTML;
             $col1 .= scanLib::getDbcError($dbc);
 
             $table = '';
-            $table .=  "<div class='table-responsive-lg'><table class='table table-sm'>";
+            $table .=  "<div class='table-responsive'><table class='table table-sm small'>";
             $table .=  "
                 <thead>
                 <th>Description</th>
@@ -218,7 +212,7 @@ HTML;
         $pData = LastSoldDates::getPurchase($upc,$dbc);
 
         return <<<HTML
-<div class="container-fluid">
+<div class="container-fluid" style="margin-top: 20px;">
     <div class="row">
         <div class="col-lg-3">
             {$col1}
