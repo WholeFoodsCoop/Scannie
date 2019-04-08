@@ -218,6 +218,7 @@ HTML;
     private function getBadPrices($dbc)
     {
         $ret = '';
+        $HTTP_HOST = $_SERVER['HTTP_HOST'];
 
         $startDate = $_GET['startDate'];;
         $query = $dbc->prepare("
@@ -245,7 +246,7 @@ HTML;
             <legend class="panel-heading small">Items with HIGH % Deals</legend>';
         $ret .= '<table class="table table-default table-condensed small table-striped">';
         foreach ($discount as $upc => $percent) {
-            $batchL = '<a href="http://192.168.1.2/git/fannie/batches/newbatch/EditBatchPage.php?id='
+            $batchL = '<a href="http://'.$HTTP_HOST.'/git/fannie/batches/newbatch/EditBatchPage.php?id='
 				. $percent['batchID'] .'" target="_blank">' . $percent['batchID'] . '</a>';
             if ($percent['off'] > 60 && !strstr($upc,"LC")) {
                 $ret .= '<tr>';
@@ -319,6 +320,7 @@ HTML;
     private function getBadPriceItems($dbc)
     {
         $startDate = $_GET['startDate'];
+        $HTTP_HOST = $_SERVER['HTTP_HOST'];
         $ret = '';
         $ret .='<div class="panel panel-default mypanel">
             <legend class="panel-heading small">Items with Bad Sale Prices</legend>';
@@ -336,8 +338,8 @@ HTML;
         $result = $dbc->execute($query);
 		$ret .= '<table class="table table-default table-condensed small table-striped">';
         while ($row = $dbc->fetchRow($result)) {
-			$editL = '<a href="http://192.168.1.2/git/fannie/item/ItemEditorPage.php?searchupc=' . $row['upc'] . '" target="_blank">' . $row['upc'] . '</a> ';
-            $batchL = '<a href="http://192.168.1.2/git/fannie/batches/newbatch/EditBatchPage.php?id='
+            $editL = '<a href="http://'.$HTTP_HOST.'/git/fannie/item/ItemEditorPage.php?searchupc=' . $row['upc'] . '" target="_blank">' . $row['upc'] . '</a> ';
+            $batchL = '<a href="http://'.$HTTP_HOST.'/git/fannie/batches/newbatch/EditBatchPage.php?id='
 				. $row['batchID'] .'" target="_blank">' . $row['batchID'] . '</a>';
 			$ret .= '<tr>';
 			$ret .= '<td>' . $row['upc'] . '</td>';
