@@ -101,6 +101,7 @@ class CoopDealsReview extends WebDispatch
                 </div>
             ";
         }
+        $this->addOnloadCommand("$('#startDate').datepicker({dateFormat: 'yy-mm-dd'});");
 
         return <<<HTML
 <div class="container-fluid">
@@ -365,7 +366,7 @@ HTML;
     <div class="col-lg-2">
         <form method="get" class="">
             <div class="form-group">
-                <input type="input" class="form-control mainInput" name="startDate" value="{$v}">
+                <input type="input" class="form-control mainInput" name="startDate" id="startDate" value="{$v}">
             </div>
             <div class="form-group">
                 <input type="input" class="form-control mainInput" name="dealset" placeholder="DealSet" value="{$d}">
