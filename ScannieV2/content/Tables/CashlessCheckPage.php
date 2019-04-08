@@ -32,7 +32,7 @@ class CashlessCheckPage extends PageLayoutA
         cashless transactions for every lane.";
     protected $ui = TRUE;
     protected $must_authenticate = TRUE;
-   
+
     public function body_content()
     {           
         $ret = '';
@@ -43,7 +43,7 @@ class CashlessCheckPage extends PageLayoutA
             $_SESSION['store_id'] = $_GET['store_id'];
         } else {
             if (empty($_SESSION['store_id'])) {
-                $ret .= '<div align="center"><div class="alert alert-danger md-w">You must select a store ID to view Cashless Transactions.</div></div>';
+                $ret .= '<div align="center"><div class="alert alert-danger md-w">You must select a store to view Cashless Transactions.</div></div>';
             }
         }
         $view_by = $_GET['view_by'];
@@ -51,72 +51,26 @@ class CashlessCheckPage extends PageLayoutA
         $issuer = $_GET['issuer'];
         $LU = $_GET['LU'];
         
-        $ret .= $this->form_content();
+        $formcontent = $this->form_content();
         
+
         $ret .= '
-            <div align="center" class="container" style="padding:5px;">
-                <!-- <button class="btn btn-default btn-xs" onclick="$(\'#xResScan\').show(); return false;" >View xResData</button> -->
-                <button class="btn btn-default btn-xs" data-toggle="collapse" data-target="#xResScan" >View xResData</button>
-        ';
-        $xResScan = $this->getResultScan($dbc,100); //subtracting 100 goes back 1 month UNLESS the month you're looking at is Jan. 
-        $xResScanT = $this->getResultScan($dbc,0);
-        $ret .= '
-                <div class="collapse" id="xResScan">
-                    <div class="row" align="center">
-                        <div class="col-xs-6">
-                            <h4>xResultMessages in last 30 days</h4>
-                            <table class="table table-condensed small" style="width:500px">
-        ';
-        $ret .= '
-                        
-        ';
-        foreach ($xResScan as $error => $count) {
-            $ret .= '<tr>';
-            $ret .= '<td>' . $error . '</td><td>' . $count . '</tr>';
-            $ret .= '</tr>';
-        }
-        $ret .= '
-                            </table>
-                        </div><!-- column 1 -->
-        ';
-        $ret .= '
-                        <div class="col-xs-6">
-                            <h4>xResultMessages Today</h4>
-                            <table class="table table-condensed small" style="width:500px">
-                        ';
-        
-        foreach ($xResScanT as $error => $count) {
-            $ret .= '<tr>';
-            $ret .= '<td>' . $error . '</td><td>' . $count . '</tr>';
-            $ret .= '</tr>';
-        }
-        $ret .= '
-                            </table>
                         </div><!-- column 2 -->
         ';
         $ret .= '</div></div></div>';
         $hillActive = ($_SESSION['store_id'] == 1) ? 'active' : '';
         $denActive = ($_SESSION['store_id'] == 2) ? 'active' : '';
-        $ret .= '
+        $control = "";
+        $control .= '
             <form method="get" id="tabs">
                 <div align="center"><div class="container">
                     <button class="btn btn-default btn-xs '.$hillActive.'" name="store_id" value="1" >Hillside</button>
                     <button class="btn btn-default btn-xs '.$denActive.'" name="store_id" value="2" >Denfeld</button>
                     <button class="btn btn-default btn-xs" name="store_id" value="*" >ALL Stores</button>
-                    <button class="btn btn-warning btn-xs" name="inProcess" value="1">SCAN: Yesterday</button>
-                    <br /><br />
-                    <div class="well md-w" style="padding: 10px;"><label>View transactions in respect to</label><br />
-                        <button class="btn btn-default btn-xs" name="view_by" value="time" >time/recent</button>
+                    <input type="hidden" name="view_by" value="time" />
             </form>
-                        <a class="btn btn-default btn-xs" data-toggle="collapse" data-target="#issuer">issuer</a>
-                        <a class="btn btn-default btn-xs" data-toggle="collapse" data-target="#cardType">cardType</a>
-                        <a class="btn btn-default btn-xs" data-toggle="collapse" data-target="#processor" name="view_by" value="processor">processor</a>
-                        <br />
                     </div>
         ';
-        $issuers = array('American Express','AMEX','DCVR','DEBIT','Discover','EBT','M/C','MasterCard','Mercury','Visa');
-        $cardTypes = array('Credit',' Debit', 'EBTFOOD', 'EMV', 'Gift');
-        $processors = array('GoEMerchant','MercuryE2E','MercuryGift','RapidConnect');
         $ret .= '<div id="processor" class="collapse"><strong>Processor : </strong>';
         foreach ($processors as $processor) {
             $ret .= '<button class="btn btn-default btn-xs" name="ext" value="'.$processor.'" >'.$processor.'</button>';
@@ -217,10 +171,6 @@ class CashlessCheckPage extends PageLayoutA
             $lanes = array($GET['regNo']);
         }
         
-        if ($_GET['inProcess']) {
-            $ret .= $this->getVoidErrors($dbc);
-        }
-        
         foreach ($lanes as $lane) {
             if ($ext) {
                 if (in_array($ext,$issuers)) {
@@ -261,7 +211,7 @@ class CashlessCheckPage extends PageLayoutA
                 $data[$row['PID']]['amount'] = $row['amount'];
                 $data[$row['PID']]['PAN'] = substr($row['PAN'],-5);
                 $data[$row['PID']]['transType'] = $row['transType'];
-				$data[$row['PID']]['refnum'] = '<span style="color: grey; font-size: 10;">'.$row['refnum'].'</span>';
+                $data[$row['PID']]['refnum'] = '<span style="color: grey; font-size: 10;">'.$row['refnum'].'</span>';
             }
             
             $ret .= '
@@ -273,9 +223,10 @@ class CashlessCheckPage extends PageLayoutA
                 </style>
             ';
             
+            $lane = ($lane == '') ? FormLib::get('regNo') : $lane;
             $ret .= '<div align="center"><div class="card" style="" id="table'.$lane.'">
                 <div class="title"><strong>Register No.'.$lane.'</strong></div>
-                <table class="table table-striped table-condensed small">';
+                <table class="table table-striped small">';
                 
             $headers = array('Issuer','trans_no','Processor','Result','TransType','Amount','Date/Time','PAN','refnum');
             $ret .=  '<thead>';
@@ -319,116 +270,51 @@ class CashlessCheckPage extends PageLayoutA
         }
         if ($dbc->error()) $ret .=  $dbc->error();
         
-        return $ret;
+        return <<<HTML
+<div class="row">
+    <div class="col-lg-4">
+        $formcontent
+    </div>
+    <div class="col-lg-4">
+        <div style="margin: 25px">$control</div>
+    </div>
+</div>
+$ret
+HTML;
     }
     
     private function form_content()
     {
         
-        $dateID = $_GET['dateID'];
-        return '
-            <div class="container" align="center">
-            <!-- <button class="btn btn-default btn-xs" onclick="$(\'#transLookup\').show(); return false;" >Transaction Lookup</button> -->
-            <button class="btn btn-default btn-xs" data-toggle="collapse" data-target="#transLookup">Transaction Lookup</button> 
-            <form method="get" class="form-inline collapse" id="transLookup" >
-               <br />
-                <div class="input-group" >
-                    <span class="input-group-addon">
-                        DateID 
-                    </span>
-                    <input type="text" class="form-control" id="dateID" value="'.$dateID.'" style="width: 175px" name="dateID" placeholder="YYYYMMDD">&nbsp;&nbsp;
-                </div>
-                
-                <div class="input-group">
-                    <span class="input-group-addon">
-                        Reg No.
-                    </span>
-                    <input type="text" class="form-control" id="regNo" style="width: 175px" name="regNo" >&nbsp;&nbsp;
-                </div>
-                <input type="hidden" name="LU" value="1">
-                <button class="btn btn-default btn-xs" type="submit" class="btn btn-default">L/U Transactions</button>
-                <br>
-            </form>
+        $dateID = FormLib::get('dateID');
+        $regno = FormLib::get('regNo');
+        $this->addOnloadCommand("$('#dateID').datepicker({dateFormat: 'yymmdd'});");
+
+        return <<<HTML
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title h5">Transaction Lookup</div>
+                <form method="get" class="" id="transLookup">
+                    <div class="form-group">
+                        <label for="dateID">DateID</label>
+                        <input type="text" class="form-control" id="dateID" value="$dateID" name="dateID" placeholder="YYYYMMDD"/>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dateID">Reg No.</label>
+                        <input type="text" class="form-control" id="regNo" name="regNo" value="$regno"/>
+                    </div>
+                    <div class="form-group">
+                        <input type="hidden" name="LU" value="1">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-default btn-xs form-control" type="submit" class="btn btn-default">L/U Transactions</button>
+                    </div>
+                </form>
             </div>
-        ';
+        </div>
+HTML;
     }
-    
-    private function getResultScan($dbc,$minusDate)
-    {
-        $date = date('Ymd');
-        $date -= $minusDate; 
-        $data = array();
-        
-        $prep = $dbc->prepare("
-            select 
-                count(xResultMessage) AS count, 
-                xResultMessage 
-            from PaycardTransactions 
-            where xResultMessage not like '%approved%' 
-                and xResultMessage not like '%declined%' 
-                and dateID >= ? 
-            group by xResultMessage 
-            order by count(xResultMessage);");
-        $result = $dbc->execute($prep,$date);
-        while ($row = $dbc->fetchRow($result)) {
-            $data[$row['xResultMessage']] = $row['count'];
-        }
-        if ($dbc->error()) echo '<div class="alert alert-danger small">'.$dbc->error().'</div>';
-        
-        return $data;
-    }
-    
-    private function getVoidErrors($dbc)
-    {
-        $date = date('Ymd');
-        $date -= 1; //look at previous day. Doesn't work for the 1st of the month. 
-        $rDate = 
-        
-        $prep = $dbc->prepare("SELECT transNo, registerNo FROM PaycardTransactions WHERE dateid = ? AND xResultMessage = 'In Process!';");
-        $result = $dbc->execute($prep,$date);
-        $transactions = array();
-        while ($row = $dbc->fetchRow($result)) {
-            $transactions[$row['transNo']] = $row['registerNo'];
-        }
-        if ($dbc->error()) echo '<div class="alert alert-danger small">'.$dbc->error().'</div>';
-        
-        foreach ($transactions as $transNo => $registerNo) {
-            $args = array($date,$transNo,$registerNo);
-            $prep = $dbc->prepare("select * from PaycardTransactions where dateid = ? and transNo = ? and registerNo = ?;");
-            $result = $dbc->execute($prep,$args);
-            while ($row = $dbc->fetchRow($result)) {
-                if ($row['xResultMessage'] == 'In Process!') {
-                    $curPTID = $row['paycardTransactionID'];
-                    $curEmpNo = $row['empNo'];
-                    $curAmount = $row['amount'];
-                }
-                if ($row['paycardTransactionID'] == ($curPTID+1)) {
-                    $xRes = $row['xResultMessage'];
-                    $amount = $row['amount'];
-                    $qln = 1;
-                    
-                    if ($xRes == 'Cancelled at POS.') {
-                    } elseif ((strstr($xRes,'Approved') || strstr($xRes,'APPROVED')) && $amount == $curAmount) {
-                        //do nothing
-                        //do nothing
-                    } else {
-                        echo '
-                            <div align="center">
-                                <div class="alert alert-danger md-w" >
-                                    POSSIBLE INCOMPLETE TRANS <br />('.$xRes.') '.$curEmpNo.'-'.$registerNo.'-'.$transNo.' on '.$date.' <br />
-                                </div>
-                            </div>
-                        ';
-                    }
-                    
-                    
-                }
-            }
-        }
-        
-        return $ret;
-    }
-    
     
 }
 WebDispatch::conditionalExec();
