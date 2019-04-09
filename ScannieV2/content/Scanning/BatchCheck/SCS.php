@@ -655,6 +655,7 @@ HTML;
         if ($this->data[$upc]['special_price'] == 0.00) {
             $curPrice = "Not On Sale";    
             $batchData = '<div class="line"></div>';
+            $bkgstyle = "<style>body { background: grey; }</style>";
         } else {
             $curPrice = '$'.$this->data[$upc]['special_price'];
             $plus = ($numBatches > 1) ? '<a id="showMoreBatches" class="showMoreBatches">+</a>' : '';
@@ -678,6 +679,7 @@ HTML;
         $this->addScript('scs.js?time='.$timestamp);
 
         return <<<HTML
+$bkgstyle
 <audio id="sound-beep" src="../../../common/src/sound/beep-complete.ogg" type="audio/ogg">Your browser does not support the &#60;audio&#62; element.</audio>    
 <div id="response"></div>
 {$this->hiddenContent()}
