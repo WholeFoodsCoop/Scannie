@@ -411,7 +411,7 @@ HTML;
                 } elseif ($column_name == 'price' || $column_name == 'srp') {
                     $ret .=  '<td class="price">$' . $v . '</td>';
                 } elseif ($column_name == 'upc') {
-                    $upclink = '<a class="upc" href="http://192.168.1.2/git/fannie/item/ItemEditorPage.php?searchupc='.$v.
+                    $upclink = '<a class="upc" href="http://'.$_SERVER['HTTP_HOST'].'/git/fannie/item/ItemEditorPage.php?searchupc='.$v.
                         '&ntype=UPC&searchBtn=" target="_blank">'.$v.'</a>';
                     $ret .=  '<td>' . $upclink . '</td>';
                     $curUpc = $v;
