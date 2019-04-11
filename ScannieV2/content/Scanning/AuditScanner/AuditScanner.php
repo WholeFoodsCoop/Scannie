@@ -263,7 +263,9 @@ HTML;
             WHERE curdate() BETWEEN b.startDate AND b.endDate
                 AND sbm.storeID = ?
                 AND bl.upc = ?
-                AND b.batchType BETWEEN 1 AND 12;");
+                AND b.batchType BETWEEN 1 AND 12
+                AND b.batchType <> 4
+                ;");
         $saleQres = $dbc->execute($saleQuery,$saleQueryArgs);
         //$batchList = array( 'price' => array(), 'batchID' => array(), 'batchName' => array() );
         while ($row = $dbc->fetchRow($saleQres)) {
