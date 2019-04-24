@@ -194,66 +194,74 @@ HTML;
     {
         include(__DIR__.'/../config.php');
         $dbc = new SQLManager(${$h}.$regNo, 'pdo_mysql', ${$db}, $SCANUSER, $SCANPASS);
-
-        $upcs = array();
-        foreach ($this->upcs as $k => $v) {
-            $upcs[] = $k;
-        }
-        list($inStr, $args) = $dbc->safeInClause($upcs);
-        $query = "SELECT upc, store_id FROM products WHERE upc IN ({$inStr})
-            AND special_price = 0";
-        $prep = $dbc->prepare($query);
-        $res = $dbc->execute($prep, $args);
-        $laneupcs = array();
-        while ($row = $dbc->fetchRow($res)) {
-            $laneupcs[$row['upc']] = $row['store_id'];
-        }
-
-        $ret = "";
-        $td = "";
-        $stores = array();
-        for ($i=1; $i<=$numstores; $i++) {
-            $stores[] = $i;
-        }
-        $alphaStore = array(1=>'[H]',2=>'[D]');
-        foreach ($laneupcs as $upc => $store_id) {
-            $bids = array();
-            $sps = array();
-            $spstr = "";
-            foreach ($this->upcs[$upc]['B'] as $k => $v) {
-                $bids[] = $k;
-            }
-            foreach ($stores as $store) {
-                foreach ($bids as $bid) {
-                    $sps[] = $this->upcs[$upc]['B'][$bid]['salePrice'][$store];
-                    $curHref = "http://{$FANNIEROOT_DIR}/batches/newbatch/EditBatchPage.php?id=";
-                    $l = "<span style='color: grey'> | </span>";
-                    $spstr .= "{$l}<a href='{$curHref}{$bid}' target='_blank'>"
-                        .$this->upcs[$upc]['B'][$bid]['salePrice'][$store] ."</a>";
+        try {
+            if ($dbc->connections[${$db}] == false) {
+                throw new Exception();
+            } else {
+                $upcs = array();
+                foreach ($this->upcs as $k => $v) {
+                    $upcs[] = $k;
                 }
-                foreach ($bids as $bid) {
-                    if ($saleprice = $this->upcs[$upc]['B'][$bid]['salePrice'][$store]) {
-                        $specialprice = $this->upcs[$upc]['P'][$store];
-                        if ($saleprice != $specialprice && !in_array($specialprice, $sps)) {
-                            $curHref = "http://{$FANNIEROOT_DIR}/batches/batchhistory/BatchHistoryPage.php?upc=";
-                            $ln = "<a href='{$curHref}{$upc}' target='_blank'><span class=\"scanicon-book\"></span></a>";
-                            $ieHref = "<a href='http://{$FANNIEROOT_DIR}/item/ItemEditorPage.php?searchupc={$upc}
-                                &ntype=UPC&searchBtn=' target='_blank'>{$upc}</a>";
-                            $td .= "
-                                <tr>
-                                <td>{$ieHref}</td>
-                                <td>{$this->upcs[$upc]['P']['brand']}</td>
-                                <td>{$this->upcs[$upc]['P']['description']}</td>
-                                <td>{$this->upcs[$upc]['P'][1]} | {$this->upcs[$upc]['P'][2]}</td>
-                                <td>{$ln}{$spstr}</td>
-                                <td>{$regNo}</td>
-                                </tr>";
+                list($inStr, $args) = $dbc->safeInClause($upcs);
+                $query = "SELECT upc, store_id FROM products WHERE upc IN ({$inStr})
+                    AND special_price = 0";
+                $prep = $dbc->prepare($query);
+                $res = $dbc->execute($prep, $args);
+                $laneupcs = array();
+                while ($row = $dbc->fetchRow($res)) {
+                    $laneupcs[$row['upc']] = $row['store_id'];
+                }
+
+                $ret = "";
+                $td = "";
+                $stores = array();
+                for ($i=1; $i<=$numstores; $i++) {
+                    $stores[] = $i;
+                }
+                $alphaStore = array(1=>'[H]',2=>'[D]');
+                foreach ($laneupcs as $upc => $store_id) {
+                    $bids = array();
+                    $sps = array();
+                    $spstr = "";
+                    foreach ($this->upcs[$upc]['B'] as $k => $v) {
+                        $bids[] = $k;
+                    }
+                    foreach ($stores as $store) {
+                        foreach ($bids as $bid) {
+                            $sps[] = $this->upcs[$upc]['B'][$bid]['salePrice'][$store];
+                            $curHref = "http://{$FANNIEROOT_DIR}/batches/newbatch/EditBatchPage.php?id=";
+                            $l = "<span style='color: grey'> | </span>";
+                            $spstr .= "{$l}<a href='{$curHref}{$bid}' target='_blank'>"
+                                .$this->upcs[$upc]['B'][$bid]['salePrice'][$store] ."</a>";
                         }
+                        foreach ($bids as $bid) {
+                            if ($saleprice = $this->upcs[$upc]['B'][$bid]['salePrice'][$store]) {
+                                $specialprice = $this->upcs[$upc]['P'][$store];
+                                if ($saleprice != $specialprice && !in_array($specialprice, $sps)) {
+                                    $curHref = "http://{$FANNIEROOT_DIR}/batches/batchhistory/BatchHistoryPage.php?upc=";
+                                    $ln = "<a href='{$curHref}{$upc}' target='_blank'><span class=\"scanicon-book\"></span></a>";
+                                    $ieHref = "<a href='http://{$FANNIEROOT_DIR}/item/ItemEditorPage.php?searchupc={$upc}
+                                        &ntype=UPC&searchBtn=' target='_blank'>{$upc}</a>";
+                                    $td .= "
+                                        <tr>
+                                        <td>{$ieHref}</td>
+                                        <td>{$this->upcs[$upc]['P']['brand']}</td>
+                                        <td>{$this->upcs[$upc]['P']['description']}</td>
+                                        <td>{$this->upcs[$upc]['P'][1]} | {$this->upcs[$upc]['P'][2]}</td>
+                                        <td>{$ln}{$spstr}</td>
+                                        <td>{$regNo}</td>
+                                        </tr>";
+                                }
+                            }
+                        }
+                        unset($bids);
+                        unset($sps);
                     }
                 }
-                unset($bids);
-                unset($sps);
             }
+        }
+        catch (Exception $e) {
+            //echo $e->getMessage();
         }
 
         return <<<HTML
